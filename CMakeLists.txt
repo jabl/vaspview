@@ -5,7 +5,7 @@
 
 cmake_minimum_required (VERSION 2.6)
 
-project (vaspview C )
+project (vaspview C CXX)
 
 SUBDIRS (src)
 find_package(GLUT)
