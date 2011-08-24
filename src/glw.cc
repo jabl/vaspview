@@ -29,7 +29,6 @@ typedef struct GLWTimerEntry
     GLWActionFunc  func;
 } GLWTimerEntry;
 
-extern CHashTable glw_frame_table;
 extern CHashTable glw_timer_table;
 extern CHashTable glw_idler_table;
 
@@ -37,7 +36,6 @@ extern CHashTable glw_idler_table;
 
 void glwInit(int *_argc,char **_argv)
 {
-    _HTInit(&glw_frame_table,0,int,GLWFrame *,NULL,NULL);
     _HTInit(&glw_timer_table,0,int,GLWTimerEntry,NULL,NULL);
     _HTInit(&glw_idler_table,0,int,GLWTimerEntry,NULL,NULL);
     glutInit(_argc,_argv);
