@@ -5,15 +5,12 @@
 
 cmake_minimum_required (VERSION 2.6)
 
-# Fortran required due to FindLAPACK module
-project (tb C CXX)
+project (vaspview C )
 
+SUBDIRS (src)
 find_package(GLUT)
 find_package(OpenGL)
 set(GLLIBS ${GLUT_LIBRARY} ${OPENGL_LIBRARY} ${X11_LIBRARIES})
-
-#include_directories (src)
-include_directories (${vaspview_SOURCE_DIR}/src)
 
 # More compiler output
 set( CMAKE_VERBOSE_MAKEFILE ON )
@@ -23,12 +20,5 @@ set( CMAKE_VERBOSE_MAKEFILE ON )
 #   add_definitions (-g -msse2 -fopenmp -Wall -Wno-long-long -pedantic)
 #endif ()
    
-add_executable(vaspview ds3.c)
+add_definitions (-O2 -g)
 
-#include(FindLAPACK)
-#if (LAPACK_FOUND)
-#   target_link_libraries (tbcpp ${LAPACK_LIBRARIES})
-#endif ()
-
-#target_link_libraries (vaspview glut GLU GL Xi Xmu Xext X11 m ) 
-target_link_libraries (vaspview ${GLLIBS} m ) 
