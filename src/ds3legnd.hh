@@ -23,14 +23,16 @@ typedef struct DSColorLegend DSColorLegend;
 
 
 
-struct DSColorLegend{
-       GLWComponent  super;
- const DSColorScale *cs;
-       GLubyte       ctable[UCHAR_MAX+1][4];
-       GLWComponent *cm_scale;
-       GLWLabel     *lb_min;
-       GLWLabel     *lb_max;
-       GLWLabel     *lb_label;};
+struct DSColorLegend
+{
+    GLWComponent  super;
+    const DSColorScale *cs;
+    GLubyte       ctable[UCHAR_MAX+1][4];
+    GLWComponent *cm_scale;
+    GLWLabel     *lb_min;
+    GLWLabel     *lb_max;
+    GLWLabel     *lb_label;
+};
 
 
 DSColorLegend *dsColorLegendAlloc(void);
@@ -40,7 +42,7 @@ void           dsColorLegendFree(DSColorLegend *_this);
 
 int            dsColorLegendSetDataSet(DSColorLegend *_this,DataSet3D *_ds3);
 void           dsColorLegendSetColorScale(DSColorLegend *_this,
-                                          const DSColorScale *_cs);
+        const DSColorScale *_cs);
 int            dsColorLegendSetRange(DSColorLegend *_this,double _min,
                                      double _max);
 int            dsColorLegendSetLabel(DSColorLegend *_this,const char *_label);

@@ -23,10 +23,12 @@ typedef struct DS3Bonds DS3Bonds;
 
 
 
-struct DS3Bonds{
- double *bonds;
- long    natoms;
- long    nbonds;};
+struct DS3Bonds
+{
+    double *bonds;
+    long    natoms;
+    long    nbonds;
+};
 
 
 # define _DSBondIdx(_i,_j,_n)                                                 \

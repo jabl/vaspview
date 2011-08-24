@@ -27,234 +27,332 @@
 
 CHashTable glw_frame_table;
 
-static void glwFramePeerDispose(GLWFrame *_this,const GLWCallbacks *_cb){
- glwCompSuperDispose(&_this->super,_cb);
- daDstr(&_this->title);
- htDel(&glw_frame_table,&_this->super.wid,NULL);
- glutDestroyWindow(_this->super.wid);}
+static void glwFramePeerDispose(GLWFrame *_this,const GLWCallbacks *_cb)
+{
+    glwCompSuperDispose(&_this->super,_cb);
+    daDstr(&_this->title);
+    htDel(&glw_frame_table,&_this->super.wid,NULL);
+    glutDestroyWindow(_this->super.wid);
+}
 
-static void glwFramePeerEntry(GLWFrame *_this,const GLWCallbacks *_cb,int _s){
- GLWComponent *focus;
- glwCompSuperEntry(&_this->super,_cb,_s);
- focus=_this->super.focus!=NULL?_this->super.focus:&_this->super;
- if(glwCompIsFocusable(focus))glwCompFocus(focus,_s);}
+static void glwFramePeerEntry(GLWFrame *_this,const GLWCallbacks *_cb,int _s)
+{
+    GLWComponent *focus;
+    glwCompSuperEntry(&_this->super,_cb,_s);
+    focus=_this->super.focus!=NULL?_this->super.focus:&_this->super;
+    if (glwCompIsFocusable(focus))glwCompFocus(focus,_s);
+}
 
-static void glwFrameGlutCursor(GLWFrame *_this){
- GLWComponent *c;
- for(c=&_this->super;c->capture!=NULL;c=c->capture);
- for(;c->parent!=NULL&&c->cursor==GLUT_CURSOR_INHERIT;c=c->parent);
- glutSetCursor(c->cursor);}
+static void glwFrameGlutCursor(GLWFrame *_this)
+{
+    GLWComponent *c;
+    for (c=&_this->super; c->capture!=NULL; c=c->capture);
+    for (; c->parent!=NULL&&c->cursor==GLUT_CURSOR_INHERIT; c=c->parent);
+    glutSetCursor(c->cursor);
+}
 
-static void glwFrameGlutDisplay(void){
- int wid;
- wid=glutGetWindow();
- if(wid!=0){
-  GLWFrame **framep=(GLWFrame **)htGet(&glw_frame_table,&wid);
-  if(framep!=NULL&&*framep!=NULL){
-   int minw;
-   int minh;
-   int maxw;
-   int maxh;
-   int w;
-   int h;
-   glwCompGetMinSize(&(*framep)->super,&minw,&minh);
-   glwCompGetMaxSize(&(*framep)->super,&maxw,&maxh);
-   w=(*framep)->super.bounds.w;
-   h=(*framep)->super.bounds.h;
-   if(maxw>=0&&w>maxw)w=maxw;
-   if(maxh>=0&&h>maxh)h=maxh;
-   if(minw>=0&&w<minw)w=minw;
-   if(minh>=0&&h<minh)h=minh;
-   if(w!=(*framep)->super.bounds.w||h!=(*framep)->super.bounds.h){
-    glutReshapeWindow(w,h);}
-   else{
-    glwCompValidate(&(*framep)->super);
-    glDrawBuffer(GL_BACK);
-    glPushAttrib(GL_ALL_ATTRIB_BITS);
-    glViewport(0,0,(*framep)->super.bounds.w,(*framep)->super.bounds.h);
-    glwCompDisplay(&(*framep)->super);
-    glPopAttrib();
-    glwCompDisplayChildren(&(*framep)->super);
-    glutSwapBuffers();} } } }
+static void glwFrameGlutDisplay(void)
+{
+    int wid;
+    wid=glutGetWindow();
+    if (wid!=0)
+    {
+        GLWFrame **framep=(GLWFrame **)htGet(&glw_frame_table,&wid);
+        if (framep!=NULL&&*framep!=NULL)
+        {
+            int minw;
+            int minh;
+            int maxw;
+            int maxh;
+            int w;
+            int h;
+            glwCompGetMinSize(&(*framep)->super,&minw,&minh);
+            glwCompGetMaxSize(&(*framep)->super,&maxw,&maxh);
+            w=(*framep)->super.bounds.w;
+            h=(*framep)->super.bounds.h;
+            if (maxw>=0&&w>maxw)w=maxw;
+            if (maxh>=0&&h>maxh)h=maxh;
+            if (minw>=0&&w<minw)w=minw;
+            if (minh>=0&&h<minh)h=minh;
+            if (w!=(*framep)->super.bounds.w||h!=(*framep)->super.bounds.h)
+            {
+                glutReshapeWindow(w,h);
+            }
+            else
+            {
+                glwCompValidate(&(*framep)->super);
+                glDrawBuffer(GL_BACK);
+                glPushAttrib(GL_ALL_ATTRIB_BITS);
+                glViewport(0,0,(*framep)->super.bounds.w,(*framep)->super.bounds.h);
+                glwCompDisplay(&(*framep)->super);
+                glPopAttrib();
+                glwCompDisplayChildren(&(*framep)->super);
+                glutSwapBuffers();
+            }
+        }
+    }
+}
 
-static void glwFrameGlutReshape(int _w,int _h){
- int wid;
- wid=glutGetWindow();
- if(wid!=0){
-  GLWFrame **framep=(GLWFrame **)htGet(&glw_frame_table,&wid);
-  if(framep!=NULL&&*framep!=NULL){
-   glwCompSetBounds(&(*framep)->super,(*framep)->super.bounds.x,
-                    (*framep)->super.bounds.y,_w,_h);} } }
+static void glwFrameGlutReshape(int _w,int _h)
+{
+    int wid;
+    wid=glutGetWindow();
+    if (wid!=0)
+    {
+        GLWFrame **framep=(GLWFrame **)htGet(&glw_frame_table,&wid);
+        if (framep!=NULL&&*framep!=NULL)
+        {
+            glwCompSetBounds(&(*framep)->super,(*framep)->super.bounds.x,
+                             (*framep)->super.bounds.y,_w,_h);
+        }
+    }
+}
 
-static void glwFrameGlutVisibility(int _state){
- int wid;
- wid=glutGetWindow();
- if(wid!=0){
-  GLWFrame **framep=(GLWFrame **)htGet(&glw_frame_table,&wid);
-  if(framep!=NULL&&*framep!=NULL){
-   glwCompVisibility(&(*framep)->super,_state==GLUT_VISIBLE?1:0);} } }
+static void glwFrameGlutVisibility(int _state)
+{
+    int wid;
+    wid=glutGetWindow();
+    if (wid!=0)
+    {
+        GLWFrame **framep=(GLWFrame **)htGet(&glw_frame_table,&wid);
+        if (framep!=NULL&&*framep!=NULL)
+        {
+            glwCompVisibility(&(*framep)->super,_state==GLUT_VISIBLE?1:0);
+        }
+    }
+}
 
-static void glwFrameGlutEntry(int _state){
- int wid;
- wid=glutGetWindow();
- if(wid!=0){
-  GLWFrame **framep=(GLWFrame **)htGet(&glw_frame_table,&wid);
-  if(framep!=NULL&&*framep!=NULL){
-   glwCompEntry(&(*framep)->super,_state==GLUT_ENTERED?1:0);} } }
+static void glwFrameGlutEntry(int _state)
+{
+    int wid;
+    wid=glutGetWindow();
+    if (wid!=0)
+    {
+        GLWFrame **framep=(GLWFrame **)htGet(&glw_frame_table,&wid);
+        if (framep!=NULL&&*framep!=NULL)
+        {
+            glwCompEntry(&(*framep)->super,_state==GLUT_ENTERED?1:0);
+        }
+    }
+}
 
-static void glwFrameGlutKeyboard(unsigned char _key,int _x,int _y){
- int wid;
- wid=glutGetWindow();
- if(wid!=0){
-  GLWFrame **framep=(GLWFrame **)htGet(&glw_frame_table,&wid);
-  if(framep!=NULL&&*framep!=NULL){
-   glwCompKeyboard(&(*framep)->super,_key,
-                   _x,(*framep)->super.bounds.h-_y);
-   glwFrameGlutCursor(*framep);} } }
+static void glwFrameGlutKeyboard(unsigned char _key,int _x,int _y)
+{
+    int wid;
+    wid=glutGetWindow();
+    if (wid!=0)
+    {
+        GLWFrame **framep=(GLWFrame **)htGet(&glw_frame_table,&wid);
+        if (framep!=NULL&&*framep!=NULL)
+        {
+            glwCompKeyboard(&(*framep)->super,_key,
+                            _x,(*framep)->super.bounds.h-_y);
+            glwFrameGlutCursor(*framep);
+        }
+    }
+}
 
-static void glwFrameGlutSpecial(int _key,int _x,int _y){
- int wid;
- wid=glutGetWindow();
- if(wid!=0){
-  GLWFrame **framep=(GLWFrame **)htGet(&glw_frame_table,&wid);
-  if(framep!=NULL&&*framep!=NULL){
-   glwCompSpecial(&(*framep)->super,_key,
-                  _x,(*framep)->super.bounds.h-_y);
-   glwFrameGlutCursor(*framep);} } }
+static void glwFrameGlutSpecial(int _key,int _x,int _y)
+{
+    int wid;
+    wid=glutGetWindow();
+    if (wid!=0)
+    {
+        GLWFrame **framep=(GLWFrame **)htGet(&glw_frame_table,&wid);
+        if (framep!=NULL&&*framep!=NULL)
+        {
+            glwCompSpecial(&(*framep)->super,_key,
+                           _x,(*framep)->super.bounds.h-_y);
+            glwFrameGlutCursor(*framep);
+        }
+    }
+}
 
-static void glwFrameGlutMouse(int _but,int _state,int _x,int _y){
- int wid;
- wid=glutGetWindow();
- if(wid!=0){
-  GLWFrame **framep=(GLWFrame **)htGet(&glw_frame_table,&wid);
-  if(framep!=NULL&&*framep!=NULL){
-   glwCompMouse(&(*framep)->super,_but,_state==GLUT_DOWN?1:0,
-                _x,(*framep)->super.bounds.h-_y);
-   glwFrameGlutCursor(*framep);} } }
+static void glwFrameGlutMouse(int _but,int _state,int _x,int _y)
+{
+    int wid;
+    wid=glutGetWindow();
+    if (wid!=0)
+    {
+        GLWFrame **framep=(GLWFrame **)htGet(&glw_frame_table,&wid);
+        if (framep!=NULL&&*framep!=NULL)
+        {
+            glwCompMouse(&(*framep)->super,_but,_state==GLUT_DOWN?1:0,
+                         _x,(*framep)->super.bounds.h-_y);
+            glwFrameGlutCursor(*framep);
+        }
+    }
+}
 
-static void glwFrameGlutMotion(int _x,int _y){
- int wid;
- wid=glutGetWindow();
- if(wid!=0){
-  GLWFrame **framep=(GLWFrame **)htGet(&glw_frame_table,&wid);
-  if(framep!=NULL&&*framep!=NULL){
-   glwCompMotion(&(*framep)->super,
-                 _x,(*framep)->super.bounds.h-_y);
-   glwFrameGlutCursor(*framep);} } }
+static void glwFrameGlutMotion(int _x,int _y)
+{
+    int wid;
+    wid=glutGetWindow();
+    if (wid!=0)
+    {
+        GLWFrame **framep=(GLWFrame **)htGet(&glw_frame_table,&wid);
+        if (framep!=NULL&&*framep!=NULL)
+        {
+            glwCompMotion(&(*framep)->super,
+                          _x,(*framep)->super.bounds.h-_y);
+            glwFrameGlutCursor(*framep);
+        }
+    }
+}
 
-static void glwFrameGlutPassiveMotion(int _x,int _y){
- int wid;
- wid=glutGetWindow();
- if(wid!=0){
-  GLWFrame **framep=(GLWFrame **)htGet(&glw_frame_table,&wid);
-  if(framep!=NULL&&*framep!=NULL){
-   glwCompPassiveMotion(&(*framep)->super,
-                        _x,(*framep)->super.bounds.h-_y);
-   glwFrameGlutCursor(*framep);} } }
-
-
-const GLWCallbacks GLW_FRAME_CALLBACKS={
- &GLW_COMPONENT_CALLBACKS,
- (GLWDisposeFunc)glwFramePeerDispose,
- NULL,
- NULL,
- NULL/*(GLWValidateFunc)glwFramePeerValidate*/,
- NULL,
- NULL,
- NULL,
- (GLWEntryFunc)glwFramePeerEntry,
- NULL,
- NULL,
- NULL,
- NULL,
- NULL};
-
-
-GLWFrame *glwFrameAlloc(const char *_title){
- GLWFrame *this_;
- this_=(GLWFrame *)malloc(sizeof(GLWFrame));
- if(this_!=NULL){
-  if(glwFrameInit(this_,_title)){
-   return this_;}
-  free(this_);}
- return NULL;}
-
-int glwFrameInit(GLWFrame *_this,const char *_title){
- int wid;
- wid=glutCreateWindow(_title);
- if(wid!=0){
-  if(htIns(&glw_frame_table,&wid,&_this)!=NULL){
-   glwCompInit(&_this->super);
-   _DAInit(&_this->title,0,char);
-   if(daInsArrayHead(&_this->title,_title,strlen(_title)+1)){
-    _this->super.wid=wid;
-    _this->super.callbacks=&GLW_FRAME_CALLBACKS;
-    glwCompSetCursor(&_this->super,GLUT_CURSOR_RIGHT_ARROW);
-    glutDisplayFunc(glwFrameGlutDisplay);
-    glutReshapeFunc(glwFrameGlutReshape);
-    glutVisibilityFunc(glwFrameGlutVisibility);
-    glutEntryFunc(glwFrameGlutEntry);
-    glutKeyboardFunc(glwFrameGlutKeyboard);
-    glutSpecialFunc(glwFrameGlutSpecial);
-    glutMouseFunc(glwFrameGlutMouse);
-    glutMotionFunc(glwFrameGlutMotion);
-    glutPassiveMotionFunc(glwFrameGlutPassiveMotion);
-    return 1;}
-   daDstr(&_this->title);
-   glwCompDstr(&_this->super);
-   htDel(&glw_frame_table,&wid,NULL);}
-  glutDestroyWindow(wid);}
- return 0;}
-
-void glwFrameDstr(GLWFrame *_this){
- glwCompDstr(&_this->super);}
-
-void glwFrameFree(GLWFrame *_this){
- glwCompFree(&_this->super);}
+static void glwFrameGlutPassiveMotion(int _x,int _y)
+{
+    int wid;
+    wid=glutGetWindow();
+    if (wid!=0)
+    {
+        GLWFrame **framep=(GLWFrame **)htGet(&glw_frame_table,&wid);
+        if (framep!=NULL&&*framep!=NULL)
+        {
+            glwCompPassiveMotion(&(*framep)->super,
+                                 _x,(*framep)->super.bounds.h-_y);
+            glwFrameGlutCursor(*framep);
+        }
+    }
+}
 
 
-int glwFrameSetTitle(GLWFrame *_this,const char *_title){
- size_t len;
- len=strlen(_title)+1;
- if(daSetSize(&_this->title,len)){
-  int wid;
-  memcpy(_DAGetAt(&_this->title,0,char),_title,len);
-  wid=glutGetWindow();
-  if(wid!=_this->super.wid)glutSetWindow(_this->super.wid);
-  glutSetWindowTitle(_title);
-  glutSetIconTitle(_title);
-  if(wid!=_this->super.wid)glutSetWindow(wid);
-  return 1;}
- return 0;}
+const GLWCallbacks GLW_FRAME_CALLBACKS=
+{
+    &GLW_COMPONENT_CALLBACKS,
+    (GLWDisposeFunc)glwFramePeerDispose,
+    NULL,
+    NULL,
+    NULL/*(GLWValidateFunc)glwFramePeerValidate*/,
+    NULL,
+    NULL,
+    NULL,
+    (GLWEntryFunc)glwFramePeerEntry,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL
+};
 
-const char *glwFrameGetTitle(GLWFrame *_this){
- return _DAGetAt(&_this->title,0,char);}
 
-void glwFrameShow(GLWFrame *_this){
- int wid;
- wid=glutGetWindow();
- if(wid!=_this->super.wid)glutSetWindow(_this->super.wid);
- glutShowWindow();
- if(wid!=_this->super.wid)glutSetWindow(wid);}
+GLWFrame *glwFrameAlloc(const char *_title)
+{
+    GLWFrame *this_;
+    this_=(GLWFrame *)malloc(sizeof(GLWFrame));
+    if (this_!=NULL)
+    {
+        if (glwFrameInit(this_,_title))
+        {
+            return this_;
+        }
+        free(this_);
+    }
+    return NULL;
+}
 
-void glwFrameHide(GLWFrame *_this){
- int wid;
- wid=glutGetWindow();
- if(wid!=_this->super.wid)glutSetWindow(_this->super.wid);
- glutHideWindow();
- if(wid!=_this->super.wid)glutSetWindow(wid);}
+int glwFrameInit(GLWFrame *_this,const char *_title)
+{
+    int wid;
+    wid=glutCreateWindow(_title);
+    if (wid!=0)
+    {
+        if (htIns(&glw_frame_table,&wid,&_this)!=NULL)
+        {
+            glwCompInit(&_this->super);
+            _DAInit(&_this->title,0,char);
+            if (daInsArrayHead(&_this->title,_title,strlen(_title)+1))
+            {
+                _this->super.wid=wid;
+                _this->super.callbacks=&GLW_FRAME_CALLBACKS;
+                glwCompSetCursor(&_this->super,GLUT_CURSOR_RIGHT_ARROW);
+                glutDisplayFunc(glwFrameGlutDisplay);
+                glutReshapeFunc(glwFrameGlutReshape);
+                glutVisibilityFunc(glwFrameGlutVisibility);
+                glutEntryFunc(glwFrameGlutEntry);
+                glutKeyboardFunc(glwFrameGlutKeyboard);
+                glutSpecialFunc(glwFrameGlutSpecial);
+                glutMouseFunc(glwFrameGlutMouse);
+                glutMotionFunc(glwFrameGlutMotion);
+                glutPassiveMotionFunc(glwFrameGlutPassiveMotion);
+                return 1;
+            }
+            daDstr(&_this->title);
+            glwCompDstr(&_this->super);
+            htDel(&glw_frame_table,&wid,NULL);
+        }
+        glutDestroyWindow(wid);
+    }
+    return 0;
+}
 
-void glwFramePack(GLWFrame *_this){
- int prew;
- int preh;
- glwCompGetPreSize(&_this->super,&prew,&preh);
- if(prew>=0||preh>=0){
-  int wid;
-  if(prew<0)prew=_this->super.bounds.w;
-  if(preh<0)preh=_this->super.bounds.h;
-  wid=glutGetWindow();
-  if(wid!=_this->super.wid)glutSetWindow(_this->super.wid);
-  glutReshapeWindow(prew,preh);
-  if(wid!=_this->super.wid)glutSetWindow(wid);} }
+void glwFrameDstr(GLWFrame *_this)
+{
+    glwCompDstr(&_this->super);
+}
+
+void glwFrameFree(GLWFrame *_this)
+{
+    glwCompFree(&_this->super);
+}
+
+
+int glwFrameSetTitle(GLWFrame *_this,const char *_title)
+{
+    size_t len;
+    len=strlen(_title)+1;
+    if (daSetSize(&_this->title,len))
+    {
+        int wid;
+        memcpy(_DAGetAt(&_this->title,0,char),_title,len);
+        wid=glutGetWindow();
+        if (wid!=_this->super.wid)glutSetWindow(_this->super.wid);
+        glutSetWindowTitle(_title);
+        glutSetIconTitle(_title);
+        if (wid!=_this->super.wid)glutSetWindow(wid);
+        return 1;
+    }
+    return 0;
+}
+
+const char *glwFrameGetTitle(GLWFrame *_this)
+{
+    return _DAGetAt(&_this->title,0,char);
+}
+
+void glwFrameShow(GLWFrame *_this)
+{
+    int wid;
+    wid=glutGetWindow();
+    if (wid!=_this->super.wid)glutSetWindow(_this->super.wid);
+    glutShowWindow();
+    if (wid!=_this->super.wid)glutSetWindow(wid);
+}
+
+void glwFrameHide(GLWFrame *_this)
+{
+    int wid;
+    wid=glutGetWindow();
+    if (wid!=_this->super.wid)glutSetWindow(_this->super.wid);
+    glutHideWindow();
+    if (wid!=_this->super.wid)glutSetWindow(wid);
+}
+
+void glwFramePack(GLWFrame *_this)
+{
+    int prew;
+    int preh;
+    glwCompGetPreSize(&_this->super,&prew,&preh);
+    if (prew>=0||preh>=0)
+    {
+        int wid;
+        if (prew<0)prew=_this->super.bounds.w;
+        if (preh<0)preh=_this->super.bounds.h;
+        wid=glutGetWindow();
+        if (wid!=_this->super.wid)glutSetWindow(_this->super.wid);
+        glutReshapeWindow(prew,preh);
+        if (wid!=_this->super.wid)glutSetWindow(wid);
+    }
+}
 
 #endif                                                           /*_glwframe_C*/

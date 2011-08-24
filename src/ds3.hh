@@ -149,29 +149,33 @@ typedef double   (*DSUnscaleFunc)(const DSDataScale *_this,double _v);
 
 
 
-struct DSPoint3D{
- Vect3d   pos;
- int      typ;
- double   col;};
+struct DSPoint3D
+{
+    Vect3d   pos;
+    int      typ;
+    double   col;
+};
 
 
 
 # define _DS3Index(_this,_x,_y,_z)                                            \
  ((_x)+(_this)->density[0]*((_y)+(_this)->density[1]*(_z)))
 
-struct DataSet3D{
- char           *name;                                  /*Name of the data set*/
- char           *label[4];                      /*Label of three axes and data*/
- char           *units[4];                     /*Units for three axes and data*/
- Vect3d          basis[3];                         /*Basis vectors for lattice*/
- Vect3d          center;                               /*Center of the lattice*/
- size_t          npoints;                                   /*Number of points*/
- DSPoint3D      *points;                                     /*Discrete points*/
- /*DSLine3D       *lines;*/                                 /*Lines between points*/
- size_t          density[3];       /*Dimensions of packed array of data values*/
- double         *data;                               /*3D packed array of data*/
- double          min;                                     /*Minimum data value*/
- double          max;};                                   /*Maximum data value*/
+struct DataSet3D
+{
+    char           *name;                                  /*Name of the data set*/
+    char           *label[4];                      /*Label of three axes and data*/
+    char           *units[4];                     /*Units for three axes and data*/
+    Vect3d          basis[3];                         /*Basis vectors for lattice*/
+    Vect3d          center;                               /*Center of the lattice*/
+    size_t          npoints;                                   /*Number of points*/
+    DSPoint3D      *points;                                     /*Discrete points*/
+    /*DSLine3D       *lines;*/                                 /*Lines between points*/
+    size_t          density[3];       /*Dimensions of packed array of data values*/
+    double         *data;                               /*3D packed array of data*/
+    double          min;                                     /*Minimum data value*/
+    double          max;
+};                                   /*Maximum data value*/
 
 
 void ds3Init(DataSet3D *_this);
@@ -179,8 +183,10 @@ void ds3Dstr(DataSet3D *_this);
 
 
 
-struct DSColorScale{
- DSColorScaleFunc scale;};
+struct DSColorScale
+{
+    DSColorScaleFunc scale;
+};
 
 
 # define dsColorScale(_this,_v)                                               \
@@ -198,9 +204,11 @@ extern const DSColorScale DS_RAINBOW_SCALE;
 
 
 
-struct DSDataScale{
- DSScaleFunc   scale;
- DSUnscaleFunc unscale;};
+struct DSDataScale
+{
+    DSScaleFunc   scale;
+    DSUnscaleFunc unscale;
+};
 
 
 # define dsScale(_this,_data)                                                 \
@@ -211,10 +219,12 @@ struct DSDataScale{
 
 
 
-struct DSLinearScale{
- DSDataScale super;
- double      mul;
- double      offs;};
+struct DSLinearScale
+{
+    DSDataScale super;
+    double      mul;
+    double      offs;
+};
 
 
 void dsLinearScaleInit(DSLinearScale *_this,double _min,double _max);
@@ -224,10 +234,12 @@ extern const DSLinearScale DS_LINEAR_SCALE_IDENTITY;
 
 
 
-struct DSLogScale{
- DSDataScale super;
- double      mul;
- double      offs;};
+struct DSLogScale
+{
+    DSDataScale super;
+    double      mul;
+    double      offs;
+};
 
 
 void dsLogScaleInit(DSLogScale *_this,double _min,double _max);

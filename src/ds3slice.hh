@@ -24,13 +24,15 @@ typedef struct DS3Slice DS3Slice;
 
 
 
-struct DS3Slice{
- int            t_sz;                              /*Size of the slice texture*/
- int            i_id;              /*Timer ID for making the high-detail slice*/
- GLuint         t_id;                                /*ID of the slice texture*/
- GLubyte       *txtr;                                    /*Texture data buffer*/
- unsigned char *cdata;                      /*3D packed array of color indices*/
- GLubyte        ctable[UCHAR_MAX+1][4];};                        /*Color table*/
+struct DS3Slice
+{
+    int            t_sz;                              /*Size of the slice texture*/
+    int            i_id;              /*Timer ID for making the high-detail slice*/
+    GLuint         t_id;                                /*ID of the slice texture*/
+    GLubyte       *txtr;                                    /*Texture data buffer*/
+    unsigned char *cdata;                      /*3D packed array of color indices*/
+    GLubyte        ctable[UCHAR_MAX+1][4];
+};                        /*Color table*/
 
 void ds3SliceInit(DS3Slice *_this,size_t _dens[3]);
 void ds3SliceDstr(DS3Slice *_this,DS3View *_view);

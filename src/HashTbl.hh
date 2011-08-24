@@ -49,10 +49,12 @@ typedef unsigned (*HTHashFunc)(void *_ctx,const void *_key);
 /*An entry in the hash table. This holds the actual data for up to
   HashTable.grp_sz key/value pairs, and links to the next group in the
   collision list                                                              */
-struct CHashGroup{
- CHashGroup    *next;                   /*The next group in the collision list*/
- unsigned       inuse;  /*Bitfield indicating which key/value pairs are filled*/
- unsigned char  data[1];};                      /*Data for the key/value pairs*/
+struct CHashGroup
+{
+    CHashGroup    *next;                   /*The next group in the collision list*/
+    unsigned       inuse;  /*Bitfield indicating which key/value pairs are filled*/
+    unsigned char  data[1];
+};                      /*Data for the key/value pairs*/
 
 
 
@@ -97,20 +99,22 @@ struct CHashGroup{
   When removing key/value pairs, you should supply a non-NULL pointer for the
   'val' parameter to htDel(), which will give you access to the old key/value
   pair after they are removed from the table                                  */
-struct CHashTable{
- size_t         key_sz;                         /*The number of bytes in a key*/
- size_t         val_sz;                       /*The number of bytes in a value*/
- unsigned       grp_sz;                /*The number of entries in a hash group*/
- size_t         thresh; /*Number of entries at which the capacity is increased*/
- double         load;    /*Determines the threshold: thresh=(size_t)(load*cap)*/
- HTKeyCmpFunc   cmp;                           /*The compare function for keys*/
- HTHashFunc     hash;                             /*The hash function for keys*/
- void          *cmp_ctx;    /*The context value passed to the compare function*/
- void          *hash_ctx;      /*The context value passed to the hash function*/
- size_t         mod_count;      /*Value used to detect concurrent modification*/
- size_t         size;                           /*The number of entries in use*/
- size_t         cap;                        /*The size of the hash group table*/
- CHashGroup   **table;};                         /*The hash group table itself*/
+struct CHashTable
+{
+    size_t         key_sz;                         /*The number of bytes in a key*/
+    size_t         val_sz;                       /*The number of bytes in a value*/
+    unsigned       grp_sz;                /*The number of entries in a hash group*/
+    size_t         thresh; /*Number of entries at which the capacity is increased*/
+    double         load;    /*Determines the threshold: thresh=(size_t)(load*cap)*/
+    HTKeyCmpFunc   cmp;                           /*The compare function for keys*/
+    HTHashFunc     hash;                             /*The hash function for keys*/
+    void          *cmp_ctx;    /*The context value passed to the compare function*/
+    void          *hash_ctx;      /*The context value passed to the hash function*/
+    size_t         mod_count;      /*Value used to detect concurrent modification*/
+    size_t         size;                           /*The number of entries in use*/
+    size_t         cap;                        /*The size of the hash group table*/
+    CHashGroup   **table;
+};                         /*The hash group table itself*/
 
 
 
@@ -122,14 +126,16 @@ struct CHashTable{
   next attempt to access a value from the table, or increment the iterator.
   Like the HashTable, no synchronization is provided for multi-threaded
   applications                                                                */
-struct CHashIterator{
- CHashTable *hash_table;               /*The hash table that is being iterated*/
- CHashGroup *entry;
- CHashGroup *next;
- size_t      grp;
- unsigned    off;
- size_t      k_off;
- size_t      mod_count;};
+struct CHashIterator
+{
+    CHashTable *hash_table;               /*The hash table that is being iterated*/
+    CHashGroup *entry;
+    CHashGroup *next;
+    size_t      grp;
+    unsigned    off;
+    size_t      k_off;
+    size_t      mod_count;
+};
 
 
 
@@ -187,25 +193,25 @@ unsigned htDefHashFunc(void *_ctx,const void *_key);
              compare function each time it is called
   hash_ctx: The hash function context. This value is passed verbatim to the
              hash function each time it is called                             */
-      void  htInit(CHashTable *_this,size_t _key_sz,size_t _val_sz,
-                   HTKeyCmpFunc _cmp,HTHashFunc _hash,
-                   size_t _cap,double _load,unsigned _grp_sz,
-                   void *_cmp_ctx,void *_hash_ctx);
+void  htInit(CHashTable *_this,size_t _key_sz,size_t _val_sz,
+             HTKeyCmpFunc _cmp,HTHashFunc _hash,
+             size_t _cap,double _load,unsigned _grp_sz,
+             void *_cmp_ctx,void *_hash_ctx);
 
 # define _HTInit(_this,_cap,_key_type,_val_type,_cmp,_hash)                   \
  (htInit((_this),sizeof(_key_type),sizeof(_val_type),                         \
          (_cmp),(_hash),(_cap),0,0,NULL,NULL))
- 
+
 /*Makes a shallow copy of the hash table. This means that all key-value pairs
   are copied by value. New, separate memory space is allocated for the
   internal structure of the hash table, however, so that it can be modified
   without causing any change to the original hash table.
   that: The new, uninitialized hash table to clone this one into
   Return: true iff the cloning was succesful                                  */
-      int   htClone(CHashTable *_this,CHashTable *_that);
+int   htClone(CHashTable *_this,CHashTable *_that);
 
 /*Frees all resources currently used by this hash table                       */
-      void  htDstr(CHashTable *_this);
+void  htDstr(CHashTable *_this);
 
 
 /*Determines if a key is contained in the hash table. If so, it returns a
@@ -215,7 +221,7 @@ unsigned htDefHashFunc(void *_ctx,const void *_key);
   key: A pointer to the key to search for
   Return: A pointer to the key, or NULL if it was not found                   */
 const void *htGetKey(const CHashTable *_this,const void *_key);
- 
+
 /*Gets a pointer to the value which is stored in the hash table for this key.
   If the key is not found in the hash table, returns NULL. This pointer is
   suitable for short term access only. Subsequent calls to functions which
@@ -224,7 +230,7 @@ const void *htGetKey(const CHashTable *_this,const void *_key);
   key: A pointer to the key to retrieve the value for
   Return: A pointer to the value stored with this key, or NULL if the key was
            not found                                                          */
-      void *htGet(const CHashTable *_this,const void *_key);
+void *htGet(const CHashTable *_this,const void *_key);
 
 /*Associates the specified value with the specified key. The hash table should
   not already contain a mapping for this key. New space is allocated if
@@ -238,7 +244,7 @@ const void *htGetKey(const CHashTable *_this,const void *_key);
   val:  A pointer to the value to associate with the key
   Return: A pointer the the new location of the value in the hash table, or
            NULL, if the value could not be inserted.                          */
-      void *htIns(CHashTable *_this,const void *_key,const void *_val);
+void *htIns(CHashTable *_this,const void *_key,const void *_val);
 
 /*Associates the specified value with the specified key. If the hash table
   previously contained a mapping for this key, the old value is replaced, and
@@ -254,20 +260,20 @@ const void *htGetKey(const CHashTable *_this,const void *_key);
   val:  A pointer to the value to associate with the key
   Return: A pointer the the new location of the value in the hash table, or
            NULL, if the value could not be inserted.                          */
-      void *htPut(CHashTable *_this,const void *_key,const void *_val);
+void *htPut(CHashTable *_this,const void *_key,const void *_val);
 
 /*Removes the mapping for this key from this hash table if present. mod_count
-  is increased to reflect the change 
+  is increased to reflect the change
   key: The key whose mapping is to be removed from the map
   val: A place to store the value that used to be associated with this key. If
         this is not NULL, the value will be copied into this location before
         its storage in the hash table is deallocated, and the key found in the
         hash table will also be copied into the key location
   Return: true iff the key was found and removed                              */
-      int   htDel(CHashTable *_this,void *_key,void *_val);
+int   htDel(CHashTable *_this,void *_key,void *_val);
 
 /*Removes all mappings from this hash table                                   */
-      void  htClear(CHashTable *_this);
+void  htClear(CHashTable *_this);
 
 
 

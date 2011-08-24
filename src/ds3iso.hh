@@ -29,29 +29,37 @@ typedef struct DS3IsoSurface DS3IsoSurface;
 # define DS3V_NO_EDGE  (-1L)
 # define DS3V_NO_CHILD (-1L)
 
-struct DS3IsoVertex{
- Vect3d vert;
- Vect3d norm;};
+struct DS3IsoVertex
+{
+    Vect3d vert;
+    Vect3d norm;
+};
 
 
 
-struct DS3IsoOctNode{
- long node[8];};
+struct DS3IsoOctNode
+{
+    long node[8];
+};
 
 
 
-struct DS3IsoOctLeaf{
- GLint nverts;
- GLint verts[15];};
+struct DS3IsoOctLeaf
+{
+    GLint nverts;
+    GLint verts[15];
+};
 
 
 
-struct DS3IsoSurface{
- CDynArray verts;
- CDynArray nodes;
- CDynArray leafs;
- long      dim;
- long      stp;};
+struct DS3IsoSurface
+{
+    CDynArray verts;
+    CDynArray nodes;
+    CDynArray leafs;
+    long      dim;
+    long      stp;
+};
 
 
 void ds3IsoInit(DS3IsoSurface *_this,size_t _dens[3]);

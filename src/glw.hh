@@ -73,19 +73,23 @@ typedef struct GLWTabbedPane         GLWTabbedPane;
 
 
 
-struct GLWRect{
- int x;
- int y;
- int w;
- int h;};
+struct GLWRect
+{
+    int x;
+    int y;
+    int w;
+    int h;
+};
 
 
 
-struct GLWInsets{
- int t;
- int b;
- int l;
- int r;};
+struct GLWInsets
+{
+    int t;
+    int b;
+    int l;
+    int r;
+};
 
 
 
@@ -113,21 +117,23 @@ typedef int  (*GLWMotionFunc)(GLWComponent *_this,const GLWCallbacks *_cb,
                               int _x,int _y);
 typedef int  (*GLWDisposeFunc)(GLWComponent *_this,const GLWCallbacks *_cb);
 
-struct GLWCallbacks{
- const GLWCallbacks      *super;
-       GLWDisposeFunc     dispose;
-       GLWDisplayFunc     display;
-       GLWDisplayFunc     display_children;
-       GLWValidateFunc    validate;
-       GLWEnableFunc      enable;
-       GLWFocusFunc       focus;
-       GLWVisibilityFunc  visibility;
-       GLWEntryFunc       entry;
-       GLWKeyboardFunc    keyboard;
-       GLWSpecialFunc     special;
-       GLWMouseFunc       mouse;
-       GLWMotionFunc      motion;
-       GLWMotionFunc      passive_motion;};
+struct GLWCallbacks
+{
+    const GLWCallbacks      *super;
+    GLWDisposeFunc     dispose;
+    GLWDisplayFunc     display;
+    GLWDisplayFunc     display_children;
+    GLWValidateFunc    validate;
+    GLWEnableFunc      enable;
+    GLWFocusFunc       focus;
+    GLWVisibilityFunc  visibility;
+    GLWEntryFunc       entry;
+    GLWKeyboardFunc    keyboard;
+    GLWSpecialFunc     special;
+    GLWMouseFunc       mouse;
+    GLWMotionFunc      motion;
+    GLWMotionFunc      passive_motion;
+};
 
 # define GLWC_RELATIVE   (-1)
 # define GLWC_REMAINDER  (0)
@@ -152,68 +158,76 @@ struct GLWCallbacks{
 # define GLWC_SNAP_ALWAYS (-1)
 # define GLWC_SNAP_NEVER  (0)
 
-struct GLWConstraints{
- int       minw;
- int       minh;
- int       prew;
- int       preh;
- int       maxw;
- int       maxh;
- GLWInsets insets;
- double    alignx;
- double    aligny;
- int       fill;
- int       gridx;
- int       gridy;
- int       gridw;
- int       gridh;
- double    weightx;
- double    weighty;};
+struct GLWConstraints
+{
+    int       minw;
+    int       minh;
+    int       prew;
+    int       preh;
+    int       maxw;
+    int       maxh;
+    GLWInsets insets;
+    double    alignx;
+    double    aligny;
+    int       fill;
+    int       gridx;
+    int       gridy;
+    int       gridw;
+    int       gridh;
+    double    weightx;
+    double    weighty;
+};
 
 typedef void (*GLWLayoutFunc)(GLWLayoutManager *_this,GLWComponent *_comp);
 typedef void (*GLWLayoutSizeFunc)(GLWLayoutManager *_this,GLWComponent *_comp,
                                   int *_w,int *_h);
 
-struct GLWLayoutManager{
- GLWLayoutFunc     layout;
- GLWLayoutFunc     invalidate;
- GLWLayoutSizeFunc min_size;
- GLWLayoutSizeFunc pre_size;
- GLWLayoutSizeFunc max_size;
- GLWLayoutFunc     dispose;};
+struct GLWLayoutManager
+{
+    GLWLayoutFunc     layout;
+    GLWLayoutFunc     invalidate;
+    GLWLayoutSizeFunc min_size;
+    GLWLayoutSizeFunc pre_size;
+    GLWLayoutSizeFunc max_size;
+    GLWLayoutFunc     dispose;
+};
 
 
 
-typedef struct GLWGBLCInfo{
- int min_w;
- int min_h;
- int pre_w;
- int pre_h;
- int max_w;
- int max_h;
- int x;
- int y;
- int w;
- int h;}GLWGBLCInfo;
+typedef struct GLWGBLCInfo
+{
+    int min_w;
+    int min_h;
+    int pre_w;
+    int pre_h;
+    int max_w;
+    int max_h;
+    int x;
+    int y;
+    int w;
+    int h;
+} GLWGBLCInfo;
 
-struct GLWGridBagLayout{
- GLWLayoutManager  super;
- int               w;
- int               h;
- int               start_x;
- int               start_y;
- int              *min_w;
- int              *min_h;
- int              *pre_w;
- int              *pre_h;
- int              *adj_w;
- int              *adj_h;
- double           *weight_x;
- double           *weight_y;
- GLWGBLCInfo      *cache;
- GLWComponent     *comp;
- unsigned          valid:1;
- unsigned          validating:1;};
+struct GLWGridBagLayout
+{
+    GLWLayoutManager  super;
+    int               w;
+    int               h;
+    int               start_x;
+    int               start_y;
+    int              *min_w;
+    int              *min_h;
+    int              *pre_w;
+    int              *pre_h;
+    int              *adj_w;
+    int              *adj_h;
+    double           *weight_x;
+    double           *weight_y;
+    GLWGBLCInfo      *cache;
+    GLWComponent     *comp;
+    unsigned          valid:1;
+    unsigned          validating:1;
+};
 
 
 GLWGridBagLayout *glwGridBagLayoutAlloc(void);
@@ -223,29 +237,31 @@ void              glwGridBagLayoutFree(GLWGridBagLayout *_this);
 
 
 
-struct GLWComponent{
-       GLWComponent     *parent;
- const GLWCallbacks     *callbacks;
-       GLWRect           bounds;
-       GLWConstraints    constraints;
-       GLWcolor          forec;
-       GLWcolor          backc;
-       GLWfont           font;
-       GLWcursor         cursor;
-       CDynArray         comps;
-       CDynArray         timers;
-       CDynArray         idlers;
-       GLWLayoutManager *layout;
-       GLWComponent     *focus;                 /*Currently focused descendant*/
-       GLWComponent     *capture;           /*Current child with mouse capture*/
-       unsigned          mouse_b;                         /*Mouse button state*/
-       int               wid;                                 /*GLUT Window id*/
-       unsigned          visible:1;
-       unsigned          enabled:1;
-       unsigned          valid:1;
-       unsigned          validate_root:1;
-       unsigned          focused:1;
-       unsigned          focusable:1;};
+struct GLWComponent
+{
+    GLWComponent     *parent;
+    const GLWCallbacks     *callbacks;
+    GLWRect           bounds;
+    GLWConstraints    constraints;
+    GLWcolor          forec;
+    GLWcolor          backc;
+    GLWfont           font;
+    GLWcursor         cursor;
+    CDynArray         comps;
+    CDynArray         timers;
+    CDynArray         idlers;
+    GLWLayoutManager *layout;
+    GLWComponent     *focus;                 /*Currently focused descendant*/
+    GLWComponent     *capture;           /*Current child with mouse capture*/
+    unsigned          mouse_b;                         /*Mouse button state*/
+    int               wid;                                 /*GLUT Window id*/
+    unsigned          visible:1;
+    unsigned          enabled:1;
+    unsigned          valid:1;
+    unsigned          validate_root:1;
+    unsigned          focused:1;
+    unsigned          focusable:1;
+};
 
 
 extern const GLWCallbacks GLW_COMPONENT_CALLBACKS;
@@ -341,7 +357,7 @@ void           glwCompDispose(GLWComponent *_this);
 void           glwCompSuperDisplay(GLWComponent *_this,
                                    const GLWCallbacks *_cb);
 void           glwCompSuperDisplayChildren(GLWComponent *_this,
-                                           const GLWCallbacks *_cb);
+        const GLWCallbacks *_cb);
 void           glwCompSuperValidate(GLWComponent *_this,
                                     const GLWCallbacks *_cb);
 void           glwCompSuperEnable(GLWComponent *_this,const GLWCallbacks *_cb,
@@ -363,146 +379,156 @@ int            glwCompSuperMouse(GLWComponent *_this,const GLWCallbacks *_cb,
 int            glwCompSuperMotion(GLWComponent *_this,const GLWCallbacks *_cb,
                                   int _x,int _y);
 int            glwCompSuperPassiveMotion(GLWComponent *_this,
-                                         const GLWCallbacks *_cb,
-                                         int _x,int _y);
+        const GLWCallbacks *_cb,
+        int _x,int _y);
 void           glwCompSuperDispose(GLWComponent *_this,
                                    const GLWCallbacks *_cb);
 
 
 
-struct GLWFrame{
- GLWComponent  super;
- CDynArray     title;};
+struct GLWFrame
+{
+    GLWComponent  super;
+    CDynArray     title;
+};
 
 
 extern const GLWCallbacks GLW_FRAME_CALLBACKS;
 
-      GLWFrame *glwFrameAlloc(const char *_title);
-      int       glwFrameInit(GLWFrame *_this,const char *_title);
-      void      glwFrameDstr(GLWFrame *_this);
-      void      glwFrameFree(GLWFrame *_this);
+GLWFrame *glwFrameAlloc(const char *_title);
+int       glwFrameInit(GLWFrame *_this,const char *_title);
+void      glwFrameDstr(GLWFrame *_this);
+void      glwFrameFree(GLWFrame *_this);
 
-      int       glwFrameSetTitle(GLWFrame *_this,const char *_title);
+int       glwFrameSetTitle(GLWFrame *_this,const char *_title);
 const char     *glwFrameGetTitle(GLWFrame *_this);
-      void      glwFrameShow(GLWFrame *_this);
-      void      glwFrameHide(GLWFrame *_this);
-      void      glwFramePack(GLWFrame *_this);
+void      glwFrameShow(GLWFrame *_this);
+void      glwFrameHide(GLWFrame *_this);
+void      glwFramePack(GLWFrame *_this);
 
 
 
-struct GLWLabel{
- GLWComponent super;
- CDynArray    label;};
+struct GLWLabel
+{
+    GLWComponent super;
+    CDynArray    label;
+};
 
 
 extern const GLWCallbacks GLW_LABEL_CALLBACKS;
 
-      GLWLabel *glwLabelAlloc(const char *_label);
-      int       glwLabelInit(GLWLabel *_this,const char *_label);
-      void      glwLabelDstr(GLWLabel *_this);
-      void      glwLabelFree(GLWLabel *_this);
+GLWLabel *glwLabelAlloc(const char *_label);
+int       glwLabelInit(GLWLabel *_this,const char *_label);
+void      glwLabelDstr(GLWLabel *_this);
+void      glwLabelFree(GLWLabel *_this);
 
 const char     *glwLabelGetLabel(GLWLabel *_this);
-      int       glwLabelSetLabel(GLWLabel *_this,const char *_label);
-      int       glwLabelAddLabel(GLWLabel *_this,const char *_label);
+int       glwLabelSetLabel(GLWLabel *_this,const char *_label);
+int       glwLabelAddLabel(GLWLabel *_this,const char *_label);
 
 
 
-struct GLWButton{
- GLWComponent   super;
- CDynArray      label;
- GLWActionFunc  pressed;
- void          *pressed_ctx;
- unsigned       down:1;
- unsigned       release:1;};
+struct GLWButton
+{
+    GLWComponent   super;
+    CDynArray      label;
+    GLWActionFunc  pressed;
+    void          *pressed_ctx;
+    unsigned       down:1;
+    unsigned       release:1;
+};
 
 
 extern const GLWCallbacks GLW_BUTTON_CALLBACKS;
 
-      GLWButton     *glwButtonAlloc(const char *_label);
-      int            glwButtonInit(GLWButton *_this,const char *_label);
-      void           glwButtonDstr(GLWButton *_this);
-      void           glwButtonFree(GLWButton *_this);
+GLWButton     *glwButtonAlloc(const char *_label);
+int            glwButtonInit(GLWButton *_this,const char *_label);
+void           glwButtonDstr(GLWButton *_this);
+void           glwButtonFree(GLWButton *_this);
 
 const char          *glwButtonGetLabel(GLWButton *_this);
-      int            glwButtonSetLabel(GLWButton *_this,const char *_label);
-      int            glwButtonAddLabel(GLWButton *_this,const char *_label);
-      GLWActionFunc  glwButtonGetPressedFunc(GLWButton *_this);
-      void           glwButtonSetPressedFunc(GLWButton *_this,
-                                             GLWActionFunc _func);
-      void          *glwButtonGetPressedCtx(GLWButton *_this);
-      void           glwButtonSetPressedCtx(GLWButton *_this,void *_ctx);
+int            glwButtonSetLabel(GLWButton *_this,const char *_label);
+int            glwButtonAddLabel(GLWButton *_this,const char *_label);
+GLWActionFunc  glwButtonGetPressedFunc(GLWButton *_this);
+void           glwButtonSetPressedFunc(GLWButton *_this,
+                                       GLWActionFunc _func);
+void          *glwButtonGetPressedCtx(GLWButton *_this);
+void           glwButtonSetPressedCtx(GLWButton *_this,void *_ctx);
 
 
-struct GLWTextField{
- GLWComponent   super;
- GLWActionFunc  action;                      /*Enter pressed callback function*/
- void          *action_ctx;                     /*Extra parameter for callback*/
- GLWActionFunc  changed;                      /*Text changed callback function*/
- void          *changed_ctx;                    /*Extra parameter for callback*/
- CDynArray      text;                                           /*Current text*/
- CDynArray      seld;                         /*Currently selected text buffer*/
- int            sels;                                        /*Selection start*/
- int            sele;                                          /*Selection end*/
- int            carp;                                         /*Caret position*/
- int            mark;               /*Selection mark (for dragging selections)*/
- int            offs;                                         /*Display offset*/
- int            cols;                            /*Preferred number of columns*/
- int            echo;                                         /*Echo character*/
- int            blink_timer;                       /*Timer for blinking cursor*/
- unsigned       editable:1;
- unsigned       caret:1;};                                       /*Draw caret?*/
+struct GLWTextField
+{
+    GLWComponent   super;
+    GLWActionFunc  action;                      /*Enter pressed callback function*/
+    void          *action_ctx;                     /*Extra parameter for callback*/
+    GLWActionFunc  changed;                      /*Text changed callback function*/
+    void          *changed_ctx;                    /*Extra parameter for callback*/
+    CDynArray      text;                                           /*Current text*/
+    CDynArray      seld;                         /*Currently selected text buffer*/
+    int            sels;                                        /*Selection start*/
+    int            sele;                                          /*Selection end*/
+    int            carp;                                         /*Caret position*/
+    int            mark;               /*Selection mark (for dragging selections)*/
+    int            offs;                                         /*Display offset*/
+    int            cols;                            /*Preferred number of columns*/
+    int            echo;                                         /*Echo character*/
+    int            blink_timer;                       /*Timer for blinking cursor*/
+    unsigned       editable:1;
+    unsigned       caret:1;
+};                                       /*Draw caret?*/
 
 
 extern const GLWCallbacks GLW_TEXT_FIELD_CALLBACKS;
 
-      GLWTextField  *glwTextFieldAlloc(const char *_text,int _cols);
-      int            glwTextFieldInit(GLWTextField *_this,
-                                      const char *_text,int _cols);
-      void           glwTextFieldDstr(GLWTextField *_this);
-      void           glwTextFieldFree(GLWTextField *_this);
+GLWTextField  *glwTextFieldAlloc(const char *_text,int _cols);
+int            glwTextFieldInit(GLWTextField *_this,
+                                const char *_text,int _cols);
+void           glwTextFieldDstr(GLWTextField *_this);
+void           glwTextFieldFree(GLWTextField *_this);
 
-      int            glwTextFieldIsEditable(GLWTextField *_this);
-      void           glwTextFieldSetEditable(GLWTextField *_this,int _b);
+int            glwTextFieldIsEditable(GLWTextField *_this);
+void           glwTextFieldSetEditable(GLWTextField *_this,int _b);
 const char          *glwTextFieldGetText(GLWTextField *_this);
-      int            glwTextFieldSetText(GLWTextField *_this,
-                                         const char *_text);
-      int            glwTextFieldAddText(GLWTextField *_this,
-                                         const char *_text);
+int            glwTextFieldSetText(GLWTextField *_this,
+                                   const char *_text);
+int            glwTextFieldAddText(GLWTextField *_this,
+                                   const char *_text);
 const char          *glwTextFieldGetSelectedText(GLWTextField *_this);
-      int            glwTextFieldGetCaretPos(GLWTextField *_this);
-      void           glwTextFieldSetCaretPos(GLWTextField *_this,int _carp);
-      int            glwTextFieldGetSelectionStart(GLWTextField *_this);
-      void           glwTextFieldSetSelectionStart(GLWTextField *_this,
-                                                   int _sels);
-      int            glwTextFieldGetSelectionEnd(GLWTextField *_this);
-      void           glwTextFieldSetSelectionEnd(GLWTextField *_this,
-                                                 int _sele);
-      void           glwTextFieldSelect(GLWTextField *_this,
-                                        int _sels,int _sele);
-      int            glwTextFieldGetCols(GLWTextField *_this);
-      void           glwTextFieldSetCols(GLWTextField *_this,int _cols);
-      int            glwTextFieldGetEchoChar(GLWTextField *_this);
-      void           glwTextFieldSetEchoChar(GLWTextField *_this,int _echo);
-      GLWActionFunc  glwTextFieldGetActionFunc(GLWTextField *_this);
-      void           glwTextFieldSetActionFunc(GLWTextField *_this,
-                                               GLWActionFunc _func);
-      void          *glwTextFieldGetActionCtx(GLWTextField *_this);
-      void           glwTextFieldSetActionCtx(GLWTextField *_this,void *_ctx);
-      GLWActionFunc  glwTextFieldGetChangedFunc(GLWTextField *_this);
-      void           glwTextFieldSetChangedFunc(GLWTextField *_this,
-                                                GLWActionFunc _func);
-      void          *glwTextFieldGetChangedCtx(GLWTextField *_this);
-      void           glwTextFieldSetChangedCtx(GLWTextField *_this,
-                                               void *_ctx);
+int            glwTextFieldGetCaretPos(GLWTextField *_this);
+void           glwTextFieldSetCaretPos(GLWTextField *_this,int _carp);
+int            glwTextFieldGetSelectionStart(GLWTextField *_this);
+void           glwTextFieldSetSelectionStart(GLWTextField *_this,
+        int _sels);
+int            glwTextFieldGetSelectionEnd(GLWTextField *_this);
+void           glwTextFieldSetSelectionEnd(GLWTextField *_this,
+        int _sele);
+void           glwTextFieldSelect(GLWTextField *_this,
+                                  int _sels,int _sele);
+int            glwTextFieldGetCols(GLWTextField *_this);
+void           glwTextFieldSetCols(GLWTextField *_this,int _cols);
+int            glwTextFieldGetEchoChar(GLWTextField *_this);
+void           glwTextFieldSetEchoChar(GLWTextField *_this,int _echo);
+GLWActionFunc  glwTextFieldGetActionFunc(GLWTextField *_this);
+void           glwTextFieldSetActionFunc(GLWTextField *_this,
+        GLWActionFunc _func);
+void          *glwTextFieldGetActionCtx(GLWTextField *_this);
+void           glwTextFieldSetActionCtx(GLWTextField *_this,void *_ctx);
+GLWActionFunc  glwTextFieldGetChangedFunc(GLWTextField *_this);
+void           glwTextFieldSetChangedFunc(GLWTextField *_this,
+        GLWActionFunc _func);
+void          *glwTextFieldGetChangedCtx(GLWTextField *_this);
+void           glwTextFieldSetChangedCtx(GLWTextField *_this,
+        void *_ctx);
 
 
 
-struct GLWCheckBoxGroup{
- CDynArray      cbs;
- int            seld;
- GLWActionFunc  changed;
- void          *changed_ctx;};
+struct GLWCheckBoxGroup
+{
+    CDynArray      cbs;
+    int            seld;
+    GLWActionFunc  changed;
+    void          *changed_ctx;
+};
 
 
 GLWCheckBoxGroup *glwCheckBoxGroupAlloc(void);
@@ -511,88 +537,92 @@ void              glwCheckBoxGroupDstr(GLWCheckBoxGroup *_this);
 void              glwCheckBoxGroupFree(GLWCheckBoxGroup *_this);
 int               glwCheckBoxGroupGetSelectedIdx(GLWCheckBoxGroup *_this);
 void              glwCheckBoxGroupSetSelectedIdx(GLWCheckBoxGroup *_this,
-                                                 int _i);
+        int _i);
 void              glwCheckBoxGroupSelectNext(GLWCheckBoxGroup *_this);
 void              glwCheckBoxGroupSelectPrev(GLWCheckBoxGroup *_this);
 GLWActionFunc     glwCheckBoxGroupGetChangedFunc(GLWCheckBoxGroup *_this);
 void              glwCheckBoxGroupSetChangedFunc(GLWCheckBoxGroup *_this,
-                                                 GLWActionFunc _func);
+        GLWActionFunc _func);
 void             *glwCheckBoxGroupGetChangedCtx(GLWCheckBoxGroup *_this);
 void              glwCheckBoxGroupSetChangedCtx(GLWCheckBoxGroup *_this,
-                                                void *_ctx);
+        void *_ctx);
 
 
 
-struct GLWCheckBox{
- GLWComponent      super;
- GLWActionFunc     changed;
- void             *changed_ctx;
- GLWCheckBoxGroup *group;
- CDynArray         label;
- unsigned          state:1;
- unsigned          down:1;};
+struct GLWCheckBox
+{
+    GLWComponent      super;
+    GLWActionFunc     changed;
+    void             *changed_ctx;
+    GLWCheckBoxGroup *group;
+    CDynArray         label;
+    unsigned          state:1;
+    unsigned          down:1;
+};
 
 
 extern const GLWCallbacks GLW_CHECK_BOX_CALLBACKS;
 
-      GLWCheckBox      *glwCheckBoxAlloc(const char *_label,int _state,
-                                         GLWCheckBoxGroup *_group);
-      int               glwCheckBoxInit(GLWCheckBox *_this,
-                                        const char *_label,int _state,
-                                        GLWCheckBoxGroup *_group);
-      void              glwCheckBoxDstr(GLWCheckBox *_this);
-      void              glwCheckBoxFree(GLWCheckBox *_this);
+GLWCheckBox      *glwCheckBoxAlloc(const char *_label,int _state,
+                                   GLWCheckBoxGroup *_group);
+int               glwCheckBoxInit(GLWCheckBox *_this,
+                                  const char *_label,int _state,
+                                  GLWCheckBoxGroup *_group);
+void              glwCheckBoxDstr(GLWCheckBox *_this);
+void              glwCheckBoxFree(GLWCheckBox *_this);
 
-      int               glwCheckBoxGetState(GLWCheckBox *_this);
-      void              glwCheckBoxSetState(GLWCheckBox *_this,int _state);
+int               glwCheckBoxGetState(GLWCheckBox *_this);
+void              glwCheckBoxSetState(GLWCheckBox *_this,int _state);
 const char             *glwCheckBoxGetLabel(GLWCheckBox *_this);
-      int               glwCheckBoxSetLabel(GLWCheckBox *_this,
-                                            const char *_label);
-      int               glwCheckBoxAddLabel(GLWCheckBox *_this,
-                                            const char *_label);
-      GLWCheckBoxGroup *glwCheckBoxGetGroup(GLWCheckBox *_this);
-      int               glwCheckBoxSetGroup(GLWCheckBox *_this,
-                                            GLWCheckBoxGroup *_group);
-      GLWActionFunc     glwCheckBoxGetChangedFunc(GLWCheckBox *_this);
-      void              glwCheckBoxSetChangedFunc(GLWCheckBox *_this,
-                                                  GLWActionFunc _func);
-      void             *glwCheckBoxGetChangedCtx(GLWCheckBox *_this);
-      void              glwCheckBoxSetChangedCtx(GLWCheckBox *_this,
-                                                 void *_ctx);
+int               glwCheckBoxSetLabel(GLWCheckBox *_this,
+                                      const char *_label);
+int               glwCheckBoxAddLabel(GLWCheckBox *_this,
+                                      const char *_label);
+GLWCheckBoxGroup *glwCheckBoxGetGroup(GLWCheckBox *_this);
+int               glwCheckBoxSetGroup(GLWCheckBox *_this,
+                                      GLWCheckBoxGroup *_group);
+GLWActionFunc     glwCheckBoxGetChangedFunc(GLWCheckBox *_this);
+void              glwCheckBoxSetChangedFunc(GLWCheckBox *_this,
+        GLWActionFunc _func);
+void             *glwCheckBoxGetChangedCtx(GLWCheckBox *_this);
+void              glwCheckBoxSetChangedCtx(GLWCheckBox *_this,
+        void *_ctx);
 
 
 
-struct GLWSlider{
- GLWComponent   super;
- GLWActionFunc  changed;
- void          *changed_ctx;
- CHashTable     labels;
- int            major_ticks;
- int            major_offs;
- int            minor_ticks;
- int            minor_offs;
- int            snap;
- int            ornt;
- int            min;
- int            max;
- int            val;
- int            ext;
- int            label_hi;                      /*Values used for slider layout*/
- int            label_lo;
- int            thumb_offs;
- GLWRect        thumb_rect;
- int            track_offs;
- GLWRect        track_rect;
- GLWRect        tick_rect;
- GLWRect        label_rect;
- unsigned       center_labels:1;};
+struct GLWSlider
+{
+    GLWComponent   super;
+    GLWActionFunc  changed;
+    void          *changed_ctx;
+    CHashTable     labels;
+    int            major_ticks;
+    int            major_offs;
+    int            minor_ticks;
+    int            minor_offs;
+    int            snap;
+    int            ornt;
+    int            min;
+    int            max;
+    int            val;
+    int            ext;
+    int            label_hi;                      /*Values used for slider layout*/
+    int            label_lo;
+    int            thumb_offs;
+    GLWRect        thumb_rect;
+    int            track_offs;
+    GLWRect        track_rect;
+    GLWRect        tick_rect;
+    GLWRect        label_rect;
+    unsigned       center_labels:1;
+};
 
 
 extern const GLWCallbacks GLW_SLIDER_CALLBACKS;
 
 GLWSlider     *glwSliderAlloc(int _min,int _max,int _val,int _ext);
 void           glwSliderInit(GLWSlider *_this,int _min,int _max,
-                         int _val,int _ext);
+                             int _val,int _ext);
 void           glwSliderDstr(GLWSlider *_this);
 void           glwSliderFree(GLWSlider *_this);
 
@@ -627,57 +657,59 @@ void           glwSliderSetChangedCtx(GLWSlider *_this,void *_ctx);
 
 
 
-struct GLWTabbedPane{
- GLWComponent super;
- CDynArray    tabs;
- CDynArray    runs;
- GLWRect      area;
- int          tplc;
- int          seld;
- int          max_tab_w;
- int          max_tab_h;
- unsigned     valid:1;};
+struct GLWTabbedPane
+{
+    GLWComponent super;
+    CDynArray    tabs;
+    CDynArray    runs;
+    GLWRect      area;
+    int          tplc;
+    int          seld;
+    int          max_tab_w;
+    int          max_tab_h;
+    unsigned     valid:1;
+};
 
 
 extern const GLWCallbacks GLW_TABBED_PANE_CALLBACKS;
 
 
-      GLWTabbedPane *glwTabbedPaneAlloc(void);
-      void           glwTabbedPaneInit(GLWTabbedPane *_this);
-      void           glwTabbedPaneDstr(GLWTabbedPane *_this);
-      void           glwTabbedPaneFree(GLWTabbedPane *_this);
+GLWTabbedPane *glwTabbedPaneAlloc(void);
+void           glwTabbedPaneInit(GLWTabbedPane *_this);
+void           glwTabbedPaneDstr(GLWTabbedPane *_this);
+void           glwTabbedPaneFree(GLWTabbedPane *_this);
 
-      int            glwTabbedPaneGetPlacement(GLWTabbedPane *_this);
-      void           glwTabbedPaneSetPlacement(GLWTabbedPane *_this,
-                                               int _tplc);
-      int            glwTabbedPaneGetSelectedIdx(GLWTabbedPane *_this);
-      void           glwTabbedPaneSetSelectedIdx(GLWTabbedPane *_this,
-                                                 int _idx);
-      GLWComponent  *glwTabbedPaneGetSelectedComp(GLWTabbedPane *_this);
-      void           glwTabbedPaneSetSelectedComp(GLWTabbedPane *_this,
-                                                  GLWComponent *_comp);
-      int            glwTabbedPaneAdd(GLWTabbedPane *_this,
-                                      GLWComponent *_comp,
-                                      const char *_title,int _idx);
-      int            glwTabbedPaneDel(GLWTabbedPane *_this,
-                                      GLWComponent *_comp);
-      void           glwTabbedPaneDelAt(GLWTabbedPane *_this,int _idx);
-      void           glwTabbedPaneDelAll(GLWTabbedPane *_this);
-      int            glwTabbedPaneGetTabCount(GLWTabbedPane *_this);
-      int            glwTabbedPaneGetRunCount(GLWTabbedPane *_this);
-      GLWcolor       glwTabbedPaneGetBackColorAt(GLWTabbedPane *_this,
-                                                 int _idx);
-      void           glwTabbedPaneSetBackColorAt(GLWTabbedPane *_this,
-                                                 int _idx,GLWcolor _c);
-      GLWcolor       glwTabbedPaneGetForeColorAt(GLWTabbedPane *_this,
-                                                 int _idx);
-      void           glwTabbedPaneSetForeColorAt(GLWTabbedPane *_this,
-                                                 int _idx,GLWcolor _c);
+int            glwTabbedPaneGetPlacement(GLWTabbedPane *_this);
+void           glwTabbedPaneSetPlacement(GLWTabbedPane *_this,
+        int _tplc);
+int            glwTabbedPaneGetSelectedIdx(GLWTabbedPane *_this);
+void           glwTabbedPaneSetSelectedIdx(GLWTabbedPane *_this,
+        int _idx);
+GLWComponent  *glwTabbedPaneGetSelectedComp(GLWTabbedPane *_this);
+void           glwTabbedPaneSetSelectedComp(GLWTabbedPane *_this,
+        GLWComponent *_comp);
+int            glwTabbedPaneAdd(GLWTabbedPane *_this,
+                                GLWComponent *_comp,
+                                const char *_title,int _idx);
+int            glwTabbedPaneDel(GLWTabbedPane *_this,
+                                GLWComponent *_comp);
+void           glwTabbedPaneDelAt(GLWTabbedPane *_this,int _idx);
+void           glwTabbedPaneDelAll(GLWTabbedPane *_this);
+int            glwTabbedPaneGetTabCount(GLWTabbedPane *_this);
+int            glwTabbedPaneGetRunCount(GLWTabbedPane *_this);
+GLWcolor       glwTabbedPaneGetBackColorAt(GLWTabbedPane *_this,
+        int _idx);
+void           glwTabbedPaneSetBackColorAt(GLWTabbedPane *_this,
+        int _idx,GLWcolor _c);
+GLWcolor       glwTabbedPaneGetForeColorAt(GLWTabbedPane *_this,
+        int _idx);
+void           glwTabbedPaneSetForeColorAt(GLWTabbedPane *_this,
+        int _idx,GLWcolor _c);
 const char          *glwTabbedPaneGetTitleAt(GLWTabbedPane *_this,int _idx);
-      int            glwTabbedPaneSetTitleAt(GLWTabbedPane *_this,int _idx,
-                                              const char *_s);
-      int            glwTabbedPaneAddTitleAt(GLWTabbedPane *_this,int _idx,
-                                             const char *_s);
+int            glwTabbedPaneSetTitleAt(GLWTabbedPane *_this,int _idx,
+                                       const char *_s);
+int            glwTabbedPaneAddTitleAt(GLWTabbedPane *_this,int _idx,
+                                       const char *_s);
 
 
 

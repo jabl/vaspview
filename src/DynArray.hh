@@ -50,12 +50,14 @@ typedef struct CDynArray CDynArray;
   the same time. Note that extra care must be taken with pointers to elements
   in the array when other threads may be modfiying, and possibly repositioning
   it*/
-struct CDynArray{
- char   *data;
- size_t  elm_sz;
- size_t  size;
- size_t  cap;
- size_t  inc;};
+struct CDynArray
+{
+    char   *data;
+    size_t  elm_sz;
+    size_t  size;
+    size_t  cap;
+    size_t  inc;
+};
 
 
 # define /*void*/ _DAInit(/*CDynArray **/_this,/*size_t*/_cap,_type)          \
@@ -63,19 +65,19 @@ struct CDynArray{
 
 # define /*type **/_DAGetAt(/*CDynArray **/_this,/*size_t*/ _i,_type)         \
  ((_i)+(_type *)daGetAt((_this),0))
- 
+
 # define /*type **/_DASetAt(/*CDynArray **/_this,/*size_t*/ _i,               \
                             /*type **/_elm,_type)                             \
  ((_type *)daSetAt((_this),(_i),(_type *)(_elm)))
- 
-           void    daInit(CDynArray *_this,size_t _elm_sz,
-                          size_t _cap,size_t _inc);
-           void    daDstr(CDynArray *_this);
 
-           void    daTrimToSize(CDynArray *_this);
-           int     daEnsureCapacity(CDynArray *_this,size_t _cap);
+void    daInit(CDynArray *_this,size_t _elm_sz,
+               size_t _cap,size_t _inc);
+void    daDstr(CDynArray *_this);
 
-           int     daSetSize(CDynArray *_this,size_t _sz);
+void    daTrimToSize(CDynArray *_this);
+int     daEnsureCapacity(CDynArray *_this,size_t _cap);
+
+int     daSetSize(CDynArray *_this,size_t _sz);
 
 # define /*int*/   daInsHead(/*CDynArray **/_this,/*void */_elm)              \
  (daInsBefore(_this,0,_elm))
@@ -90,8 +92,8 @@ struct CDynArray{
 # define /*int*/   daInsBefore(/*CDynArray **/_this,/*size_t*/ _i,            \
                                /*void **/_elm)                                \
  (daInsArrayBefore((_this),(_i),(_elm),1))
-           int     daInsArrayBefore(CDynArray *_this,size_t _i,
-                                    const void *_elms,size_t _n);
+int     daInsArrayBefore(CDynArray *_this,size_t _i,
+                         const void *_elms,size_t _n);
 # define /*int*/   daInsAfter(/*CDynArray **/_this,/*size_t*/ _i,             \
                               /*void **/_elm)                                 \
  (daInsBefore(_this,(_i)+1,_elm))

@@ -42,118 +42,122 @@ typedef struct DS3ViewComp DS3ViewComp;
 # define DS3V_PROJECT_PERSPECTIVE  (0)
 # define DS3V_PROJECT_ORTHOGRAPHIC (1)
 
-struct DS3ViewComp{
- GLWComponent  super;
- DS3View      *ds3view;};
+struct DS3ViewComp
+{
+    GLWComponent  super;
+    DS3View      *ds3view;
+};
 
 
 
-struct DS3View{
-       GLWComponent   super;
-       DS3ViewComp   *cm_axes;
-       DS3ViewComp   *cm_box;
-       DS3ViewComp   *cm_pts;
+struct DS3View
+{
+    GLWComponent   super;
+    DS3ViewComp   *cm_axes;
+    DS3ViewComp   *cm_box;
+    DS3ViewComp   *cm_pts;
 # if defined(__DS3_ADD_BONDS__)
-       DS3ViewComp   *cm_bnds;
+    DS3ViewComp   *cm_bnds;
 # endif
-       DS3ViewComp   *cm_slice;
-       DS3ViewComp   *cm_iso;
-       GLWActionFunc  data_changed_func;
-       void          *data_changed_ctx;
-       GLWActionFunc  slice_changed_func;
-       void          *slice_changed_ctx;
-       GLWActionFunc  ornt_changed_func;
-       void          *ornt_changed_ctx;
-       GLWActionFunc  zoom_changed_func;
-       void          *zoom_changed_ctx;
-       GLWActionFunc  cntr_changed_func;
-       void          *cntr_changed_ctx;
-       GLWActionFunc  box_changed_func;
-       void          *box_changed_ctx;
-       GLWActionFunc  point_changed_func;
-       void          *point_changed_ctx;
+    DS3ViewComp   *cm_slice;
+    DS3ViewComp   *cm_iso;
+    GLWActionFunc  data_changed_func;
+    void          *data_changed_ctx;
+    GLWActionFunc  slice_changed_func;
+    void          *slice_changed_ctx;
+    GLWActionFunc  ornt_changed_func;
+    void          *ornt_changed_ctx;
+    GLWActionFunc  zoom_changed_func;
+    void          *zoom_changed_ctx;
+    GLWActionFunc  cntr_changed_func;
+    void          *cntr_changed_ctx;
+    GLWActionFunc  box_changed_func;
+    void          *box_changed_ctx;
+    GLWActionFunc  point_changed_func;
+    void          *point_changed_ctx;
 # if defined(__DS3_ADD_BONDS__)
-       GLWActionFunc  bond_changed_func;
-       void          *bond_changed_ctx;
+    GLWActionFunc  bond_changed_func;
+    void          *bond_changed_ctx;
 #  if defined(__DS3_SAVE_BONDS__)
-       GLWActionFunc  bonds_changed_func;
-       void          *bonds_changed_ctx;
+    GLWActionFunc  bonds_changed_func;
+    void          *bonds_changed_ctx;
 #  endif
 # endif
-       DataSet3D     *ds3;
- const DSColorScale  *cs;             /*Color scale for data->color conversion*/
- const DSDataScale   *ds;       /*Data scale for data<->[0,1] interval mapping*/
-       /*Display structures*/
+    DataSet3D     *ds3;
+    const DSColorScale  *cs;             /*Color scale for data->color conversion*/
+    const DSDataScale   *ds;       /*Data scale for data<->[0,1] interval mapping*/
+    /*Display structures*/
 # if defined(__DS3_ADD_BONDS__)
-       DS3Bonds       bonds;                             /*Bonds between atoms*/
+    DS3Bonds       bonds;                             /*Bonds between atoms*/
 # endif
-       DS3Slice       slice;
-       DS3IsoSurface  iso;
-       /*Cached information*/
-       double         offs;              /*Radius of smallest enclosing sphere*/
-       double         rot[3][3]; /*Rotation matrix for orientation around cntr*/
-       double         basis[16];                   /*GL-formatted basis matrix*/
-       double         basinv[3][3];                    /*Inverted basis matrix*/
-       double         strans[3][4];              /*Slice transformation matrix*/
-       CDynArray      view_stack;                           /*Saved clip boxes*/
-       /*Viewing parameters*/
-       double         point_r;                                  /*Point radius*/
-       double         slice_t;                         /*Slice angles/distance*/
-       double         slice_p;
-       double         slice_d;
-       double         iso_v;                        /*Iso-surface value/detail*/
-       int            iso_d;
-       /*Position/orientation parameters*/
-       int            proj;                                  /*Projection type*/
-       double         zoom;                   /*Distance from point to look at*/
-       Vect3d         cntr;                                 /*Point to look at*/
-       double         roll;                        /*Orientation around center*/
-       double         pitch;
-       double         yaw;
-       double         box[2][3];                                    /*Clip box*/
-       /*Mouse/keyboard tracking info*/
-       int            track_cb;                  /*Are we tracking a clip box?*/
-       int            track_cx;             /*Pixel coordinates of mouse click*/
-       int            track_cy;
-       int            track_mx;  /*Pixel coordinates of current mouse position*/
-       int            track_my;
-       Vect3d         track_p0;                      /*Ray from mouse position*/
-       Vect3d         track_p1;                          /*(world coordinates)*/
-       Vect3d         track_pt; /*Point mouse is currently (world-coordinates)*/
-       double         track_t; /*Distance along projection ray to intersection*/
-       Vect3d         track_an;/*Point mouse clicked (unit vector from center)*/
-       double         track_rd;     /*Distance from center where mouse clicked*/
-       int            track_rt;    /*Which half of the sphere is being tracked*/
-       double         track_r;                  /*Orientation at time of click*/
-       double         track_p;
-       double         track_y;
-       int            track_ax;                           /*Axis mouse is over*/
-       int            track_lx;                     /*Last axis mouse was over*/
-       int            track_pl;                  /*Plane keyboard has selected*/
-       long           track_mp;                           /*Atom mouse is over*/
-       long           track_lp;                     /*Last atom mouse was over*/
-       long           track_sp;                                /*Selected atom*/
+    DS3Slice       slice;
+    DS3IsoSurface  iso;
+    /*Cached information*/
+    double         offs;              /*Radius of smallest enclosing sphere*/
+    double         rot[3][3]; /*Rotation matrix for orientation around cntr*/
+    double         basis[16];                   /*GL-formatted basis matrix*/
+    double         basinv[3][3];                    /*Inverted basis matrix*/
+    double         strans[3][4];              /*Slice transformation matrix*/
+    CDynArray      view_stack;                           /*Saved clip boxes*/
+    /*Viewing parameters*/
+    double         point_r;                                  /*Point radius*/
+    double         slice_t;                         /*Slice angles/distance*/
+    double         slice_p;
+    double         slice_d;
+    double         iso_v;                        /*Iso-surface value/detail*/
+    int            iso_d;
+    /*Position/orientation parameters*/
+    int            proj;                                  /*Projection type*/
+    double         zoom;                   /*Distance from point to look at*/
+    Vect3d         cntr;                                 /*Point to look at*/
+    double         roll;                        /*Orientation around center*/
+    double         pitch;
+    double         yaw;
+    double         box[2][3];                                    /*Clip box*/
+    /*Mouse/keyboard tracking info*/
+    int            track_cb;                  /*Are we tracking a clip box?*/
+    int            track_cx;             /*Pixel coordinates of mouse click*/
+    int            track_cy;
+    int            track_mx;  /*Pixel coordinates of current mouse position*/
+    int            track_my;
+    Vect3d         track_p0;                      /*Ray from mouse position*/
+    Vect3d         track_p1;                          /*(world coordinates)*/
+    Vect3d         track_pt; /*Point mouse is currently (world-coordinates)*/
+    double         track_t; /*Distance along projection ray to intersection*/
+    Vect3d         track_an;/*Point mouse clicked (unit vector from center)*/
+    double         track_rd;     /*Distance from center where mouse clicked*/
+    int            track_rt;    /*Which half of the sphere is being tracked*/
+    double         track_r;                  /*Orientation at time of click*/
+    double         track_p;
+    double         track_y;
+    int            track_ax;                           /*Axis mouse is over*/
+    int            track_lx;                     /*Last axis mouse was over*/
+    int            track_pl;                  /*Plane keyboard has selected*/
+    long           track_mp;                           /*Atom mouse is over*/
+    long           track_lp;                     /*Last atom mouse was over*/
+    long           track_sp;                                /*Selected atom*/
 # if defined(__DS3_ADD_BONDS__)
-       long           track_mbf;                   /*Bond mouse is over (from)*/
-       long           track_mbt;                     /*Bond mouse is over (to)*/
-       long           track_lbf;             /*Last bond mouse was over (from)*/
-       long           track_lbt;               /*Last bond mouse was over (to)*/
-       long           track_sbf;                        /*Selected bond (from)*/
-       long           track_sbt;                          /*Selected bond (to)*/
+    long           track_mbf;                   /*Bond mouse is over (from)*/
+    long           track_mbt;                     /*Bond mouse is over (to)*/
+    long           track_lbf;             /*Last bond mouse was over (from)*/
+    long           track_lbt;               /*Last bond mouse was over (to)*/
+    long           track_sbf;                        /*Selected bond (from)*/
+    long           track_sbt;                          /*Selected bond (to)*/
 # endif
-       long           track_dx;            /*Data-value on slice mouse is over*/
-       long           track_dy;
-       long           track_dz;
-       /*Which items to draw*/
-       CDynArray      draw_point;                 /*Whether to draw each point*/
-       unsigned       draw_coords:1;   /*Whether to draw the coordinate system*/
-       unsigned       draw_points:1;       /*Whether or not to draw any points*/
-       unsigned       draw_slice:1;         /*Whether or not to draw the slice*/
-       unsigned       draw_iso:1;     /*Whether or not to draw the iso-surface*/
-       /*Which display structures are valid*/
-       unsigned       c_valid:1;
-       unsigned       t_valid:1;
-       unsigned       s_valid:1;};
+    long           track_dx;            /*Data-value on slice mouse is over*/
+    long           track_dy;
+    long           track_dz;
+    /*Which items to draw*/
+    CDynArray      draw_point;                 /*Whether to draw each point*/
+    unsigned       draw_coords:1;   /*Whether to draw the coordinate system*/
+    unsigned       draw_points:1;       /*Whether or not to draw any points*/
+    unsigned       draw_slice:1;         /*Whether or not to draw the slice*/
+    unsigned       draw_iso:1;     /*Whether or not to draw the iso-surface*/
+    /*Which display structures are valid*/
+    unsigned       c_valid:1;
+    unsigned       t_valid:1;
+    unsigned       s_valid:1;
+};
 
 
 void     ds3ViewExpandRot(double _y,double _p,double _r,double _rot[3][3]);
