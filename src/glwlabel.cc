@@ -103,12 +103,12 @@ const GLWCallbacks GLW_LABEL_CALLBACKS={
  NULL};
 
 GLWLabel *glwLabelAlloc(const char *_label){
- GLWLabel *this;
- this=(GLWLabel *)malloc(sizeof(GLWLabel));
- if(this!=NULL){
-  if(glwLabelInit(this,_label)){
-   return this;}
-  free(this);}
+ GLWLabel *this_;
+ this_=(GLWLabel *)malloc(sizeof(GLWLabel));
+ if(this_!=NULL){
+  if(glwLabelInit(this_,_label)){
+   return this_;}
+  free(this_);}
  return NULL;}
 
 int glwLabelInit(GLWLabel *_this,const char *_label){

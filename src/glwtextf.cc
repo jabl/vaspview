@@ -415,11 +415,11 @@ const GLWCallbacks GLW_TEXT_FIELD_CALLBACKS={
 
 
 GLWTextField *glwTextFieldAlloc(const char *_text,int _cols){
- GLWTextField *this;
- this=(GLWTextField *)malloc(sizeof(GLWTextField));
- if(this!=NULL){
-  if(glwTextFieldInit(this,_text,_cols))return this;
-  free(this);}
+ GLWTextField *this_;
+ this_=(GLWTextField *)malloc(sizeof(GLWTextField));
+ if(this_!=NULL){
+  if(glwTextFieldInit(this_,_text,_cols))return this_;
+  free(this_);}
  return NULL;}
 
 int glwTextFieldInit(GLWTextField *_this,const char *_text,int _cols){

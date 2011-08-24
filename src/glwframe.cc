@@ -171,12 +171,12 @@ const GLWCallbacks GLW_FRAME_CALLBACKS={
 
 
 GLWFrame *glwFrameAlloc(const char *_title){
- GLWFrame *this;
- this=(GLWFrame *)malloc(sizeof(GLWFrame));
- if(this!=NULL){
-  if(glwFrameInit(this,_title)){
-   return this;}
-  free(this);}
+ GLWFrame *this_;
+ this_=(GLWFrame *)malloc(sizeof(GLWFrame));
+ if(this_!=NULL){
+  if(glwFrameInit(this_,_title)){
+   return this_;}
+  free(this_);}
  return NULL;}
 
 int glwFrameInit(GLWFrame *_this,const char *_title){

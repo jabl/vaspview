@@ -923,22 +923,22 @@ const GLWCallbacks DS3_VIEW_CALLBACKS={
  (GLWMotionFunc)ds3ViewPeerPassiveMotion};
 
 static DS3ViewComp *ds3ViewCompAlloc(DS3View *_ds3view){
- DS3ViewComp *this;
- this=(DS3ViewComp *)malloc(sizeof(DS3ViewComp));
- if(this!=NULL){
-  glwCompInit(&this->super);
-  this->ds3view=_ds3view;
-  return this;}
+ DS3ViewComp *this_;
+ this_=(DS3ViewComp *)malloc(sizeof(DS3ViewComp));
+ if(this_!=NULL){
+  glwCompInit(&this_->super);
+  this_->ds3view=_ds3view;
+  return this_;}
  return NULL;}
 
 
 DS3View *ds3ViewAlloc(void){
- DS3View *this;
- this=(DS3View *)malloc(sizeof(DS3View));
- if(this!=NULL){
-  if(ds3ViewInit(this)){
-   return this;}
-  free(this);}
+ DS3View *this_;
+ this_=(DS3View *)malloc(sizeof(DS3View));
+ if(this_!=NULL){
+  if(ds3ViewInit(this_)){
+   return this_;}
+  free(this_);}
  return NULL;}
 
 int ds3ViewInit(DS3View *_this){

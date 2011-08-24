@@ -46,11 +46,11 @@ static const GLWCallbacks DS_COLOR_LEGEND_SCALE_CALLBACKS={
 
 
 DSColorLegend *dsColorLegendAlloc(void){
- DSColorLegend *this;
- this=(DSColorLegend *)malloc(sizeof(DSColorLegend));
- if(this!=NULL){
-  if(dsColorLegendInit(this))return this;
-  free(this);}
+ DSColorLegend *this_;
+ this_=(DSColorLegend *)malloc(sizeof(DSColorLegend));
+ if(this_!=NULL){
+  if(dsColorLegendInit(this_))return this_;
+  free(this_);}
  return NULL;}
  
 int dsColorLegendInit(DSColorLegend *_this){

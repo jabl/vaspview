@@ -52,7 +52,7 @@ void daInit(CDynArray *_this,size_t _elm_sz,size_t _cap,size_t _inc){
  _this->cap=_cap;
  _this->inc=_inc;
  if(_cap){
-  _this->data=malloc(_elm_sz*_cap*sizeof(char));
+	 _this->data=static_cast<char*>(malloc(_elm_sz*_cap*sizeof(char)));
   if(_this->data==NULL)_this->cap=0;}
  else _this->data=NULL;}
 
@@ -66,7 +66,7 @@ void daDstr(CDynArray *_this){
   not grow beyond its current size*/
 void daTrimToSize(CDynArray *_this){
  if(_this->cap>_this->size){
-  char *data=realloc(_this->data,_this->elm_sz*_this->size*sizeof(char));
+	 char *data=static_cast<char*>(realloc(_this->data,_this->elm_sz*_this->size*sizeof(char)));
   if(data!=NULL||_this->size==0){
    _this->data=data;
    _this->cap=_this->size;} } }
@@ -81,7 +81,7 @@ int daEnsureCapacity(CDynArray *_this,size_t _cap){
  if(_this->cap<_cap){
   size_t cap=_Max(_cap,_this->inc>0?_this->cap+_this->inc:
                        _Max(4,_Min(_this->cap<<1,_this->cap+1024)));
-  char *data=realloc(_this->data,_this->elm_sz*cap*sizeof(char));
+  char *data=static_cast<char*>(realloc(_this->data,_this->elm_sz*cap*sizeof(char)));
   if(data==NULL)return 0;
   _this->data=data;
   _this->cap=cap;}
@@ -170,11 +170,11 @@ int daFGetS(CDynArray *_line,FILE *_in){
 void daTrimWS(CDynArray *_line){
  unsigned char *line;
  int            i;
- line=_line->data;
+ line=reinterpret_cast<unsigned char *>(_line->data);
  if(_line->size>1){
   for(i=(int)_line->size-2;i>=0&&isspace(line[i]);i--);
   daDelRange(_line,i+1,_line->size-2-i);
-  line=_line->data;
+  line=reinterpret_cast<unsigned char *>(_line->data);
   for(i=0;(size_t)i+1<_line->size&&isspace(line[i]);i++);
   daDelRange(_line,0,i);} }
 

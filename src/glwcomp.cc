@@ -66,7 +66,7 @@ static void glwCompGlutIdle(void){
  clear=1;
  hiInit(&hi,&glw_idler_table);
  while(hiInc(&hi)){
-  idler=hiGetValue(&hi);
+	 idler=static_cast<GLWTimerEntry*> (hiGetValue(&hi));
   if(idler!=NULL){
    glutSetWindow(idler->comp->wid);
    idler->func(idler->ctx,idler->comp);
@@ -193,10 +193,11 @@ const GLWCallbacks GLW_COMPONENT_CALLBACKS={
 
 
 GLWComponent *glwCompAlloc(void){
- GLWComponent *this;
- this=(GLWComponent *)malloc(sizeof(GLWComponent));
- if(this!=NULL)glwCompInit(this);
- return this;}
+ GLWComponent *this_;
+ this_=(GLWComponent *)malloc(sizeof(GLWComponent));
+ if(this_!=NULL)glwCompInit(this_);
+ return this_;
+}
 
 void glwCompInit(GLWComponent *_this){
  _this->parent=NULL;
@@ -630,23 +631,23 @@ void glwCompNextFocus(GLWComponent *_this){
  if(_this->parent!=NULL)glwCompNextFocus(_this->parent);
  else{
   GLWComponent *old;
-  GLWComponent *new;
+  GLWComponent *new_;
   old=_this->focus!=NULL?_this->focus:_this;
   glwCompNextFocusTree(_this);
-  new=_this->focus!=NULL?_this->focus:_this;
-  if(old!=new&&glwCompIsFocused(old))glwCompFocus(old,0);
-  if(old!=new&&glwCompIsFocusable(new))glwCompFocus(new,1);} }
+  new_=_this->focus!=NULL?_this->focus:_this;
+  if(old!=new_&&glwCompIsFocused(old))glwCompFocus(old,0);
+  if(old!=new_&&glwCompIsFocusable(new_))glwCompFocus(new_,1);} }
 
 void glwCompPrevFocus(GLWComponent *_this){
  if(_this->parent!=NULL)glwCompNextFocus(_this->parent);
  else{
   GLWComponent *old;
-  GLWComponent *new;
+  GLWComponent *new_;
   old=_this->focus!=NULL?_this->focus:_this;
   glwCompPrevFocusTree(_this);
-  new=_this->focus!=NULL?_this->focus:_this;
-  if(old!=new&&glwCompIsFocused(old))glwCompFocus(old,0);
-  if(old!=new&&glwCompIsFocusable(new))glwCompFocus(new,1);} }
+  new_=_this->focus!=NULL?_this->focus:_this;
+  if(old!=new_&&glwCompIsFocused(old))glwCompFocus(old,0);
+  if(old!=new_&&glwCompIsFocusable(new_))glwCompFocus(new_,1);} }
 
 void glwCompClearFocus(GLWComponent *_this){
  if(_this->focus!=NULL){
@@ -761,13 +762,13 @@ int glwCompDelTimer(GLWComponent *_this,int _id){
 
 GLWActionFunc glwCompGetTimerFunc(GLWComponent *_this,int _id){
  GLWTimerEntry *entry;
- entry=htGet(&glw_timer_table,&_id);
+ entry=static_cast<GLWTimerEntry*> (htGet(&glw_timer_table,&_id));
  if(entry!=NULL)return entry->func;
  return NULL;}
 
 void *glwCompGetTimerCtx(GLWComponent *_this,int _id){
  GLWTimerEntry *entry;
- entry=htGet(&glw_timer_table,&_id);
+ entry=static_cast<GLWTimerEntry*> (htGet(&glw_timer_table,&_id));
  if(entry!=NULL)return entry->ctx;
  return NULL;}
 
@@ -806,13 +807,13 @@ int glwCompDelIdler(GLWComponent *_this,int _id){
 
 GLWActionFunc glwCompGetIdlerFunc(GLWComponent *_this,int _id){
  GLWTimerEntry *entry;
- entry=htGet(&glw_idler_table,&_id);
+ entry=static_cast<GLWTimerEntry*>(htGet(&glw_idler_table,&_id));
  if(entry!=NULL)return entry->func;
  return NULL;}
 
 void *glwCompGetIdlerCtx(GLWComponent *_this,int _id){
  GLWTimerEntry *entry;
- entry=htGet(&glw_idler_table,&_id);
+ entry=static_cast<GLWTimerEntry*>(htGet(&glw_idler_table,&_id));
  if(entry!=NULL)return entry->ctx;
  return NULL;}
 

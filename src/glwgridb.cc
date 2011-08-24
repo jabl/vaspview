@@ -572,10 +572,10 @@ static void glwGBLLayout(GLWGridBagLayout *_this,GLWComponent *_comp){
 
 
 GLWGridBagLayout *glwGridBagLayoutAlloc(void){
- GLWGridBagLayout *this;
- this=(GLWGridBagLayout *)malloc(sizeof(GLWGridBagLayout));
- if(this!=NULL)glwGridBagLayoutInit(this);
- return this;}
+ GLWGridBagLayout *this_;
+ this_=(GLWGridBagLayout *)malloc(sizeof(GLWGridBagLayout));
+ if(this_!=NULL)glwGridBagLayoutInit(this_);
+ return this_;}
 
 void glwGridBagLayoutInit(GLWGridBagLayout *_this){
  _this->super.layout=(GLWLayoutFunc)glwGBLLayout;

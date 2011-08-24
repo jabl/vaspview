@@ -47,15 +47,15 @@
 #  error "GLUT version 3 or later is required"
 # endif
 
-# if defined(GL_EXT_paletted_texture)
+#if defined(GL_EXT_paletted_texture)
 extern int has_gl_ext_paletted_texture;
-#  if defined(_WIN32)&&!defined(MESA)
+#if defined(_WIN32)&&!defined(MESA)
 extern PFNGLCOLORTABLEEXTPROC               gl_color_table_ext;
 extern PFNGLCOLORSUBTABLEEXTPROC            gl_color_sub_table_ext;
 extern PFNGLGETCOLORTABLEEXTPROC            gl_get_color_table_ext;
 extern PFNGLGETCOLORTABLEPARAMETERIVEXTPROC gl_get_color_table_parameterfv_ext;
 extern PFNGLGETCOLORTABLEPARAMETERFVEXTPROC gl_get_color_table_parameteriv_ext;
-#   define glColorTableEXT               (*gl_color_table_ext)
+#define glColorTableEXT               (*gl_color_table_ext)
 #   define glColorSubTableEXT            (*gl_color_sub_table_ext)
 #   define glGetColorTableEXT            (*gl_get_color_table_ext)
 #   define glGetColorTableParameterfvEXT (*gl_get_color_table_parameterfv_ext)

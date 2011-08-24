@@ -192,7 +192,7 @@ static void glwSliderLayout(GLWLayoutManager *_this,GLWSlider *_slider){
   while(hiInc(&hi)){
    const char **lblp;
          int    w;
-   lblp=hiGetValue(&hi);
+	 lblp=static_cast<const char**>(hiGetValue(&hi));
    if(lblp!=NULL&&*lblp!=NULL){
     w=glwFontGetStringWidth(_slider->super.font,*lblp);
     if(w>_slider->label_rect.w)_slider->label_rect.w=w;} }
@@ -661,10 +661,10 @@ const GLWCallbacks GLW_SLIDER_CALLBACKS={
 
 
 GLWSlider *glwSliderAlloc(int _min,int _max,int _val,int _ext){
- GLWSlider *this;
- this=(GLWSlider *)malloc(sizeof(GLWSlider));
- if(this!=NULL)glwSliderInit(this,_min,_max,_val,_ext);
- return this;}
+ GLWSlider *this_;
+ this_=(GLWSlider *)malloc(sizeof(GLWSlider));
+ if(this_!=NULL)glwSliderInit(this_,_min,_max,_val,_ext);
+ return this_;}
 
 void glwSliderInit(GLWSlider *_this,int _min,int _max,int _val,int _ext){
  glwCompInit(&_this->super);
@@ -798,7 +798,7 @@ int glwSliderAddLabel(GLWSlider *_this,int _val,const char *_label){
   char   **lblp;
   len=strlen(_label)+1;
   lbl=(char *)malloc(len*sizeof(char));
-  lblp=htGet(&_this->labels,&_val);
+  lblp=static_cast<char**>(htGet(&_this->labels,&_val));
   if(lblp!=NULL){
    free(*lblp);
    *lblp=lbl;}

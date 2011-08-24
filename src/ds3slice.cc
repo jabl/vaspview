@@ -473,7 +473,7 @@ static int ds3SliceTexture3D(DS3Slice *_this,DS3View *_view){
   glTexParameteri(GL_TEXTURE_3D,GL_TEXTURE_WRAP_S,GL_REPEAT);
   glTexParameteri(GL_TEXTURE_3D,GL_TEXTURE_WRAP_T,GL_REPEAT);
   glTexParameteri(GL_TEXTURE_3D,GL_TEXTURE_WRAP_R,GL_REPEAT);
-#  if defined(GL_EXT_paletted_texture)
+#if defined(GL_EXT_paletted_texture) && defined(_WIN32)
   /*If we have paletted textures available, use those to reduce memory and
     CPU consumption to 1/4 of that for an RGBA texture*/
   if(has_gl_ext_paletted_texture){

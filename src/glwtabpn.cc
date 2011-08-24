@@ -744,10 +744,10 @@ const GLWCallbacks GLW_TABBED_PANE_CALLBACKS={
  NULL};
 
 GLWTabbedPane *glwTabbedPaneAlloc(void){
- GLWTabbedPane *this;
- this=(GLWTabbedPane *)malloc(sizeof(GLWTabbedPane));
- if(this!=NULL)glwTabbedPaneInit(this);
- return this;}
+ GLWTabbedPane *this_;
+ this_=(GLWTabbedPane *)malloc(sizeof(GLWTabbedPane));
+ if(this_!=NULL)glwTabbedPaneInit(this_);
+ return this_;}
 
 void glwTabbedPaneInit(GLWTabbedPane *_this){
  glwCompInit(&_this->super);

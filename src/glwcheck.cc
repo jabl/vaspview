@@ -32,10 +32,10 @@
 # define GLW_CHECK_BOX_INSET (2)
 
 GLWCheckBoxGroup *glwCheckBoxGroupAlloc(void){
- GLWCheckBoxGroup *this;
- this=(GLWCheckBoxGroup *)malloc(sizeof(GLWCheckBoxGroup));
- if(this!=NULL)glwCheckBoxGroupInit(this);
- return this;}
+ GLWCheckBoxGroup *this_;
+ this_=(GLWCheckBoxGroup *)malloc(sizeof(GLWCheckBoxGroup));
+ if(this_!=NULL)glwCheckBoxGroupInit(this_);
+ return this_;}
 
 void glwCheckBoxGroupInit(GLWCheckBoxGroup *_this){
  _DAInit(&_this->cbs,0,GLWCheckBox *);
@@ -347,11 +347,11 @@ const GLWCallbacks GLW_CHECK_BOX_CALLBACKS={
 
 GLWCheckBox *glwCheckBoxAlloc(const char *_label,int _state,
                               GLWCheckBoxGroup *_group){
- GLWCheckBox *this;
- this=(GLWCheckBox *)malloc(sizeof(GLWCheckBox));
- if(this!=NULL){
-  if(glwCheckBoxInit(this,_label,_state,_group))return this;
-  free(this);}
+ GLWCheckBox *this_;
+ this_=(GLWCheckBox *)malloc(sizeof(GLWCheckBox));
+ if(this_!=NULL){
+  if(glwCheckBoxInit(this_,_label,_state,_group))return this_;
+  free(this_);}
  return NULL;}
 
 int glwCheckBoxInit(GLWCheckBox *_this,const char *_label,int _state,

@@ -199,12 +199,12 @@ const GLWCallbacks GLW_BUTTON_CALLBACKS={
  NULL};
 
 GLWButton *glwButtonAlloc(const char *_label){
- GLWButton *this;
- this=(GLWButton *)malloc(sizeof(GLWButton));
- if(this!=NULL){
-  if(glwButtonInit(this,_label)){
-   return this;}
-  free(this);}
+ GLWButton *this_;
+ this_=(GLWButton *)malloc(sizeof(GLWButton));
+ if(this_!=NULL){
+  if(glwButtonInit(this_,_label)){
+   return this_;}
+  free(this_);}
  return NULL;}
 
 int glwButtonInit(GLWButton *_this,const char *_label){
