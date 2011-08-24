@@ -21,9 +21,6 @@
 #include <ctype.h>
 #include <string.h>
 #include "DynArray.hh"
-#pragma hdrstop
-#if !defined(_util_DynArray_C)
-# define _util_DynArray_C (1)
 
 # if !defined(_Min)
 #  define _Min(_a,_b) ((_a)<=(_b)?(_a):(_b))
@@ -223,9 +220,3 @@ void daTrimWS(CDynArray *_line)
         daDelRange(_line,0,i);
     }
 }
-
-
-
-
-
-#endif                                                      /*_util_DynArray_C*/

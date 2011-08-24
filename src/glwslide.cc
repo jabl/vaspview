@@ -20,9 +20,6 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include "glw.hh"
-#pragma hdrstop
-#if !defined(_glwslide_C)
-# define _glwslide_C (1)
 
 /*A slider component. Sliders may be horizontal or vertical, and may contain
   major and minor tick marks, and labels for specific values. A slider value
@@ -1223,5 +1220,3 @@ void glwSliderSetChangedCtx(GLWSlider *_this,void *_ctx)
 {
     _this->changed_ctx=_ctx;
 }
-
-#endif                                                           /*_glwslide_C*/

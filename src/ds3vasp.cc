@@ -16,9 +16,6 @@
   along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA*/
 #include "ds3vasp.hh"
-#pragma hdrstop
-#if !defined(_ds3vasp_C)
-# define _ds3vasp_C (1)
 
 /*Reads the VASP header, and sets up for reading the data asynchronously*/
 int ds3VaspReaderInit(DS3VaspReader *_this,DataSet3D *_ds3,FILE *_in)
@@ -202,5 +199,3 @@ int ds3VaspReaderCancel(DS3VaspReader *_this)
     ds3Dstr(_this->ds3);
     return 1;
 }
-
-#endif                                                            /*_ds3vasp_C*/

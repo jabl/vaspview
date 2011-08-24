@@ -19,9 +19,6 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include "glw.hh"
-#pragma hdrstop
-#if !defined(_glwcomp_C)
-# define _glwcomp_C (1)
 
 /*Generic component. All components can contain other components. They receive
   events from their parent (translated into their coordinate system), which
@@ -1439,5 +1436,3 @@ void glwCompSuperDispose(GLWComponent *_this,const GLWCallbacks *_cb)
     for (_cb=_cb->super; _cb!=NULL&&_cb->dispose==NULL; _cb=_cb->super);
     if (_cb!=NULL)_cb->dispose(_this,_cb);
 }
-
-#endif                                                            /*_glwcomp_C*/

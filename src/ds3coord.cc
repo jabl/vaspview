@@ -18,9 +18,6 @@
 #include "ds3.hh"
 #include "ds3view.hh"
 #include "ds3coord.hh"
-#pragma hdrstop
-#if !defined(_ds3coord_C)
-# define _ds3coord_C (1)
 
 # define DS3V_UNIT_ANGLE (5)                    /*Amount to turn per keystroke*/
 # define DS3V_UNIT_DIST  (0.05)                 /*Amount to move per keystroke*/
@@ -691,5 +688,3 @@ const GLWCallbacks DS3_VIEW_BOX_CALLBACKS=
     NULL,
     NULL
 };
-
-#endif                                                           /*_ds3coord_C*/

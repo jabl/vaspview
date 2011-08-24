@@ -19,9 +19,6 @@
 #include <string.h>
 #include <limits.h>
 #include "HashTbl.hh"
-#pragma hdrstop
-# if !defined(_util_HashTable_C)
-# define _util_HashTable_C (1)
 
 # define HT_GRP_MAX (sizeof(int)*CHAR_BIT)
 
@@ -608,5 +605,3 @@ int hiDel(CHashIterator *_this,void *_key,void *_val)
     }
     return 0;
 }
-
-#endif                                                     /*_util_HashTable_C*/

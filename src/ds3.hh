@@ -15,6 +15,10 @@
   You should have received a copy of the GNU General Public License
   along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA*/
+
+#ifndef DS3_HH
+#define DS3_HH
+
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -28,8 +32,6 @@
 #include <GL/glu.h>
 #include "glw.hh"
 #include "vect.hh"
-#if !defined(_ds3_H)
-# define _ds3_H (1)
 
 # if !defined(M_PI)
 #  define M_PI (3.141592653589793238462643)

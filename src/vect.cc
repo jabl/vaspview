@@ -15,13 +15,9 @@
   You should have received a copy of the GNU General Public License
   along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA*/
-#pragma hdrstop
-#if !defined(_vect_C)
-# define _vect_C (1)
+
 # include "vect.hh"
 
 _DeclareTypedVect3(double,d)
 
 _DefineTypedVect3(double,d)
-
-# endif                                                              /*_vect_C*/

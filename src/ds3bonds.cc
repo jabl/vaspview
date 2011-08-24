@@ -18,9 +18,6 @@
 #include "ds3.hh"
 #include "ds3view.hh"
 #include "ds3bonds.hh"
-#pragma hdrstop
-#if defined(__DS3_ADD_BONDS__)&&!defined(_ds3bonds_C)
-# define _ds3bonds_C (1)
 
 /*Initializes the bonds structure*/
 void ds3BondsInit(DS3Bonds *_this)
@@ -471,5 +468,3 @@ const GLWCallbacks DS3_VIEW_BNDS_CALLBACKS=
     NULL,
     (GLWMotionFunc)ds3ViewBondsPeerPassiveMotion
 };
-
-#endif                                                           /*_ds3bonds_C*/

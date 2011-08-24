@@ -18,9 +18,7 @@
 #include "ds3.hh"
 #include "ds3view.hh"
 #include "ds3slice.hh"
-#pragma hdrstop
-#if !defined(_ds3slice_C)
-# define _ds3slice_C (1)
+
 
 /*NOTE: The 2D slice extraction is the only operation that prevents the
   data set from being repeated an arbitrary amount in each direction. If we
@@ -1253,5 +1251,3 @@ void ds3SliceDstr(DS3Slice *_this,DS3View *_view)
     free(_this->cdata);
     _this->cdata=NULL;
 }
-
-#endif                                                           /*_ds3slice_C*/

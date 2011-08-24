@@ -15,10 +15,12 @@
   You should have received a copy of the GNU General Public License
   along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA*/
-#include <stddef.h>
-#include <stdlib.h>
+
 #if !defined(_HashTable_H)
 # define _HashTable_H (1)
+
+#include <stddef.h>
+#include <stdlib.h>
 
 #define HT_LOAD_MIN    (0.0625)
 #define HT_LOAD_DEF    (0.75)

@@ -19,9 +19,6 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include "glw.hh"
-#pragma hdrstop
-#if !defined(_glwcheck_C)
-# define _glwcheck_C (1)
 
 /*Checkbox component*/
 
@@ -676,4 +673,3 @@ void glwCheckBoxSetChangedCtx(GLWCheckBox *_this,void *_ctx)
     _this->changed_ctx=_ctx;
 }
 
-#endif                                                           /*_glwcheck_C*/

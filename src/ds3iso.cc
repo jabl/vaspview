@@ -18,9 +18,7 @@
 #include "ds3.hh"
 #include "ds3view.hh"
 #include "ds3iso.hh"
-#pragma hdrstop
-#if !defined(_ds3iso_C)
-# define _ds3iso_C (1)
+
 
 /*When generating the iso-surface, we cannot simply make a list of triangles
   to draw, for two reasons. One, the surface is translucent (so that it cannot
@@ -1010,5 +1008,3 @@ int ds3IsoMake(DS3IsoSurface *_this,DataSet3D *_ds3,double _v,int _d)
         return 1;
     }
 }
-
-#endif                                                             /*_ds3iso_C*/

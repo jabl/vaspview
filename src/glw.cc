@@ -19,9 +19,6 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include "glw.hh"
-#pragma hdrstop
-#if !defined(_glw_C)
-# define _glw_C (1)
 
 /*Initialization and a few miscellaneous functions (colors and fonts)*/
 
@@ -254,5 +251,3 @@ void glwInsetsInit(GLWInsets *_this,int _t,int _b,int _l,int _r)
     _this->l=_l;
     _this->r=_r;
 }
-
-#endif                                                                /*_glw_C*/

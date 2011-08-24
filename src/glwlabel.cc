@@ -19,9 +19,6 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include "glw.hh"
-#pragma hdrstop
-#if !defined(_glwlabel_C)
-# define _glwlabel_C (1)
 
 /*A static, one line label component*/
 
@@ -208,5 +205,3 @@ int glwLabelAddLabel(GLWLabel *_this,const char *_label)
     else return 1;
     return 0;
 }
-
-#endif                                                           /*_glwlabel_C*/

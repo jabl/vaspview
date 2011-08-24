@@ -17,9 +17,6 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA*/
 #include "ds3.hh"
 #include "ds3legnd.hh"
-#pragma hdrstop
-#if !defined(_ds3legnd_C)
-# define _ds3legnd_C (1)
 
 /*Draws the color scale for the color legend*/
 static void dsColorLegendScalePeerDisplay(GLWComponent *_this,
@@ -192,5 +189,3 @@ int dsColorLegendAddLabel(DSColorLegend *_this,const char *_label)
 {
     return glwLabelAddLabel(_this->lb_label,_label);
 }
-
-#endif                                                           /*_ds3legnd_C*/

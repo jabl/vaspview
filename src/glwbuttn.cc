@@ -19,9 +19,6 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include "glw.hh"
-#pragma hdrstop
-#if !defined(_glwbuttn_C)
-# define _glwbuttn_C (1)
 
 /*Button component*/
 
@@ -367,5 +364,3 @@ void glwButtonSetPressedCtx(GLWButton *_this,void *_ctx)
 {
     _this->pressed_ctx=_ctx;
 }
-
-#endif                                                                /*_viz_C*/

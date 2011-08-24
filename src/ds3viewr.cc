@@ -20,9 +20,6 @@
 #include "ds3legnd.hh"
 #include "ds3view.hh"
 #include "ds3viewr.hh"
-#pragma hdrstop
-#if !defined(_ds3viewr_C)
-# define _ds3viewr_C (1)
 
 static void ds3ViewerTextChanged(DS3Viewer *_this,GLWComponent *_c);
 static void ds3ViewerTextSet(DS3Viewer *_this,GLWComponent *_c);
@@ -2630,5 +2627,3 @@ void ds3ViewerOpenFile(DS3Viewer *_this,const char *_file)
         }
     }
 }
-
-#endif                                                           /*_ds3viewr_C*/

@@ -15,10 +15,12 @@
   You should have received a copy of the GNU General Public License
   along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA*/
-#include "ds3.hh"
-#include "ds3view.hh"
+
 #if !defined(_ds3slice_H)
 # define _ds3slice_H (1)
+
+#include "ds3.hh"
+#include "ds3view.hh"
 
 typedef struct DS3Slice DS3Slice;
 

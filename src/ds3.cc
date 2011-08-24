@@ -17,9 +17,6 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA*/
 #include "ds3.hh"
 #include "ds3viewr.hh"
-#pragma hdrstop
-#if !defined(_ds3_C)
-# define _ds3_C (1)
 
 /*Initializes the data set to default values*/
 void ds3Init(DataSet3D *_this)
@@ -505,5 +502,3 @@ int main(int _argc,char **_argv)
     else fprintf(stderr,"Could not initialize UI.\n");
     return 1;
 }
-
-#endif                                                                /*_ds3_C*/

@@ -15,6 +15,10 @@
   You should have received a copy of the GNU General Public License
   along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA*/
+
+#if !defined(_glw_H)
+# define _glw_H (1)
+
 #include <stddef.h>
 #include <stdlib.h>
 #include <ctype.h>
@@ -23,8 +27,6 @@
 #include <string.h>
 #include "DynArray.hh"
 #include "HashTbl.hh"
-#if !defined(_glw_H)
-# define _glw_H (1)
 
 /*This is a small, portable component library that is dependent only on OpenGL
   and GLUT. It is not very general purpose, and in order to be made so

@@ -18,9 +18,7 @@
 #include "ds3.hh"
 #include "ds3view.hh"
 #include "ds3pts.hh"
-#pragma hdrstop
-#if !defined(_ds3pts_C)
-# define _ds3pts_C (1)
+
 
 /*Draws the atoms*/
 static void ds3ViewPointsPeerDisplay(DS3ViewComp *_this,
@@ -340,5 +338,3 @@ const GLWCallbacks DS3_VIEW_PTS_CALLBACKS=
     NULL,
     (GLWMotionFunc)ds3ViewPointsPeerPassiveMotion
 };
-
-#endif                                                             /*_ds3pts_C*/

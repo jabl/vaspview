@@ -19,9 +19,6 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include "glw.hh"
-#pragma hdrstop
-#if !defined(_glwtextf_C)
-# define _glwtextf_C (1)
 
 /*Text field component. Although text may be selected, no clipboard or drag
   and drop capabilities are supported.*/
@@ -856,5 +853,3 @@ void glwTextFieldSetChangedCtx(GLWTextField *_this,void *_ctx)
 {
     _this->changed_ctx=_ctx;
 }
-
-#endif                                                                /*_viz_C*/

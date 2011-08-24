@@ -19,9 +19,7 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include "glw.hh"
-#pragma hdrstop
-#if !defined(_glwtabpn_C)
-# define _glwtabpn_C (1)
+
 
 /*A tabbed pane component. Instead of adding children directly, components are
   added as tabs. Only the currently active tab's component is ever actually a
@@ -1340,5 +1338,3 @@ int glwTabbedPaneAddTitleAt(GLWTabbedPane *_this,int _idx,const char *_s)
     else return 1;
     return 0;
 }
-
-#endif                                                           /*_glwtabpn_C*/

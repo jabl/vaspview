@@ -19,9 +19,6 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include "glw.hh"
-#pragma hdrstop
-#if !defined(_glwframe_C)
-# define _glwframe_C (1)
 
 /*The highest-level component.*/
 
@@ -354,5 +351,3 @@ void glwFramePack(GLWFrame *_this)
         if (wid!=_this->super.wid)glutSetWindow(wid);
     }
 }
-
-#endif                                                           /*_glwframe_C*/

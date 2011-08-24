@@ -15,9 +15,11 @@
   You should have received a copy of the GNU General Public License
   along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA*/
+
+#ifndef DS3BONDS_HH
+#define DS3BONDS_HH
+
 #include "ds3.hh"
-#if defined(__DS3_ADD_BONDS__)&&!defined(_ds3bonds_H)
-# define _ds3bonds_H (1)
 
 typedef struct DS3Bonds DS3Bonds;
 

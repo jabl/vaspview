@@ -17,9 +17,6 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA*/
 #include "ds3.hh"
 #include "ds3view.hh"
-#pragma hdrstop
-#if !defined(_ds3view_C)
-# define _ds3view_C (1)
 
 typedef struct DS3ViewParams
 {
@@ -2096,4 +2093,3 @@ int ds3ViewGetSelectedBond(DS3View *_this,long *_from,long *_to)
 }
 # endif
 
-#endif                                                            /*_ds3view_C*/
