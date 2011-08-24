@@ -29,7 +29,6 @@
 #include <unordered_map>
 #include <string>
 #include "DynArray.hh"
-#include "HashTbl.hh"
 
 /*This is a small, portable component library that is dependent only on OpenGL
   and GLUT. It is not very general purpose, and in order to be made so
