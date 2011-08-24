@@ -1,6 +1,7 @@
 /*GL Widget Set - simple, portable OpenGL/GLUT widget set
   Copyright (C) 1999-2001 Timothy B. Terriberry
   (mailto:tterribe@users.sourceforge.net)
+  2011 Janne Blomqvist
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -224,11 +225,10 @@ static void glwSliderLayout(GLWLayoutManager *_this,GLWSlider *_slider)
 {
     if (_slider->ornt==GLWC_VERTICAL)
     {
-        CHashIterator hi;
         int           h;
         _slider->thumb_rect.w=GLW_SLIDER_THUMB_HEIGHT;
         _slider->thumb_rect.h=GLW_SLIDER_THUMB_WIDTH;
-        if (_slider->labels.size>0&&_slider->center_labels)
+        if (_slider->labels.size() > 0 && _slider->center_labels)
         {
             _slider->track_offs=(glwFontGetHeight(_slider->super.font)>>1)+
                                 GLW_SLIDER_INSET;
@@ -249,17 +249,12 @@ static void glwSliderLayout(GLWLayoutManager *_this,GLWSlider *_slider)
         _slider->label_rect.y=_slider->tick_rect.y-_slider->track_offs+
                               GLW_SLIDER_INSET;
         _slider->label_rect.w=0;
-        hiInit(&hi,&_slider->labels);
-        while (hiInc(&hi))
+	for (auto it = _slider->labels.begin(); 
+	     it != _slider->labels.end(); ++it)
         {
-            const char **lblp;
-            int    w;
-            lblp=static_cast<const char**>(hiGetValue(&hi));
-            if (lblp!=NULL&&*lblp!=NULL)
-            {
-                w=glwFontGetStringWidth(_slider->super.font,*lblp);
-                if (w>_slider->label_rect.w)_slider->label_rect.w=w;
-            }
+		std::string& lblp = (*it).second;
+		int w = glwFontGetStringWidth(_slider->super.font, lblp.c_str());
+	    if (w>_slider->label_rect.w)_slider->label_rect.w=w;
         }
         _slider->label_rect.h=_slider->tick_rect.h+
                               (_slider->track_offs-GLW_SLIDER_INSET<<1);
@@ -272,20 +267,21 @@ static void glwSliderLayout(GLWLayoutManager *_this,GLWSlider *_slider)
         int w;
         _slider->thumb_rect.w=GLW_SLIDER_THUMB_WIDTH;
         _slider->thumb_rect.h=GLW_SLIDER_THUMB_HEIGHT;
-        if (_slider->labels.size>0&&_slider->center_labels)
+        if (!_slider->labels.empty() && _slider->center_labels)
         {
-            const char **lblp;
-            lblp=(const char **)htGet(&_slider->labels,&_slider->label_lo);
-            if (lblp!=NULL&&*lblp!=NULL)
-            {
-                _slider->track_offs=(glwFontGetStringWidth(_slider->super.font,*lblp)>>1)+
+		auto it = _slider->labels.find(_slider->label_lo);
+		if (it != _slider->labels.end())
+		{
+			std::string& lblp = (*it).second;
+			_slider->track_offs=(glwFontGetStringWidth(_slider->super.font,lblp.c_str())>>1)+
                                     GLW_SLIDER_INSET;
-            }
-            lblp=(const char **)htGet(&_slider->labels,&_slider->label_hi);
-            if (lblp!=NULL&&*lblp!=NULL)
-            {
-                w=(glwFontGetStringWidth(_slider->super.font,*lblp)>>1)+GLW_SLIDER_INSET;
-            }
+		}
+		it = _slider->labels.find(_slider->label_hi);
+		if (it != _slider->labels.end())
+		{
+			std::string& lblp= (*it).second;
+			w=(glwFontGetStringWidth(_slider->super.font,lblp.c_str())>>1)+GLW_SLIDER_INSET;
+		}
             if (w>_slider->track_offs)_slider->track_offs=w;
         }
         else _slider->track_offs=GLW_SLIDER_INSET;
@@ -307,7 +303,7 @@ static void glwSliderLayout(GLWLayoutManager *_this,GLWSlider *_slider)
         _slider->label_rect.y=_slider->tick_rect.y;
         _slider->label_rect.w=_slider->tick_rect.w+
                               (_slider->track_offs-GLW_SLIDER_INSET<<1);
-        if (_slider->labels.size>0)
+        if (_slider->labels.size() > 0)
         {
             _slider->label_rect.h=glwFontGetHeight(_slider->super.font);
         }
@@ -472,33 +468,29 @@ void glwSliderPeerDisplay(GLWSlider *_this,GLWCallbacks *_cb)
             }
             glEnd();
         }
-        if (_this->labels.size>0)                                  /*Draw the labels*/
+        if (_this->labels.size() > 0)                                  /*Draw the labels*/
         {
-            CHashIterator   ci;
-            int            *vp;
-            const char          **lblp;
             double          dy;
             int             ch;
             ch=glwFontGetHeight(_this->super.font);
             cx=_this->label_rect.x+GLW_SLIDER_INSET;
             dy=glwFontGetDescent(_this->super.font);
-            hiInit(&ci,&_this->labels);
-            while (hiInc(&ci))
+            //hiInit(&ci,&_this->labels);
+            //while (hiInc(&ci))
+	    for (auto it = _this->labels.begin(); 
+		 it != _this->labels.end(); ++it)
             {
-                vp=(int *)hiGetKey(&ci);
-                lblp=(const char **)hiGetValue(&ci);
-                if (vp!=NULL&&lblp!=NULL&&*lblp!=NULL)
-                {
+		    int vp= (*it).first;
+		    std::string& lblp = (*it).second;
                     double cy;
-                    cy=glwSliderGetYPos(_this,*vp)-0.5*ch;
+                    cy=glwSliderGetYPos(_this,vp)-0.5*ch;
                     if (cy<_this->label_rect.y)cy=_this->label_rect.y;
                     if (cy+ch>_this->label_rect.y+_this->label_rect.h)
                     {
                         cy=_this->label_rect.y+_this->label_rect.h-ch;
                     }
-                    glwFontDrawString(_this->super.font,*lblp,cx,cy+dy);
-                }
-            }
+                    glwFontDrawString(_this->super.font,lblp.c_str(),cx,cy+dy);
+	    }
         }
     }
     else
@@ -587,31 +579,27 @@ void glwSliderPeerDisplay(GLWSlider *_this,GLWCallbacks *_cb)
             }
             glEnd();
         }
-        if (_this->labels.size>0)                                  /*Draw the labels*/
+        if (_this->labels.size() > 0)                                  /*Draw the labels*/
         {
-            CHashIterator   ci;
-            int            *vp;
-            const char          **lblp;
             cy=_this->label_rect.y+glwFontGetDescent(_this->super.font);
-            hiInit(&ci,&_this->labels);
-            while (hiInc(&ci))
+            //hiInit(&ci,&_this->labels);
+            //while (hiInc(&ci))
+	    for (auto it = _this->labels.begin(); 
+		 it != _this->labels.end(); ++it)
             {
-                vp=(int *)hiGetKey(&ci);
-                lblp=(const char **)hiGetValue(&ci);
-                if (vp!=NULL&&lblp!=NULL&&*lblp!=NULL)
-                {
+		    int vp= (*it).first;
+		    std::string& lblp = (*it).second;
                     double cx;
                     double cw;
-                    cw=glwFontGetStringWidth(_this->super.font,*lblp);
-                    cx=glwSliderGetXPos(_this,*vp)-0.5*cw;
+                    cw=glwFontGetStringWidth(_this->super.font,lblp.c_str());
+                    cx=glwSliderGetXPos(_this,vp)-0.5*cw;
                     if (cx+cw>_this->label_rect.x+_this->label_rect.w)
                     {
                         cx=_this->label_rect.x+_this->label_rect.w-cw;
                     }
                     if (cx<_this->label_rect.x)cx=_this->label_rect.x;
-                    glwFontDrawString(_this->super.font,*lblp,cx,cy);
-                }
-            }
+                    glwFontDrawString(_this->super.font,lblp.c_str(),cx,cy);
+	    }
         }
     }
     if (glwCompIsFocused(&_this->super))               /*Draw the focus rectangle*/
@@ -856,16 +844,8 @@ static int glwSliderPeerMotion(GLWSlider *_this,GLWCallbacks *_cb,
 
 static void glwSliderPeerDispose(GLWSlider *_this,GLWCallbacks *_cb)
 {
-    CHashIterator hi;
     glwCompSuperDispose(&_this->super,_cb);
-    hiInit(&hi,&_this->labels);
-    while (hiInc(&hi))
-    {
-        char **lblp;
-        lblp=(char **)hiGetValue(&hi);
-        if (lblp!=NULL)free(*lblp);
-    }
-    htDstr(&_this->labels);
+    _this->labels.clear();
 }
 
 
@@ -890,8 +870,9 @@ const GLWCallbacks GLW_SLIDER_CALLBACKS=
 
 GLWSlider *glwSliderAlloc(int _min,int _max,int _val,int _ext)
 {
-    GLWSlider *this_;
-    this_=(GLWSlider *)malloc(sizeof(GLWSlider));
+	// Must be allocated by new in order to run constructors for labels map
+	// TODO: Fix  destruction to use delete instead of free()
+	GLWSlider *this_ = new GLWSlider();
     if (this_!=NULL)glwSliderInit(this_,_min,_max,_val,_ext);
     return this_;
 }
@@ -902,7 +883,6 @@ void glwSliderInit(GLWSlider *_this,int _min,int _max,int _val,int _ext)
     _this->super.callbacks=&GLW_SLIDER_CALLBACKS;
     glwCompSetLayout(&_this->super,&glw_slider_layout);
     glwCompSetFocusable(&_this->super,1);
-    _HTInit(&_this->labels,0,int,const char *,NULL,NULL);
     _this->changed=NULL;
     _this->changed_ctx=NULL;
     _this->major_ticks=0;
@@ -938,7 +918,7 @@ void glwSliderSetCenteringLabels(GLWSlider *_this,int _b)
     if (_this->center_labels!=(_b?1U:0U))
     {
         _this->center_labels=_b?1:0;
-        if (_this->labels.size>0)glwCompRepaint(&_this->super,0);
+        if (_this->labels.size() > 0) glwCompRepaint(&_this->super,0);
     }
 }
 
@@ -1099,25 +1079,28 @@ int glwSliderAddLabel(GLWSlider *_this,int _val,const char *_label)
     if (_label==NULL)return glwSliderDelLabel(_this,_val);
     else
     {
-        size_t   len;
-        char    *lbl;
-        char   **lblp;
-        len=strlen(_label)+1;
-        lbl=(char *)malloc(len*sizeof(char));
-        lblp=static_cast<char**>(htGet(&_this->labels,&_val));
-        if (lblp!=NULL)
-        {
-            free(*lblp);
-            *lblp=lbl;
-        }
-        else if (htIns(&_this->labels,&_val,&lbl)==NULL)
-        {
-            free(lbl);
-            return 0;
-        }
-        if (_this->labels.size==1||_this->label_lo>_val)_this->label_lo=_val;
-        if (_this->labels.size==1||_this->label_hi<_val)_this->label_hi=_val;
-        memcpy(lbl,_label,len);
+	    _this->labels.erase(_val);
+	    std::string tmp(_label);
+	    _this->labels.insert(std::pair<int, std::string>(_val, tmp));
+        // size_t   len;
+        // char    *lbl;
+        // char   **lblp;
+        // len=strlen(_label)+1;
+        // lbl=(char *)malloc(len*sizeof(char));
+        // lblp=static_cast<char**>(htGet(&_this->labels,&_val));
+        // if (lblp!=NULL)
+        // {
+        //     free(*lblp);
+        //     *lblp=lbl;
+        // }
+        // else if (htIns(&_this->labels,&_val,&lbl)==NULL)
+        // {
+        //     free(lbl);
+        //     return 0;
+        // }
+	    if (_this->labels.size() == 1||_this->label_lo>_val)_this->label_lo=_val;
+	    if (_this->labels.size() == 1||_this->label_hi<_val)_this->label_hi=_val;
+        //memcpy(lbl,_label,len);
         glwCompRevalidate(&_this->super);
         return 1;
     }
@@ -1125,31 +1108,21 @@ int glwSliderAddLabel(GLWSlider *_this,int _val,const char *_label)
 
 int glwSliderDelLabel(GLWSlider *_this,int _val)
 {
-    char *lbl;
-    if (htDel(&_this->labels,&_val,&lbl))
-    {
-        free(lbl);
+	_this->labels.erase(_val);
         if (_val==_this->label_lo||_val==_this->label_hi)
         {
-            CHashIterator  hi;
-            int           *v;
             _this->label_lo=INT_MAX;
             _this->label_hi=INT_MIN;
-            hiInit(&hi,&_this->labels);
-            while (hiInc(&hi))
+	    for (auto it = _this->labels.begin(); 
+		 it != _this->labels.end(); ++it)
             {
-                v=(int *)hiGetKey(&hi);
-                if (v!=NULL)
-                {
-                    if (*v<_this->label_lo)_this->label_lo=*v;
-                    if (*v>_this->label_hi)_this->label_hi=*v;
-                }
-            }
+		    int v= (*it).first;
+                    if (v < _this->label_lo) _this->label_lo=v;
+                    if (v > _this->label_hi) _this->label_hi=v;
+	    }
         }
         glwCompRevalidate(&_this->super);
         return 1;
-    }
-    return 0;
 }
 
 int glwSliderMakeLabels(GLWSlider *_this,int _start,int _inc)

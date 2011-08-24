@@ -1,6 +1,7 @@
 /*GL Widget Set - simple, portable OpenGL/GLUT widget set
   Copyright (C) 1999-2001 Timothy B. Terriberry
   (mailto:tterribe@users.sourceforge.net)
+  2011 Janne Blomqvist
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -25,6 +26,8 @@
 #include <limits.h>
 #include <math.h>
 #include <string.h>
+#include <unordered_map>
+#include <string>
 #include "DynArray.hh"
 #include "HashTbl.hh"
 
@@ -597,7 +600,7 @@ struct GLWSlider
     GLWComponent   super;
     GLWActionFunc  changed;
     void          *changed_ctx;
-    CHashTable     labels;
+    std::unordered_map<int, std::string>     labels;
     int            major_ticks;
     int            major_offs;
     int            minor_ticks;
