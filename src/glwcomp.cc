@@ -1,6 +1,7 @@
 /*GL Widget Set - simple, portable OpenGL/GLUT widget set
   Copyright (C) 1999-2001 Timothy B. Terriberry
   (mailto:tterribe@users.sourceforge.net)
+  2011 Janne Blomqvist
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -19,6 +20,8 @@
 #include <GL/gl.h>
 #include <GL/glu.h>
 #include "glw.hh"
+
+#include <unordered_map>
 
 /*Generic component. All components can contain other components. They receive
   events from their parent (translated into their coordinate system), which
@@ -42,8 +45,8 @@ typedef struct GLWTimerEntry
 
 static int glw_timer_id;
 static int glw_idler_id;
-CHashTable glw_timer_table;
-CHashTable glw_idler_table;
+std::unordered_map<int, GLWTimerEntry> glw_timer_table;
+std::unordered_map<int, GLWTimerEntry> glw_idler_table;
 
 static void glwCompGlutPostRedisplay(int _wid)
 {
@@ -56,32 +59,28 @@ static void glwCompGlutPostRedisplay(int _wid)
 
 static void glwCompGlutTimer(int _id)
 {
-    GLWTimerEntry timer;
-    if (htDel(&glw_timer_table,&_id,&timer))
+    auto it = glw_timer_table.find(_id);
+    if (it != glw_timer_table.end())
     {
-        glutSetWindow(timer.comp->wid);
-        timer.func(timer.ctx,timer.comp);
+	    GLWTimerEntry timer = (*it).second;
+	    timer.func(timer.ctx,timer.comp);
+	    glutSetWindow(timer.comp->wid);
     }
+    glw_timer_table.erase(_id);
 }
 
 static void glwCompGlutIdle(void)
 {
-    CHashIterator  hi;
-    GLWTimerEntry *idler;
-    int            clear;
-    clear=1;
-    hiInit(&hi,&glw_idler_table);
-    while (hiInc(&hi))
+    int clear = 1;
+    for (auto it = glw_idler_table.begin(); it != glw_idler_table.end(); ++it)
     {
-        idler=static_cast<GLWTimerEntry*> (hiGetValue(&hi));
-        if (idler!=NULL)
-        {
-            glutSetWindow(idler->comp->wid);
-            idler->func(idler->ctx,idler->comp);
+	    GLWTimerEntry& idler = (*it).second;
+            glutSetWindow(idler.comp->wid);
+            idler.func(idler.ctx, idler.comp);
             clear=0;
-        }
     }
-    if (clear)glutIdleFunc(NULL);
+    if (clear)
+	    glutIdleFunc(NULL);
 }
 
 static void glwCompPeerDisplay(GLWComponent *_this,const GLWCallbacks *_cb)
@@ -1092,19 +1091,18 @@ int glwCompAddTimer(GLWComponent *_this,GLWActionFunc _func,
     int           id;
     id=++glw_timer_id;
     if (!id)id=++glw_timer_id;
-    while (htGet(&glw_timer_table,&id)!=NULL)id=++glw_timer_id;
+    while (glw_timer_table.find(id) != glw_timer_table.end())
+	    id = ++glw_timer_id;
     timer.comp=_this;
     timer.ctx=_ctx;
     timer.func=_func;
-    if (htIns(&glw_timer_table,&id,&timer))
+    glw_timer_table.insert(std::pair<int, GLWTimerEntry>(id, timer));
+    if (daInsTail(&_this->timers,&id))
     {
-        if (daInsTail(&_this->timers,&id))
-        {
             glutTimerFunc(_millis,glwCompGlutTimer,id);
             return id;
-        }
-        htDel(&glw_timer_table,&id,NULL);
     }
+    glw_timer_table.erase(id);
     return 0;
 }
 
@@ -1116,7 +1114,7 @@ int glwCompDelTimer(GLWComponent *_this,int _id)
     for (i=_this->timers.size; i-->0;)if (ids[i]==_id)
         {
             daDelAt(&_this->timers,i);
-            htDel(&glw_timer_table,&_id,NULL);
+            glw_timer_table.erase(_id);
             return 1;
         }
     return 0;
@@ -1124,17 +1122,23 @@ int glwCompDelTimer(GLWComponent *_this,int _id)
 
 GLWActionFunc glwCompGetTimerFunc(GLWComponent *_this,int _id)
 {
-    GLWTimerEntry *entry;
-    entry=static_cast<GLWTimerEntry*> (htGet(&glw_timer_table,&_id));
-    if (entry!=NULL)return entry->func;
+    auto it = glw_timer_table.find(_id);
+    if (it != glw_timer_table.end())
+    {
+	    GLWTimerEntry& entry = (*it).second;
+	    return entry.func;
+    }
     return NULL;
 }
 
 void *glwCompGetTimerCtx(GLWComponent *_this,int _id)
 {
-    GLWTimerEntry *entry;
-    entry=static_cast<GLWTimerEntry*> (htGet(&glw_timer_table,&_id));
-    if (entry!=NULL)return entry->ctx;
+    auto it = glw_timer_table.find(_id);
+    if (it != glw_timer_table.end())
+    {
+	    GLWTimerEntry& entry = (*it).second;
+	    return entry.ctx;
+    }
     return NULL;
 }
 
@@ -1153,20 +1157,20 @@ int glwCompAddIdler(GLWComponent *_this,GLWActionFunc _func,void *_ctx)
     GLWTimerEntry idler;
     int           id;
     id=++glw_idler_id;
-    if (!id)id=++glw_idler_id;
-    while (htGet(&glw_idler_table,&id)!=NULL)id=++glw_idler_id;
+    if (!id)
+	    id = ++glw_idler_id;
+    while (glw_idler_table.find(id) != glw_idler_table.end())
+	    id = ++glw_idler_id;
     idler.comp=_this;
     idler.ctx=_ctx;
     idler.func=_func;
-    if (htIns(&glw_idler_table,&id,&idler))
+    glw_idler_table.insert(std::pair<int, GLWTimerEntry>(id, idler));
+    if (daInsTail(&_this->idlers,&id))
     {
-        if (daInsTail(&_this->idlers,&id))
-        {
             glutIdleFunc(glwCompGlutIdle);
             return id;
-        }
-        htDel(&glw_idler_table,&id,NULL);
     }
+    glw_idler_table.erase(id);
     return 0;
 }
 
@@ -1178,8 +1182,9 @@ int glwCompDelIdler(GLWComponent *_this,int _id)
     for (i=_this->idlers.size; i-->0;)if (ids[i]==_id)
         {
             daDelAt(&_this->idlers,i);
-            htDel(&glw_idler_table,&_id,NULL);
-            if (glw_idler_table.size<=0)glutIdleFunc(NULL);
+            glw_idler_table.erase(_id);
+            if (glw_idler_table.empty())
+		    glutIdleFunc(NULL);
             return 1;
         }
     return 0;
@@ -1187,18 +1192,24 @@ int glwCompDelIdler(GLWComponent *_this,int _id)
 
 GLWActionFunc glwCompGetIdlerFunc(GLWComponent *_this,int _id)
 {
-    GLWTimerEntry *entry;
-    entry=static_cast<GLWTimerEntry*>(htGet(&glw_idler_table,&_id));
-    if (entry!=NULL)return entry->func;
-    return NULL;
+	auto it = glw_idler_table.find(_id);
+	if (it != glw_idler_table.end())
+	{
+		GLWTimerEntry& entry = (*it).second;
+		return entry.func;
+	}
+	return NULL;
 }
 
 void *glwCompGetIdlerCtx(GLWComponent *_this,int _id)
 {
-    GLWTimerEntry *entry;
-    entry=static_cast<GLWTimerEntry*>(htGet(&glw_idler_table,&_id));
-    if (entry!=NULL)return entry->ctx;
-    return NULL;
+	auto it = glw_idler_table.find(_id);
+	if (it != glw_idler_table.end())
+	{
+		GLWTimerEntry& entry = (*it).second;
+		return entry.ctx;
+	}
+	return NULL;
 }
 
 int glwCompGetIdlerCount(GLWComponent *_this)
