@@ -18,7 +18,7 @@
 #include <GL/glut.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include "glw.h"
+#include "glw.hh"
 #pragma hdrstop
 #if !defined(_glwtextf_C)
 # define _glwtextf_C (1)

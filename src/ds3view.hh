@@ -15,7 +15,7 @@
   You should have received a copy of the GNU General Public License
   along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA*/
-#include "ds3.h"
+#include "ds3.hh"
 #if !defined(_ds3view_H)
 # define _ds3view_H (1)
 
@@ -24,13 +24,13 @@ typedef struct DS3ViewComp DS3ViewComp;
 
 
 
-# include "ds3coord.h"
-# include "ds3pts.h"
+# include "ds3coord.hh"
+# include "ds3pts.hh"
 # if defined(__DS3_ADD_BONDS__)
-#  include "ds3bonds.h"
+#  include "ds3bonds.hh"
 # endif
-# include "ds3slice.h"
-# include "ds3iso.h"
+# include "ds3slice.hh"
+# include "ds3iso.hh"
 
 
 

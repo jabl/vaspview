@@ -19,7 +19,7 @@
 #include <GL/glut.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include "glw.h"
+#include "glw.hh"
 #pragma hdrstop
 #if !defined(_glwslide_C)
 # define _glwslide_C (1)

@@ -21,8 +21,8 @@
 #include <limits.h>
 #include <math.h>
 #include <string.h>
-#include "DynArray.h"
-#include "HashTbl.h"
+#include "DynArray.hh"
+#include "HashTbl.hh"
 #if !defined(_glw_H)
 # define _glw_H (1)
 

@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
-#include "DynArray.h"
+#include "DynArray.hh"
 #pragma hdrstop
 #if !defined(_util_DynArray_C)
 # define _util_DynArray_C (1)

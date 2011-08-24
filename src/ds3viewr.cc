@@ -15,11 +15,11 @@
   You should have received a copy of the GNU General Public License
   along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA*/
-#include "ds3.h"
-#include "ds3vasp.h"
-#include "ds3legnd.h"
-#include "ds3view.h"
-#include "ds3viewr.h"
+#include "ds3.hh"
+#include "ds3vasp.hh"
+#include "ds3legnd.hh"
+#include "ds3view.hh"
+#include "ds3viewr.hh"
 #pragma hdrstop
 #if !defined(_ds3viewr_C)
 # define _ds3viewr_C (1)

@@ -18,7 +18,7 @@
 #pragma hdrstop
 #if !defined(_vect_C)
 # define _vect_C (1)
-# include "vect.h"
+# include "vect.hh"
 
 _DeclareTypedVect3(double,d)
 

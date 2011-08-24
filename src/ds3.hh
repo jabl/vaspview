@@ -26,8 +26,8 @@
 #include <GL/glut.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
-#include "glw.h"
-#include "vect.h"
+#include "glw.hh"
+#include "vect.hh"
 #if !defined(_ds3_H)
 # define _ds3_H (1)
 

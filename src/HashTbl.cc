@@ -18,7 +18,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
-#include "HashTbl.h"
+#include "HashTbl.hh"
 #pragma hdrstop
 # if !defined(_util_HashTable_C)
 # define _util_HashTable_C (1)
