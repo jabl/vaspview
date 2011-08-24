@@ -1,0 +1,34 @@
+ds3.o: ds3.c ds3.h glw.h DynArray.h HashTbl.h vect.h ds3viewr.h \
+ ds3legnd.h ds3view.h ds3coord.h ds3pts.h ds3bonds.h ds3slice.h \
+ ds3iso.h
+ds3legnd.o: ds3legnd.c ds3.h glw.h DynArray.h HashTbl.h vect.h \
+ ds3legnd.h
+ds3coord.o: ds3coord.c ds3.h glw.h DynArray.h HashTbl.h vect.h \
+ ds3view.h ds3coord.h ds3pts.h ds3bonds.h ds3slice.h ds3iso.h
+ds3pts.o: ds3pts.c ds3.h glw.h DynArray.h HashTbl.h vect.h ds3view.h \
+ ds3coord.h ds3pts.h ds3bonds.h ds3slice.h ds3iso.h
+ds3bonds.o: ds3bonds.c ds3.h glw.h DynArray.h HashTbl.h vect.h \
+ ds3view.h ds3coord.h ds3pts.h ds3bonds.h ds3slice.h ds3iso.h
+ds3slice.o: ds3slice.c ds3.h glw.h DynArray.h HashTbl.h vect.h \
+ ds3view.h ds3coord.h ds3pts.h ds3bonds.h ds3slice.h ds3iso.h
+ds3iso.o: ds3iso.c ds3.h glw.h DynArray.h HashTbl.h vect.h ds3view.h \
+ ds3coord.h ds3pts.h ds3bonds.h ds3slice.h ds3iso.h
+ds3view.o: ds3view.c ds3.h glw.h DynArray.h HashTbl.h vect.h ds3view.h \
+ ds3coord.h ds3pts.h ds3bonds.h ds3slice.h ds3iso.h
+ds3vasp.o: ds3vasp.c ds3vasp.h ds3.h glw.h DynArray.h HashTbl.h vect.h
+ds3viewr.o: ds3viewr.c ds3.h glw.h DynArray.h HashTbl.h vect.h \
+ ds3vasp.h ds3legnd.h ds3view.h ds3coord.h ds3pts.h ds3bonds.h \
+ ds3slice.h ds3iso.h ds3viewr.h
+glw.o: glw.c glw.h DynArray.h HashTbl.h
+glwbuttn.o: glwbuttn.c glw.h DynArray.h HashTbl.h
+glwcheck.o: glwcheck.c glw.h DynArray.h HashTbl.h
+glwcomp.o: glwcomp.c glw.h DynArray.h HashTbl.h
+glwframe.o: glwframe.c glw.h DynArray.h HashTbl.h
+glwgridb.o: glwgridb.c glw.h DynArray.h HashTbl.h
+glwlabel.o: glwlabel.c glw.h DynArray.h HashTbl.h
+glwslide.o: glwslide.c glw.h DynArray.h HashTbl.h
+glwtabpn.o: glwtabpn.c glw.h DynArray.h HashTbl.h
+glwtextf.o: glwtextf.c glw.h DynArray.h HashTbl.h
+DynArray.o: DynArray.c DynArray.h
+HashTbl.o: HashTbl.c HashTbl.h
+vect.o: vect.c vect.h
