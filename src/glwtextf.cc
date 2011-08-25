@@ -109,7 +109,7 @@ static int glwTextFieldGetPosAt(GLWTextField *_this,int _x)
     x=4;
     ret=_this->offs-1;
     text=_DAGetAt(&_this->text,0,unsigned char);
-    if (ret<-1)ret==1;
+    if (ret < -1) ret = 1;
     w=0;
     while (_x+w>=x)
     {
