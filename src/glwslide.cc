@@ -1080,8 +1080,7 @@ int glwSliderAddLabel(GLWSlider *_this,int _val,const char *_label)
     else
     {
 	    _this->labels.erase(_val);
-	    std::string tmp(_label);
-	    _this->labels.insert(std::pair<int, std::string>(_val, tmp));
+	    _this->labels.insert(std::pair<int, std::string>(_val, _label));
         // size_t   len;
         // char    *lbl;
         // char   **lblp;
