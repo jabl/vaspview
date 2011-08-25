@@ -27,9 +27,8 @@
 #include <limits.h>
 #include <math.h>
 #include <string.h>
+#include <GL/glew.h>
 #include <GL/glut.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
 #include "glw.hh"
 #include "vect.hh"
 
@@ -41,94 +40,6 @@
 #  define M_E  (2.71828182845904523536)
 # endif
 
-# if !defined(GL_VERSION_1_1)
-#  error "OpenGL version 1.1 or later is required"
-# endif
-
-# if GLUT_API_VERSION<3
-#  error "GLUT version 3 or later is required"
-# endif
-
-#if defined(GL_EXT_paletted_texture)
-extern int has_gl_ext_paletted_texture;
-#if defined(_WIN32)&&!defined(MESA)
-extern PFNGLCOLORTABLEEXTPROC               gl_color_table_ext;
-extern PFNGLCOLORSUBTABLEEXTPROC            gl_color_sub_table_ext;
-extern PFNGLGETCOLORTABLEEXTPROC            gl_get_color_table_ext;
-extern PFNGLGETCOLORTABLEPARAMETERIVEXTPROC gl_get_color_table_parameterfv_ext;
-extern PFNGLGETCOLORTABLEPARAMETERFVEXTPROC gl_get_color_table_parameteriv_ext;
-#define glColorTableEXT               (*gl_color_table_ext)
-#   define glColorSubTableEXT            (*gl_color_sub_table_ext)
-#   define glGetColorTableEXT            (*gl_get_color_table_ext)
-#   define glGetColorTableParameterfvEXT (*gl_get_color_table_parameterfv_ext)
-#   define glGetColorTableParameterivEXT (*gl_get_color_table_parameteriv_ext)
-#  endif
-# endif
-
-/*Some systems claim to support 3D textures, but I cannot get them to work
-   (even the Mesa sample program stex3d does not work correctly on my Linux
-   laptop, for example, and I've reports of failures on SGI machines as well).
-  Until I can figure out what I'm doing wrong, __DS3_NO_3D_TEXTURES__ can be
-   defined to prevent the use of this feature.
-  It really is a much better way of doing things, though, so you should leave
-   it enabled unless you have problems (e.g., your texture is always just a
-   solid color).*/
-# if !defined(__DS3_NO_3D_TEXTURES__)
-#  if defined(GL_VERSION_1_2)         /*3D texturing is standard in OpenGL 1.2*/
-#   if !defined(GL_EXT_texture3d)
-#    define GL_EXT_texture3d (1)               /*Pretend we have the extension*/
-#   endif
-#  elif defined(GL_EXT_texture3d) /*If we have the extension, define 1.2 names*/
-extern int has_gl_ext_texture3d;
-#   if !defined(GL_PACK_SKIP_IMAGES)
-#    define GL_PACK_SKIP_IMAGES    GL_PACK_SKIP_IMAGES_EXT
-#   endif
-#   if !defined(GL_PACK_IMAGE_HEIGHT)
-#    define GL_PACK_IMAGE_HEIGHT   GL_PACK_IMAGE_HEIGHT_EXT
-#   endif
-#   if !defined(GL_UNPACK_SKIP_IMAGES)
-#    define GL_UNPACK_SKIP_IMAGES  GL_UNPACK_SKIP_IMAGES_EXT
-#   endif
-#   if !defined(GL_UNPACK_IMAGE_HEIGHT)
-#    define GL_UNPACK_IMAGE_HEIGHT GL_UNPACK_IMAGE_HEIGHT_EXT
-#   endif
-#   if !defined(GL_TEXTURE_3D)
-#    define GL_TEXTURE_3D          GL_TEXTURE_3D_EXT
-#   endif
-#   if !defined(GL_PROXY_TEXTURE_3D)
-#    define GL_PROXY_TEXTURE_3D    GL_PROXY_TEXTURE_3D_EXT
-#   endif
-#   if !defined(GL_TEXTURE_DEPTH)
-#    define GL_TEXTURE_DEPTH       GL_TEXTURE_DEPTH_EXT
-#   endif
-#   if !defined(GL_TEXTURE_WRAP_R)
-#    define GL_TEXTURE_WRAP_R      GL_TEXTURE_WRAP_R_EXT
-#   endif
-#   if !defined(GL_MAX_3D_TEXTURE_SIZE)
-#    define GL_MAX_3D_TEXTURE_SIZE GL_MAX_3D_TEXTURE_SIZE_EXT
-#   endif
-#   if !defined(GL_TEXTURE_3D_BINDING)
-#    define GL_TEXTURE_3D_BINDING  GL_TEXTURE_3D_BINDING_EXT
-#   endif
-#   if !defined(glTexImage3D)
-#    define glTexImage3D           glTexImage3DEXT
-#   endif
-#   if !defined(glTexSubImage3D)
-#    define glTexSubImage3D        glTexSubImage3DEXT
-#   endif
-#   if !defined(glCopyTexSubImage3D)
-#    define glCopyTexSubImage3D    glCopyTexSubImage3DEXT
-#   endif
-#   if defined(_WIN32)&&!defined(MESA)
-extern PFNGLTEXIMAGE3DEXTPROC        gl_tex_image3d_ext;
-extern PFNGLTEXSUBIMAGE3DEXTPROC     gl_tex_sub_image3d_ext;
-extern PFNGLCOPYTEXSUBIMAGE3DEXTPROC gl_copy_tex_sub_image3d_ext;
-#    define glTexImage3D        (*gl_tex_image3d_ext)
-#    define glTexSubImage3D     (*gl_tex_sub_image3d_ext)
-#    define glCopyTexSubImage3D (*gl_copy_tex_image3d_ext)
-#   endif
-#  endif
-# endif
 
 /*Undefine this macro to disable the ability to add bonds between atoms*/
 # define __DS3_ADD_BONDS__ (1)

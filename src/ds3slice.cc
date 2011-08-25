@@ -226,9 +226,9 @@ static int ds3SliceMake(DS3Slice *_this,DS3View *_view)
             o[2][1]=z<zdim-1?zoff:zoff-toff;
             l=x+xdim*(y+ydim*z);
             for (m=0; m<8; m++)c[m]=cdat[l+o[0][m&1]+o[1][(m&2)>>1]+o[2][(m&4)>>2]];
-            xm=(xf>>8)+1>>1;
-            ym=(yf>>8)+1>>1;
-            zm=(zf>>8)+1>>1;
+            xm=((xf>>8)+1)>>1;
+            ym=((yf>>8)+1)>>1;
+            zm=((zf>>8)+1)>>1;
             for (m=0; m<4; m++)
             {
                 int d[4];
@@ -472,7 +472,6 @@ static int ds3SliceMakeFast(DS3Slice *_this,DS3View *_view)
   texture is nine times the size required to fill a unit box to account for
   repeating, and must be even larger to account for the power of two texture
   sizes required by OpenGL), and the 3D texturing may be hardware accelerated.*/
-# if defined(GL_EXT_texture3d)
 static int ds3SliceTexture3D(DS3Slice *_this,DS3View *_view)
 {
     GLint m;
@@ -503,13 +502,11 @@ static int ds3SliceTexture3D(DS3Slice *_this,DS3View *_view)
             for (w[i]=1,ws[i]=0; w[i]<d[i]&&w[i]<(GLsizei)m; w[i]<<=1,ws[i]++);
             dx[i]=d[i]/(double)w[i];
         }
-#  if defined(GL_EXT_paletted_texture)
-        if (has_gl_ext_paletted_texture)
+        if (GLEW_EXT_paletted_texture)
         {
             txtr=(GLubyte *)malloc(sizeof(GLubyte)*w[X]*w[Y]*w[Z]);
         }
         else
-#  endif
             txtr=(GLubyte *)malloc(4*sizeof(GLubyte)*w[X]*w[Y]*w[Z]);
         if (txtr==NULL)return 0;
         data=_view->ds3->data;
@@ -521,10 +518,9 @@ static int ds3SliceTexture3D(DS3Slice *_this,DS3View *_view)
         glTexParameteri(GL_TEXTURE_3D,GL_TEXTURE_WRAP_S,GL_REPEAT);
         glTexParameteri(GL_TEXTURE_3D,GL_TEXTURE_WRAP_T,GL_REPEAT);
         glTexParameteri(GL_TEXTURE_3D,GL_TEXTURE_WRAP_R,GL_REPEAT);
-#if defined(GL_EXT_paletted_texture) && defined(_WIN32)
         /*If we have paletted textures available, use those to reduce memory and
           CPU consumption to 1/4 of that for an RGBA texture*/
-        if (has_gl_ext_paletted_texture)
+        if (GLEW_EXT_paletted_texture)
         {
             if (!_view->c_valid)
             {
@@ -605,7 +601,6 @@ static int ds3SliceTexture3D(DS3Slice *_this,DS3View *_view)
             }
         }
         else
-#  endif
             /*Create the full-sized texture*/
         {
             for (n=0,j[Z]=0,x[Z]=0; j[Z]<w[Z]; j[Z]++,x[Z]+=dx[Z])
@@ -690,7 +685,6 @@ static int ds3SliceTexture3D(DS3Slice *_this,DS3View *_view)
     _view->t_valid=1;
     return 1;
 }
-# endif
 
 typedef struct DS3SliceVertex DS3SliceVertex;
 
@@ -784,10 +778,7 @@ static void ds3ViewSlicePeerDisplay(DS3ViewComp *_this,
     DS3View       *view;
     view=_this->ds3view;
     /*If we can, use a 3D texture for the slice*/
-# if defined(GL_EXT_texture3d)
-#  if !defined(GL_VERSION_1_2)
-    if (has_gl_ext_texture3d)
-#  endif
+    if (GLEW_EXT_texture3D)
         {if (view->t_valid||ds3SliceTexture3D(&view->slice,view))
         {
             DS3SliceVertex slice[16];
@@ -824,12 +815,8 @@ static void ds3ViewSlicePeerDisplay(DS3ViewComp *_this,
             }
         }
     }
-#  if !defined(GL_VERSION_1_2)
     else
-#  endif
-# endif
         /*If we can't use 3D texturing, fall back on extracting 2D textures (slow)*/
-# if !defined(GL_EXT_texture3d)||!defined(GL_VERSION_1_2)
     {
         if (view->t_valid||ds3SliceMakeFast(&view->slice,view))
         {
@@ -886,7 +873,6 @@ static void ds3ViewSlicePeerDisplay(DS3ViewComp *_this,
             glPopAttrib();
         }
     }
-# endif
 }
 
 /*Gets a unit ray from the center of slice rotation in the direction the mouse

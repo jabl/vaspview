@@ -404,47 +404,6 @@ void dsMatrix3x3PInv(const double _m[3][3],double _i[3][3])
   i is now y(y y)^-1 (x x)^-1 x, the pseudoinverse*/
 
 
-
-/*Win32 systems allow multiple OpenGL implementations to simultaneously
-  co-exist, which may or may not support different extensions in different
-  ways. Hence a function pointer has to be dynamically retrieved for any
-  function defined by an extension, for each rendering context. We use only
-  one rendering context, but more importantly one pixel format (function
-  pointers are guaranteed to be the same for the same pixel format), so we
-  are safe loading these once, after creating a context. BTW: this seems
-  really stupid to me, since all the other OpenGL functions can be implemeted
-  differently for different pixel formats already, I fail to see what is
-  preventing extensions functions from being added in the exact same way. Just
-  more Microsoft stupidity, if you ask me. Mesa just exports the damn
-  functions from the .dll (though it would be nice for compatibility reasons
-  if they also supported wglGetProcAddress()). Sigh, only under Windows...*/
-# if defined(GL_EXT_texture3d)&&!defined(GL_VERSION_1_2)
-int                        has_gl_ext_texture3d;
-#  if defined(_WIN32)&&!defined(MESA)
-glTexImage3DEXTFunc        gl_tex_image3d_ext;
-glTexSubImage3DEXTFunc     gl_tex_sub_image3d_ext;
-glCopyTexSubImage3DEXTFunc gl_copy_tex_sub_image3d_ext;
-#  endif
-# endif
-# if defined(GL_EXT_paletted_texture)
-int                               has_gl_ext_paletted_texture;
-#  if defined(_WIN32)&&!defined(MESA)
-/*
-glColorTableEXTFunc               gl_color_table_ext;
-glColorSubTableEXTFunc            gl_color_sub_table_ext;
-glGetColorTableEXTFunc            gl_get_color_table_ext;
-glGetColorTableParameterfvEXTFunc gl_get_color_table_parameterfv_ext;
-glGetColorTableParameterivEXTFunc gl_get_color_table_parameteriv_ext;
-*/
-PFNGLCOLORTABLEEXTPROC               gl_color_table_ext;
-PFNGLCOLORSUBTABLEEXTPROC            gl_color_sub_table_ext;
-PFNGLGETCOLORTABLEEXTPROC            gl_get_color_table_ext;
-PFNGLGETCOLORTABLEPARAMETERIVEXTPROC gl_get_color_table_parameterfv_ext;
-PFNGLGETCOLORTABLEPARAMETERFVEXTPROC gl_get_color_table_parameteriv_ext;
-#  endif
-# endif
-
-
 int main(int _argc,char **_argv)
 {
     DS3Viewer ds3v;
@@ -453,49 +412,15 @@ int main(int _argc,char **_argv)
     {
         /*At this point, we've created a window, and so should have a current
           rendering context: test for GL extensions*/
-# if defined(GL_EXT_texture3d)&&!defined(GL_VERSION_1_2)
-        has_gl_ext_texture3d=glutExtensionSupported("GL_EXT_texture_3d");
-#  if defined(_WIN32)&&!defined(MESA)
-        if (has_gl_ext_texture3d)
-        {
-            gl_tex_image3d_ext=(PFNGLTEXIMAGE3DEXTPROC)
-                               wglGetProcAddress("glTexImage3DEXT");
-            gl_tex_sub_image3d_ext=(PFNGLTEXSUBIMAGE3DEXTPROC)
-                                   wglGetProcAddress("glTexSubImage3DEXT");
-            gl_copy_tex_sub_image3d_ext=(PFNGLCOPYTEXSUBIMAGE3DEXTPROC)
-                                        wglGetProcAddress("glCopyTexSubImage3DEXT");
-            if (gl_tex_image3d_ext==NULL||gl_tex_sub_image3d_ext==NULL||
-                    gl_copy_tex_sub_image3d_ext==NULL)
-            {
-                has_gl_ext_texture3d=0;
-            }
-        }
-#  endif
-# endif
-# if defined(GL_EXT_paletted_texture)
-        has_gl_ext_paletted_texture=
-            glutExtensionSupported("GL_EXT_paletted_texture");
-#  if defined(_WIN32)&&!defined(MESA)
-        if (has_gl_ext_paletted_texture)
-        {
-            gl_color_table_ext=(PFNGLCOLORTABLEEXTPROC)wglGetProcAddress("glColorTableEXT");
-            gl_color_sub_table_ext=(PFNGLCOLORSUBTABLEEXTPROC)
-                                   wglGetProcAddress("glColorSubTableEXT");
-            gl_get_color_table_ext=(PFNGLGETCOLORTABLEEXTPROC)
-                                   wglGetProcAddress("glGetColorTableEXT");
-            gl_get_color_table_parameterfv_ext=(PFNGLGETCOLORTABLEPARAMETERIVEXTPROC)
-                                               wglGetProcAddress("glGetColorTableParameterfvEXT");
-            gl_get_color_table_parameteriv_ext=(PFNGLGETCOLORTABLEPARAMETERFVEXTPROC)
-                                               wglGetProcAddress("glGetColorTableParameterivEXT");
-            if (gl_color_table_ext==NULL||gl_color_sub_table_ext==NULL||
-                    gl_get_color_table_ext==NULL||gl_get_color_table_parameterfv_ext==NULL||
-                    gl_get_color_table_parameteriv_ext==NULL)
-            {
-                has_gl_ext_paletted_texture=0;
-            }
-        }
-#  endif
-# endif
+	    GLenum err = glewInit();
+	    if (GLEW_OK != err)
+	    {
+		    /* Problem: glewInit failed, something is seriously wrong. */
+		    fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
+		    return 1;
+	    }
+	    fprintf(stdout, "Status: Using GLEW %s\n", glewGetString(GLEW_VERSION));
+
         if (_argc>1)ds3ViewerOpenFile(&ds3v,_argv[1]);
         glutMainLoop();
     }

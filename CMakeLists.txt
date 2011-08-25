@@ -14,7 +14,7 @@ SUBDIRS (src)
 find_package(GLUT)
 find_package(OpenGL)
 find_package(GLEW)
-set(GLLIBS ${GLUT_LIBRARY} ${OPENGL_LIBRARY} ${X11_LIBRARIES})
+set(GLLIBS ${GLUT_LIBRARY} ${GLEW_LIBRARY} ${OPENGL_LIBRARY} ${X11_LIBRARIES})
 
 # More compiler output
 set( CMAKE_VERBOSE_MAKEFILE ON )
@@ -24,5 +24,5 @@ set( CMAKE_VERBOSE_MAKEFILE ON )
 #   add_definitions (-g -msse2 -fopenmp -Wall -Wno-long-long -pedantic)
 #endif ()
    
-add_definitions (-O2 -g -std=c++0x)
+add_definitions (-O0 -g -std=c++0x -Wall)
 
