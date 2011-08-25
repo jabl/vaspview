@@ -5,11 +5,15 @@
 
 cmake_minimum_required (VERSION 2.6)
 
+# For GLEW module
+SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR})
+
 project (vaspview C CXX)
 
 SUBDIRS (src)
 find_package(GLUT)
 find_package(OpenGL)
+find_package(GLEW)
 set(GLLIBS ${GLUT_LIBRARY} ${OPENGL_LIBRARY} ${X11_LIBRARIES})
 
 # More compiler output
