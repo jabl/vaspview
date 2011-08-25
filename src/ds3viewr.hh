@@ -22,6 +22,7 @@
 #include "ds3.hh"
 #include "ds3legnd.hh"
 #include "ds3view.hh"
+#include "ds3vasp.hh"
 
 typedef struct DS3Viewer     DS3Viewer;
 
@@ -114,16 +115,13 @@ struct DS3Viewer
     GLWCheckBox      *cb_projt_ortho;
     DSLinearScale     scale_linear;
     DSLogScale        scale_log;
-    DataSet3D         ds3;
+    DataSet3D*        ds3;
 # if defined(__DS3_ADD_BONDS__)&&defined(__DS3_SAVE_BONDS__)
     char             *bond_name;
 # endif
-    DataSet3D         read_ds3;
     FILE             *read_file;
     char             *read_name;
-    void             *read_ctx;
-    DS3ReadFunc       read_func;
-    DS3ReadFunc       read_cncl;
+    DS3VaspReader    *reader;
     int               read_prog;
     int               read_id;
 };

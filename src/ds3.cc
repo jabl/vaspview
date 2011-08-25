@@ -19,32 +19,34 @@
 #include "ds3viewr.hh"
 
 /*Initializes the data set to default values*/
-void ds3Init(DataSet3D *_this)
+DataSet3D::DataSet3D()
 {
-    _this->name=NULL;
-    _this->label[0]=_this->label[1]=_this->label[2]=_this->label[3]=NULL;
-    _this->units[0]=_this->units[1]=_this->units[2]=_this->units[3]=NULL;
-    vectSet3d(_this->basis[0],1,0,0);
-    vectSet3d(_this->basis[1],0,1,0);
-    vectSet3d(_this->basis[2],0,0,1);
-    vectSet3d(_this->center,0.5,0.5,0.5);
-    _this->npoints=0;
-    _this->points=NULL;
-    _this->density[0]=_this->density[1]=_this->density[2]=0;
-    _this->data=NULL;
-    _this->min=0;
-    _this->max=1;
+	printf("DataSet3D constructor\n");
+    this->name=NULL;
+    this->label[0]=this->label[1]=this->label[2]=this->label[3]=NULL;
+    this->units[0]=this->units[1]=this->units[2]=this->units[3]=NULL;
+    vectSet3d(this->basis[0],1,0,0);
+    vectSet3d(this->basis[1],0,1,0);
+    vectSet3d(this->basis[2],0,0,1);
+    vectSet3d(this->center,0.5,0.5,0.5);
+    this->npoints=0;
+    this->points=NULL;
+    this->density[0]=this->density[1]=this->density[2]=0;
+    this->data=NULL;
+    this->min=0;
+    this->max=1;
 }
 
 /*Frees the memory used by the data set*/
-void ds3Dstr(DataSet3D *_this)
+DataSet3D::~DataSet3D()
 {
+	printf("DataSet3D destructor\n");
     int i;
-    free(_this->name);
-    for (i=0; i<4; i++)free(_this->label[i]);
-    for (i=0; i<4; i++)free(_this->units[i]);
-    free(_this->points);
-    free(_this->data);
+    free(this->name);
+    for (i=0; i<4; i++)free(this->label[i]);
+    for (i=0; i<4; i++)free(this->units[i]);
+    free(this->points);
+    free(this->data);
 }
 
 

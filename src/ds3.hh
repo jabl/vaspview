@@ -74,8 +74,17 @@ struct DSPoint3D
 # define _DS3Index(_this,_x,_y,_z)                                            \
  ((_x)+(_this)->density[0]*((_y)+(_this)->density[1]*(_z)))
 
-struct DataSet3D
+class DataSet3D
 {
+public:
+	DataSet3D();
+	~DataSet3D();
+
+	// C++11 version of making private copy constructor and
+	// assignment operator.
+	DataSet3D& operator=(const DataSet3D&) = delete;
+	DataSet3D(const DataSet3D&) = delete;
+
     char           *name;                                  /*Name of the data set*/
     char           *label[4];                      /*Label of three axes and data*/
     char           *units[4];                     /*Units for three axes and data*/
@@ -89,11 +98,6 @@ struct DataSet3D
     double          min;                                     /*Minimum data value*/
     double          max;
 };                                   /*Maximum data value*/
-
-
-void ds3Init(DataSet3D *_this);
-void ds3Dstr(DataSet3D *_this);
-
 
 
 struct DSColorScale

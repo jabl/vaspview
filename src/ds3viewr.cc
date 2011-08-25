@@ -119,7 +119,7 @@ static void ds3ViewerViewDataChanged(DS3Viewer *_this,DS3View *_view)
         glwLabelSetLabel(_this->lb_datay,text);
         sprintf(text,"Z: %li",z);
         glwLabelSetLabel(_this->lb_dataz,text);
-        v=_this->ds3.data[_DS3Index(&_this->ds3,x,y,z)];
+        v=_this->ds3->data[_DS3Index(_this->ds3,x,y,z)];
         sprintf(text,"Value: %0.6lg",v);
         glwLabelSetLabel(_this->lb_datav,text);
     }
@@ -199,19 +199,19 @@ static void ds3ViewerSaveBonds(DS3Viewer *_this)
         {
             long bf;
             long bt;
-            if (fprintf(file,"#Bond information for \"%s\"\n",_this->ds3.name)>=0)
+            if (fprintf(file,"#Bond information for \"%s\"\n",_this->ds3->name)>=0)
             {
-                for (bf=0; (size_t)bf+1<_this->ds3.npoints; bf++)
+                for (bf=0; (size_t)bf+1<_this->ds3->npoints; bf++)
                 {
-                    for (bt=bf+1; (size_t)bt<_this->ds3.npoints; bt++)
+                    for (bt=bf+1; (size_t)bt<_this->ds3->npoints; bt++)
                     {
                         double s;
                         s=ds3ViewGetBond(_this->ds3view,bf,bt);
                         if (s>0&&fprintf(file,"%li %li %0.9lg\n",bf,bt,s*10)<0)break;
                     }
                 }
-                if ((size_t)bf+1==_this->ds3.npoints&&
-                        (size_t)bt==_this->ds3.npoints)
+                if ((size_t)bf+1==_this->ds3->npoints&&
+                        (size_t)bt==_this->ds3->npoints)
                 {
                     err=0;
                 }
@@ -475,7 +475,7 @@ static void ds3ViewerPointVisible(DS3Viewer *_this,GLWComponent *_c)
 static void ds3ViewerPointShowAll(DS3Viewer *_this,GLWComponent *_c)
 {
     long l;
-    for (l=0; l<(long)_this->ds3.npoints; l++)
+    for (l=0; l<(long)_this->ds3->npoints; l++)
     {
         ds3ViewSetPointVisible(_this->ds3view,l,1);
     }
@@ -488,9 +488,9 @@ static void ds3ViewerPointCenter(DS3Viewer *_this,GLWComponent *_c)
     l=ds3ViewGetSelectedPoint(_this->ds3view);
     if (l>=0)
     {
-        ds3ViewerSetCenter(_this,_this->ds3.points[l].pos[X],
-                           _this->ds3.points[l].pos[Y],
-                           _this->ds3.points[l].pos[Z]);
+        ds3ViewerSetCenter(_this,_this->ds3->points[l].pos[X],
+                           _this->ds3->points[l].pos[Y],
+                           _this->ds3->points[l].pos[Z]);
         ds3ViewSetZoom(_this->ds3view,_this->ds3view->zoom*0.5);
     }
 }
@@ -882,14 +882,15 @@ static void ds3ViewerProjTChanged(DS3Viewer *_this,GLWComponent *_c)
 static void ds3ViewerFinishRead(DS3Viewer *_this)
 {
     double iso_v;
-    ds3Dstr(&_this->ds3);
-    memcpy(&_this->ds3,&_this->read_ds3,sizeof(DataSet3D));
+    delete &_this->ds3;
+    _this->ds3 = _this->reader->transfer();
     iso_v=dsScale(_this->ds3view->ds,_this->ds3view->iso_v);
-    if (ds3ViewSetDataSet(_this->ds3view,&_this->ds3))
+    if (ds3ViewSetDataSet(_this->ds3view, _this->ds3))
     {
-        dsLinearScaleInit(&_this->scale_linear,_this->ds3.min,_this->ds3.max);
-        dsLogScaleInit(&_this->scale_log,_this->ds3.min,_this->ds3.max);
-        dsColorLegendSetDataSet(_this->legend,&_this->ds3);
+        dsLinearScaleInit(&_this->scale_linear, _this->ds3->min, 
+			  _this->ds3->max);
+        dsLogScaleInit(&_this->scale_log,_this->ds3->min,_this->ds3->max);
+        dsColorLegendSetDataSet(_this->legend, _this->ds3);
         ds3ViewerUpdatePointRLabels(_this);
         ds3ViewerUpdateIsoVLabels(_this);
         /*ds3ViewerUpdateZoomLabels(_this);*/
@@ -901,7 +902,7 @@ static void ds3ViewerFinishRead(DS3Viewer *_this)
                         _this->ds3view->iso_d);
 # if defined(__DS3_ADD_BONDS__)&&defined(__DS3_SAVE_BONDS__)
         glwLabelSetLabel(_this->lb_data_set,"Data Set: ");
-        glwLabelAddLabel(_this->lb_data_set,_this->ds3.name);
+        glwLabelAddLabel(_this->lb_data_set,_this->ds3->name);
         glwLabelSetLabel(_this->lb_status,"\"");
         glwLabelAddLabel(_this->lb_status,_this->read_name);
         glwLabelAddLabel(_this->lb_status,"\" Loaded.");
@@ -936,7 +937,7 @@ static void ds3ViewerFinishRead(DS3Viewer *_this)
 static void ds3ViewerAsyncRead(DS3Viewer *_this,GLWComponent *_c)
 {
     int ret;
-    ret=_this->read_func(_this->read_ctx);
+    ret=_this->reader->read();
     if (ret<=0)
     {
         glwCompDelIdler(&_this->frame->super,_this->read_id);
@@ -952,7 +953,7 @@ static void ds3ViewerAsyncRead(DS3Viewer *_this,GLWComponent *_c)
         else ds3ViewerFinishRead(_this);
         fclose(_this->read_file);
         free(_this->read_name);
-        free(_this->read_ctx);
+        delete _this->reader;
     }
     else if (_this->read_prog!=--ret)
     {
@@ -1021,10 +1022,9 @@ int ds3ViewerInit(DS3Viewer *_this)
     GLWComponent *cm_view;
     GLWComponent *cm_view_btns;
     GLWComponent *cm_opts;
-    ds3Init(&_this->ds3);
     _this->read_id=0;
-    dsLinearScaleInit(&_this->scale_linear,_this->ds3.min,_this->ds3.max);
-    dsLogScaleInit(&_this->scale_log,_this->ds3.min,_this->ds3.max);
+    dsLinearScaleInit(&_this->scale_linear, _this->ds3->min, _this->ds3->max);
+    dsLogScaleInit(&_this->scale_log, _this->ds3->min, _this->ds3->max);
     _this->frame=glwFrameAlloc("VASP Data Viewer");
     _this->ds3view=ds3ViewAlloc();
     cm_vals=glwCompAlloc();
@@ -2160,12 +2160,12 @@ void ds3ViewerUpdatePointRLabels(DS3Viewer *_this)
 void ds3ViewerUpdateIsoVLabels(DS3Viewer *_this)
 {
     char text[32];
-    sprintf(text,"%0.4lg",_this->ds3.min);
+    sprintf(text,"%0.4lg", _this->ds3->min);
     glwSliderAddLabel(_this->sl_iso_v,0,text);
     sprintf(text,"%0.4lg",dsUnscale(_this->ds3view->ds,
                                     (DS3V_ISO_V_RES>>1)*(1.0/DS3V_ISO_V_RES)));
     glwSliderAddLabel(_this->sl_iso_v,DS3V_ISO_V_RES>>1,text);
-    sprintf(text,"%0.4lg",_this->ds3.max);
+    sprintf(text,"%0.4lg", _this->ds3->max);
     glwSliderAddLabel(_this->sl_iso_v,DS3V_ISO_V_RES,text);
 }
 
@@ -2336,8 +2336,8 @@ void ds3ViewerSetCenter(DS3Viewer *_this,double _x,double _y,double _z)
     int    i;
     for (i=0; i<3; i++)
     {
-        cntr[i]=_this->ds3.basis[i][X]*_x+_this->ds3.basis[i][Y]*_y+
-                _this->ds3.basis[i][Z]*_z;
+        cntr[i] = _this->ds3->basis[i][X] * _x + _this->ds3->basis[i][Y] * _y 
+		+ _this->ds3->basis[i][Z] * _z;
     }
     ds3ViewSetCenterChangedFunc(_this->ds3view,NULL);
     ds3ViewSetCenter(_this->ds3view,cntr[X],cntr[Y],cntr[Z]);
@@ -2461,11 +2461,11 @@ void ds3ViewerSetSelectedPoint(DS3Viewer *_this,long _pt)
         glwTextFieldSetText(_this->tf_point_s,text);
         glwTextFieldSetChangedFunc(_this->tf_point_s,
                                    (GLWActionFunc)ds3ViewerTextChanged);
-        sprintf(text,"Atom type: %i",_this->ds3.points[_pt].typ+1);
+        sprintf(text,"Atom type: %i",_this->ds3->points[_pt].typ+1);
         glwLabelSetLabel(_this->lb_point_t,text);
         sprintf(text,"Atom location: <%0.4lg,%0.4lg,%0.4lg>",
-                _this->ds3.points[_pt].pos[X],_this->ds3.points[_pt].pos[Y],
-                _this->ds3.points[_pt].pos[Z]);
+                _this->ds3->points[_pt].pos[X], _this->ds3->points[_pt].pos[Y],
+                _this->ds3->points[_pt].pos[Z]);
         glwLabelSetLabel(_this->lb_point_l,text);
         ds3ViewerSetPointVisible(_this,
                                  ds3ViewGetPointVisible(_this->ds3view,_pt));
@@ -2547,10 +2547,10 @@ void ds3ViewerOpenFile(DS3Viewer *_this,const char *_file)
     {
         glwCompDelIdler(&_this->frame->super,_this->read_id);
         _this->read_id=0;
-        _this->read_cncl(_this->read_ctx);
+        _this->reader->cancel();
         fclose(_this->read_file);
         free(_this->read_name);
-        free(_this->read_ctx);
+        delete _this->reader;
     }
     if (_file==NULL||_file[0]=='\0')
     {
@@ -2574,7 +2574,7 @@ void ds3ViewerOpenFile(DS3Viewer *_this,const char *_file)
             int    ret;
             size_t name_sz;
             _this->read_file=in;
-            _this->read_ctx=NULL;
+            _this->reader = NULL;
             name_sz=(strlen(_file)+1)*sizeof(char);
             if ((_this->read_name=(char *)malloc(name_sz))==NULL)
             {
@@ -2583,31 +2583,16 @@ void ds3ViewerOpenFile(DS3Viewer *_this,const char *_file)
             }
             else
             {
-                DS3VaspReader *reader;
                 memcpy(_this->read_name,_file,name_sz);
-                if ((reader=(DS3VaspReader *)malloc(sizeof(DS3VaspReader)))==NULL)
-                {
-                    ret=0;
-                    errno=ENOMEM;
-                }
-                else
-                {
-                    _this->read_ctx=reader;
-                    _this->read_func=(DS3ReadFunc)ds3VaspReaderRead;
-                    _this->read_cncl=(DS3ReadFunc)ds3VaspReaderCancel;
-                    ret=ds3VaspReaderInit(reader,&_this->read_ds3,in);
-                    if (ret>0)
-                    {
-                        _this->read_id=glwCompAddIdler(&_this->frame->super,
-                                                       (GLWActionFunc)ds3ViewerAsyncRead,_this);
-                        if (!_this->read_id)
-                        {
-                            _this->read_cncl(_this->read_ctx);
-                            ret=0;
-                            errno=ENOMEM;
-                        }
-                    }
-                }
+		_this->reader = new DS3VaspReader(in);
+		_this->read_id=glwCompAddIdler(&_this->frame->super,
+					       (GLWActionFunc)ds3ViewerAsyncRead,_this);
+		if (!_this->read_id)
+		{
+			_this->reader->cancel();
+			ret=0;
+			errno=ENOMEM;
+		}
             }
             if (ret<=0)
             {
@@ -2622,7 +2607,7 @@ void ds3ViewerOpenFile(DS3Viewer *_this,const char *_file)
                 else ds3ViewerFinishRead(_this);
                 fclose(in);
                 free(_this->read_name);
-                free(_this->read_ctx);
+                delete _this->reader;
             }
         }
     }
