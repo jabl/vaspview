@@ -63,7 +63,7 @@ int ds3VaspReaderInit(DS3VaspReader *_this,DataSet3D *_ds3,FILE *_in)
         char          *e;
         unsigned long  u;
         u=strtoul(p,&e,0);
-        if (e==p||*e!='\0'&&!isspace((unsigned char)*e))goto err;
+        if (e == p || (*e != '\0' && !isspace((unsigned char)*e))) goto err;
         if (u!=0&&!daInsTail(&points,&u))goto err;
         npoints+=u;
         p=e;

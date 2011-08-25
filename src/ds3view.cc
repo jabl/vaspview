@@ -204,7 +204,7 @@ static int ds3ViewGetClipBox(DS3View *_this,int _x0,int _y0,int _x1,int _y1,
     {
         Vect3d d0;
         Vect3d d1;
-        j=i+1&3;
+        j = (i + 1) & 3;
         vectSub3d(d0,p1[i],p0[i]);
         vectSub3d(d1,p1[j],p0[i]);
         vectCross3d(plane[i],d0,d1);
@@ -361,9 +361,9 @@ static void ds3ViewPeerDisplayChildren(DS3View *_this,
             glLightfv(GL_LIGHT0,GL_DIFFUSE,LIGHT0_D);
             glLightfv(GL_LIGHT0,GL_SPECULAR,LIGHT0_S);
             glLightfv(GL_LIGHT0,GL_POSITION,LIGHT_P);
-            if (_this->track_mp>=0&&glwCompIsCapturing(&_this->cm_pts->super)
+            if ((_this->track_mp >= 0 && glwCompIsCapturing(&_this->cm_pts->super))
 # if defined(__DS3_ADD_BONDS__)
-                    ||_this->track_mbf>=0&&glwCompIsCapturing(&_this->cm_bnds->super)
+		|| (_this->track_mbf >= 0 && glwCompIsCapturing(&_this->cm_bnds->super))
 # endif
                )
             {
@@ -747,7 +747,7 @@ static int ds3ViewGetPointsPoint(DS3View *_this,Vect3d _p,double *_t,
                     for (i=0; i<_this->ds3->npoints; i++)
                     {
                         if (ds3ViewGetPointVisible(_this,(long)i)||
-                                (size_t)_this->track_sp==i&&glwCompIsFocused(&_this->cm_pts->super))
+			    ((size_t)_this->track_sp == i && glwCompIsFocused(&_this->cm_pts->super)))
                         {
                             Vect3d p;
                             Vect3d q;

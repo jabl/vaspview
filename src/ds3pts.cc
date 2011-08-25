@@ -54,8 +54,8 @@ static void ds3ViewPointsPeerDisplay(DS3ViewComp *_this,
                 {
                     for (i=0; i<view->ds3->npoints; i++)
                     {
-                        if (ds3ViewGetPointVisible(view,(long)i)||
-                                (size_t)view->track_sp==i&&glwCompIsFocused(&_this->super))
+			    if ((ds3ViewGetPointVisible(view,(long)i)) ||
+                                ((size_t)view->track_sp == i && glwCompIsFocused(&_this->super)))
                         {
                             GLWcolor c;
                             Vect3d   p;

@@ -257,10 +257,10 @@ static void glwSliderLayout(GLWLayoutManager *_this,GLWSlider *_slider)
 	    if (w>_slider->label_rect.w)_slider->label_rect.w=w;
         }
         _slider->label_rect.h=_slider->tick_rect.h+
-                              (_slider->track_offs-GLW_SLIDER_INSET<<1);
+		((_slider->track_offs - GLW_SLIDER_INSET) << 1);
         _slider->thumb_rect.x=_slider->track_rect.x;
         _slider->thumb_rect.y=glwSliderGetYPos(_slider,_slider->val)-
-                              (_slider->thumb_rect.h+1>>1);
+		((_slider->thumb_rect.h + 1) >> 1);
     }
     else
     {
@@ -302,7 +302,7 @@ static void glwSliderLayout(GLWLayoutManager *_this,GLWSlider *_slider)
                               GLW_SLIDER_INSET;
         _slider->label_rect.y=_slider->tick_rect.y;
         _slider->label_rect.w=_slider->tick_rect.w+
-                              (_slider->track_offs-GLW_SLIDER_INSET<<1);
+		((_slider->track_offs - GLW_SLIDER_INSET) << 1);
         if (_slider->labels.size() > 0)
         {
             _slider->label_rect.h=glwFontGetHeight(_slider->super.font);
@@ -497,7 +497,7 @@ void glwSliderPeerDisplay(GLWSlider *_this,GLWCallbacks *_cb)
     {
         int cx,cy,cw;
         cx=_this->track_offs;                                /*Draw the slider track*/
-        cy=_this->track_rect.y+(_this->track_rect.h+1>>1)+2;
+        cy = _this->track_rect.y + ((_this->track_rect.h + 1) >> 1) + 2;
         cw=_this->track_rect.w;
         glBegin(GL_LINES);
         glwColor(sc);

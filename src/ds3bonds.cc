@@ -151,16 +151,16 @@ static void ds3ViewBondsPeerDisplay(DS3ViewComp *_this,
                                         }
                                         for (l=0; l<3; l++)             /*Make sure points fall within our box*/
                                         {
-                                            if (q0[l]<view->box[0][l]&&q1[l]<view->box[0][l]||
-                                                    q0[l]>view->box[1][l]&&q1[l]>view->box[1][l])break;
-                                            if (q0[l]<view->box[0][l]&&q1[l]>=view->box[0][l]||
-                                                    q0[l]>=view->box[0][l]&&q1[l]<view->box[0][l])
+						if ((q0[l] < view->box[0][l] && q1[l] < view->box[0][l]) ||
+						(q0[l] > view->box[1][l] && q1[l]>view->box[1][l])) break;
+						if ((q0[l] < view->box[0][l] && q1[l] >= view->box[0][l]) ||
+                                                    (q0[l] >= view->box[0][l] && q1[l] < view->box[0][l]))
                                             {
                                                 glEnable(GL_CLIP_PLANE0+(l<<1));
                                             }
                                             else glDisable(GL_CLIP_PLANE0+(l<<1));
-                                            if (q0[l]<view->box[1][l]&&q1[l]>=view->box[1][l]||
-                                                    q0[l]>=view->box[1][l]&&q1[l]<view->box[1][l])
+						if ((q0[l] < view->box[1][l] && q1[l] >= view->box[1][l]) ||
+                                                    (q0[l] >= view->box[1][l] && q1[l] < view->box[1][l]))
                                             {
                                                 glEnable(GL_CLIP_PLANE0+(l<<1)+1);
                                             }

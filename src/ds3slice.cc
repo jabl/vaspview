@@ -583,7 +583,8 @@ static int ds3SliceTexture3D(DS3Slice *_this,DS3View *_view)
                         for (k[X]=0; k[X]<w[X]; k[X]++)
                         {
                             int c;
-                            l=k[X]+(k[Y]+(k[Z]<<ws[Y]+j[Z])<<ws[X]+j[Y])<<j[X];
+                            l = (k[X] + ((k[Y] + (k[Z] << (ws[Y] + j[Z]))) 
+					<< (ws[X] + j[Y]))) << j[X];
                             c=txtr[l];
                             c+=txtr[l+o[X]];
                             c+=txtr[l+o[Y]];
@@ -592,7 +593,8 @@ static int ds3SliceTexture3D(DS3Slice *_this,DS3View *_view)
                             c+=txtr[l+o[Z]+o[X]];
                             c+=txtr[l+o[Z]+o[Y]];
                             c+=txtr[l+o[Z]+o[Y]+o[X]];
-                            txtr[k[X]+(k[Y]+(k[Z]<<ws[Y])<<ws[X])]=(GLubyte)(c>>3);
+                            txtr[k[X] + ((k[Y] + (k[Z] << ws[Y])) << ws[X])] 
+				    = (GLubyte)(c>>3);
                         }
                     }
                 }
@@ -639,8 +641,8 @@ static int ds3SliceTexture3D(DS3Slice *_this,DS3View *_view)
             for (lod=1; ws[X]||ws[Y]||ws[Z]; lod++)
             {
                 o[X]=ws[X]?4:0;
-                o[Y]=ws[Y]?w[X]<<2:0;
-                o[Z]=ws[Z]?w[X]<<ws[Y]+2:0;
+                o[Y] = ws[Y] ? (w[X] << 2) : 0;
+                o[Z] = ws[Z] ? w[X] << (ws[Y] + 2) : 0;
                 for (i=0; i<3; i++)
                 {
                     if (ws[i])
@@ -658,7 +660,8 @@ static int ds3SliceTexture3D(DS3Slice *_this,DS3View *_view)
                         for (k[X]=0; k[X]<w[X]; k[X]++)
                         {
                             int c[4];
-                            l=k[X]+(k[Y]+(k[Z]<<ws[Y]+j[Z])<<ws[X]+j[Y])<<j[X]+2;
+                            l = (k[X] + ((k[Y] + (k[Z] << (ws[Y] + j[Z]))) 
+					 << (ws[X] + j[Y]))) << (j[X] + 2);
                             for (i=0; i<4; i++)
                             {
                                 c[i]=txtr[l+i];
@@ -670,7 +673,8 @@ static int ds3SliceTexture3D(DS3Slice *_this,DS3View *_view)
                                 c[i]+=txtr[l+o[Z]+o[Y]+i];
                                 c[i]+=txtr[l+o[Z]+o[Y]+o[X]+i];
                             }
-                            l=k[X]+(k[Y]+(k[Z]<<ws[Y])<<ws[X])<<2;
+                            l = (k[X] + ((k[Y] + (k[Z] << ws[Y])) << ws[X])) 
+				    << 2;
                             for (i=0; i<4; i++)txtr[l+i]=(GLubyte)(c[i]>>3);
                         }
                     }
@@ -717,7 +721,7 @@ static int ds3ViewSliceClipPlane(DS3SliceVertex _slice[16],int _nverts,
         if (j>=_nverts)j=0;
         d1=vectDot3d(_slice[j].p,_plane)+_plane[W];
         if (d0>=0)*(slice+ret++)=*(_slice+i);
-        if (d0>0&&d1<0||d0<0&&d1>0)
+        if (((d0 > 0) && (d1 < 0))||(d0 < 0 && (d1 > 0)))
         {
             Vect3d dp;
             double t;

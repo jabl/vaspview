@@ -638,7 +638,7 @@ int glwTextFieldIsEditable(GLWTextField *_this)
 
 void glwTextFieldSetEditable(GLWTextField *_this,int _b)
 {
-    if (_this->editable&&!_b||!_this->editable&&_b)
+	if ((_this->editable && !_b) || (!_this->editable && _b))
     {
         _this->editable=_b?1:0;
         glwCompRepaint(&_this->super,0);
