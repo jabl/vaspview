@@ -19,7 +19,6 @@
 #define FILE_HH
 
 #include <cstdio>
-#include <memory>
 
 class File
 {
@@ -31,6 +30,6 @@ public :
 	File(const File&) = delete;
 
 	std::FILE* f;
-}
+};
 
 #endif

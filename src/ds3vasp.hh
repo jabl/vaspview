@@ -20,6 +20,8 @@
 # define _ds3vasp_H (1)
 
 #include "ds3.hh"
+#include <memory>
+#include "file.hh"
 
 # define DS3_VASP_BLOCK_SIZE (8192)
 
@@ -27,7 +29,7 @@
 class DS3VaspReader
 {
 public:
-	DS3VaspReader(FILE* _in);
+	DS3VaspReader(const char* file_name, const char* mode);
 	~DS3VaspReader();
 	// Forbid copying
 	DS3VaspReader& operator=(const DS3VaspReader&) = delete;
@@ -41,7 +43,7 @@ public:
 	DataSet3D* transfer();
 
     DataSet3D *ds3;
-    FILE      *in;
+    std::unique_ptr<File>      file;
     size_t     npoints;
     size_t     k;
 };

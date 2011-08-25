@@ -18,7 +18,8 @@
 #include "ds3vasp.hh"
 
 /*Reads the VASP header, and sets up for reading the data asynchronously*/
-DS3VaspReader::DS3VaspReader(FILE *_in)
+DS3VaspReader::DS3VaspReader(const char* file_name, const char* mode) 
+	: file(new File(file_name, mode))
 {
     CDynArray      line;
     CDynArray      points;
@@ -34,28 +35,28 @@ DS3VaspReader::DS3VaspReader(FILE *_in)
     _DAInit(&line,0,char);
     _DAInit(&points,0,unsigned long);
     /*Read the data set name*/
-    if (!daFGetS(&line,_in))goto err;
+    if (!daFGetS(&line,file.f))goto err;
     daTrimWS(&line);
     daTrimToSize(&line);
     ds3->name=line.data;
     line.data=NULL;
     line.cap=line.size=0;
     /*Read the "Universal scaling factor"*/
-    if (fscanf(_in,"%lf",&scale)<1)goto err;
+    if (fscanf(file.f,"%lf",&scale)<1)goto err;
     /*Read the basis for the box*/
     for (i=0; i<3; i++)
     {
 	    for (j=0; j<3; j++)
-		    if (fscanf(_in,"%lf", ds3->basis[j] + i) < 1)
+		    if (fscanf(file.f,"%lf", ds3->basis[j] + i) < 1)
 			    goto err;
     }
     for (i=0; i<3; i++)vectMul3d(ds3->basis[i],ds3->basis[i],scale);
-    if (fscanf(_in," ")<0)goto err;
+    if (fscanf(file.f," ")<0)goto err;
     vectSet3d(ds3->center,0,0,0);
     for (i=0; i<3; i++)vectAdd3d(ds3->center,ds3->center,ds3->basis[i]);
     vectMul3d(ds3->center,ds3->center,0.5);
     /*Read the atom types*/
-    if (!daFGetS(&line,_in))goto err;
+    if (!daFGetS(&line,file.f))goto err;
     p=_DAGetAt(&line,0,char);
     for (npoints=0; *p!='\0';)
     {
@@ -72,7 +73,7 @@ DS3VaspReader::DS3VaspReader(FILE *_in)
     ds3->npoints=npoints;
     /*Read in the atom positions*/
     /*First line specifies the coordinate mode*/
-    if (fscanf(_in," ")<0||!daFGetS(&line,_in)||line.size<1)goto err;
+    if (fscanf(file.f," ")<0||!daFGetS(&line,file.f)||line.size<1)goto err;
     d=points.size>1?1.0/(points.size-1):1;
     /*Only the first (non-whitespace) character of the line matters*/
     switch (tolower(_DAGetAt(&line,0,unsigned char)[0]))
@@ -86,7 +87,7 @@ DS3VaspReader::DS3VaspReader(FILE *_in)
             col=k*d;
             for (l=*_DAGetAt(&points,k,unsigned long); l-->0; i++)
             {
-                for (j=0; j<3; j++)if (fscanf(_in,"%lf",ds3->points[i].pos+j)<1)goto err;
+                for (j=0; j<3; j++)if (fscanf(file.f,"%lf",ds3->points[i].pos+j)<1)goto err;
                 ds3->points[i].typ=(int)k;
                 ds3->points[i].col=col;
             }
@@ -106,7 +107,7 @@ DS3VaspReader::DS3VaspReader(FILE *_in)
             for (l=*_DAGetAt(&points,k,unsigned long); l-->0; i++)
             {
                 Vect3d pos;
-                for (j=0; j<3; j++)if (fscanf(_in,"%lf",&pos[j])<1)goto err;
+                for (j=0; j<3; j++)if (fscanf(file.f,"%lf",&pos[j])<1)goto err;
                 for (j=0; j<3; j++)ds3->points[i].pos[j]=scale*vectDot3d(pos,basinv[j]);
                 ds3->points[i].typ=(int)k;
                 ds3->points[i].col=col;
@@ -120,17 +121,16 @@ DS3VaspReader::DS3VaspReader(FILE *_in)
     /*Read in data dimensions*/
     for (i=0; i<3; i++)
     {
-        if (fscanf(_in,"%lu",&l)<1)goto err;
+        if (fscanf(file.f,"%lu",&l)<1)goto err;
         ds3->density[i]=(size_t)l;
     }
     /*Read in the data*/
-    this->in=_in;
     this->npoints = ds3->density[0]*ds3->density[1]*ds3->density[2];
     ds3->data=(double *)malloc(this->npoints*sizeof(double));
     if (ds3->data==NULL)goto err;
     if (this->npoints)
     {
-        if (fscanf(_in,"%lf",ds3->data)<1)goto err;
+        if (fscanf(file.f,"%lf",ds3->data)<1)goto err;
         ds3->min = ds3->max = ds3->data[0];
         this->k = 1;
     }
