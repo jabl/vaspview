@@ -594,8 +594,12 @@ void              glwCheckBoxSetChangedCtx(GLWCheckBox *_this,
 
 
 
-struct GLWSlider
+class GLWSlider
 {
+public:
+    GLWSlider(int _min,int _max,int _val,int _ext);
+    ~GLWSlider();
+
     GLWComponent   super;
     GLWActionFunc  changed;
     void          *changed_ctx;
@@ -623,12 +627,6 @@ struct GLWSlider
 
 
 extern const GLWCallbacks GLW_SLIDER_CALLBACKS;
-
-GLWSlider     *glwSliderAlloc(int _min,int _max,int _val,int _ext);
-void           glwSliderInit(GLWSlider *_this,int _min,int _max,
-                             int _val,int _ext);
-void           glwSliderDstr(GLWSlider *_this);
-void           glwSliderFree(GLWSlider *_this);
 
 int            glwSliderIsCenteringLabels(GLWSlider *_this);
 void           glwSliderSetCenteringLabels(GLWSlider *_this,int _b);

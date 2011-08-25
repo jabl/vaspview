@@ -868,45 +868,33 @@ const GLWCallbacks GLW_SLIDER_CALLBACKS=
 };
 
 
-GLWSlider *glwSliderAlloc(int _min,int _max,int _val,int _ext)
+GLWSlider::GLWSlider(int _min,int _max,int _val,int _ext)
 {
-	// Must be allocated by new in order to run constructors for labels map
-	// TODO: Fix  destruction to use delete instead of free()
-	GLWSlider *this_ = new GLWSlider();
-    if (this_!=NULL)glwSliderInit(this_,_min,_max,_val,_ext);
-    return this_;
+    glwCompInit(&this->super);
+    this->super.callbacks=&GLW_SLIDER_CALLBACKS;
+    glwCompSetLayout(&this->super,&glw_slider_layout);
+    glwCompSetFocusable(&this->super,1);
+    this->changed=NULL;
+    this->changed_ctx=NULL;
+    this->major_ticks=0;
+    this->major_offs=0;
+    this->minor_ticks=0;
+    this->minor_offs=0;
+    this->ornt=GLWC_HORIZONTAL;
+    this->snap=GLWC_SNAP_NEVER;
+    this->center_labels=0;
+    this->min=_min;
+    this->max=_max;
+    this->val = _val;
+    this->ext = _ext;
+    glwSliderSetVal(this,_val,_ext);
 }
 
-void glwSliderInit(GLWSlider *_this,int _min,int _max,int _val,int _ext)
+GLWSlider::~GLWSlider()
 {
-    glwCompInit(&_this->super);
-    _this->super.callbacks=&GLW_SLIDER_CALLBACKS;
-    glwCompSetLayout(&_this->super,&glw_slider_layout);
-    glwCompSetFocusable(&_this->super,1);
-    _this->changed=NULL;
-    _this->changed_ctx=NULL;
-    _this->major_ticks=0;
-    _this->major_offs=0;
-    _this->minor_ticks=0;
-    _this->minor_offs=0;
-    _this->ornt=GLWC_HORIZONTAL;
-    _this->snap=GLWC_SNAP_NEVER;
-    _this->center_labels=0;
-    _this->min=_min;
-    _this->max=_max;
-    glwSliderSetVal(_this,_val,_ext);
+    glwCompDstr(&this->super);
+    glwCompFree(&this->super);
 }
-
-void glwSliderDstr(GLWSlider *_this)
-{
-    glwCompDstr(&_this->super);
-}
-
-void glwSliderFree(GLWSlider *_this)
-{
-    glwCompFree(&_this->super);
-}
-
 
 int glwSliderIsCenteringLabels(GLWSlider *_this)
 {
