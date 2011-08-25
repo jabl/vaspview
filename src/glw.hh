@@ -59,22 +59,11 @@
 typedef        unsigned long         GLWcolor;
 typedef        void                 *GLWfont;
 typedef        int                   GLWcursor;
-typedef struct GLWRect               GLWRect;
-typedef struct GLWInsets             GLWInsets;
-typedef struct GLWCallbacks          GLWCallbacks;
-typedef struct GLWConstraints        GLWConstraints;
+
 typedef struct GLWLayoutManager      GLWLayoutManager;
 typedef struct GLWGridBagLayout      GLWGridBagLayout;
 typedef struct GLWComponent          GLWComponent;
-typedef struct GLWFrame              GLWFrame;
-typedef struct GLWLabel              GLWLabel;
-typedef struct GLWButton             GLWButton;
-typedef struct GLWTextField          GLWTextField;
-typedef struct GLWCheckBox           GLWCheckBox;
-typedef struct GLWCheckBoxGroup      GLWCheckBoxGroup;
-typedef struct GLWSlider             GLWSlider;
-typedef struct GLWTabbedPane         GLWTabbedPane;
-
+typedef struct GLWCallbacks          GLWCallbacks;
 
 
 struct GLWRect
