@@ -99,6 +99,7 @@ int dsColorLegendInit(DSColorLegend *_this)
     glwLabelFree(_this->lb_max);
     glwLabelFree(_this->lb_label);
     glwGridBagLayoutFree(layout);
+    return 0;
 }
 
 
