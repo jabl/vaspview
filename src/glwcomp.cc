@@ -23,6 +23,8 @@
 
 #include <unordered_map>
 
+
+
 /*Generic component. All components can contain other components. They receive
   events from their parent (translated into their coordinate system), which
   they dispatch to their children (though this can be overridden). Each
@@ -43,10 +45,12 @@ typedef struct GLWTimerEntry
     GLWActionFunc  func;
 } GLWTimerEntry;
 
+typedef std::unordered_map<int, GLWTimerEntry> timer_map;
+
 static int glw_timer_id;
 static int glw_idler_id;
-std::unordered_map<int, GLWTimerEntry> glw_timer_table;
-std::unordered_map<int, GLWTimerEntry> glw_idler_table;
+static timer_map glw_timer_table;
+static timer_map glw_idler_table;
 
 static void glwCompGlutPostRedisplay(int _wid)
 {
@@ -62,7 +66,7 @@ static void glwCompGlutTimer(int _id)
     auto it = glw_timer_table.find(_id);
     if (it != glw_timer_table.end())
     {
-	    GLWTimerEntry timer = (*it).second;
+	    GLWTimerEntry& timer = it->second;
 	    timer.func(timer.ctx,timer.comp);
 	    glutSetWindow(timer.comp->wid);
     }
@@ -72,12 +76,19 @@ static void glwCompGlutTimer(int _id)
 static void glwCompGlutIdle(void)
 {
     int clear = 1;
-    for (auto it = glw_idler_table.begin(); it != glw_idler_table.end(); ++it)
+    // Need an unusual iteration structure since the current iterator
+    // may be deleted.
+    auto it = glw_idler_table.begin();
+    while (it != glw_idler_table.end())
     {
-	    GLWTimerEntry& idler = (*it).second;
-            glutSetWindow(idler.comp->wid);
-            idler.func(idler.ctx, idler.comp);
-            clear=0;
+	    // Tricky part: idler is taken before incrementing
+	    // iterator, and before calling the functions below which
+	    // may delete the map element.
+	    GLWTimerEntry& idler = it->second;
+	    ++it;
+	    glutSetWindow(idler.comp->wid);
+	    idler.func(idler.ctx, idler.comp);
+	    clear=0;
     }
     if (clear)
 	    glutIdleFunc(NULL);
@@ -649,13 +660,17 @@ void glwCompGetPreSize(GLWComponent *_this,int *_w,int *_h)
     glwCompGetMaxSize(_this,_w!=NULL?&maxw:NULL,_h!=NULL?&maxh:NULL);
     if (_w!=NULL)
     {
-        if ((*_w<0&&minw<0)||maxw>=0&&maxw<*_w)*_w=maxw;
-        if (*_w<0||minw>=0&&minw>*_w)*_w=minw;
+	    if ((*_w<0&&minw<0)|| (maxw >= 0 && maxw < *_w))
+		    *_w=maxw;
+	    if (*_w < 0|| (minw >= 0 && minw > *_w))
+		*_w=minw;
     }
     if (_h!=NULL)
     {
-        if ((*_h<0&&minh<0)||maxh>=0&&maxh<*_h)*_h=maxh;
-        if (*_h<0||minh>=0&&minh>*_h)*_h=minh;
+	    if ((*_h<0&&minh<0)|| (maxh >= 0 && maxh < *_h))
+		*_h=maxh;
+	    if (*_h<0|| (minh >= 0 && minh > *_h))
+		*_h=minh;
     }
 }
 
