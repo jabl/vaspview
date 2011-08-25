@@ -23,38 +23,11 @@
 
 /*Initialization and a few miscellaneous functions (colors and fonts)*/
 
-typedef struct GLWTimerEntry
-{
-    GLWComponent  *comp;
-    void          *ctx;
-    GLWActionFunc  func;
-} GLWTimerEntry;
-
-
 void glwInit(int *_argc,char **_argv)
 {
     glutInit(_argc,_argv);
     glutInitDisplayMode(GLUT_RGBA|GLUT_DEPTH|GLUT_DOUBLE);
 }
-
-
-
-/*
-int glwIsExtSupported(const char *_ext){
- const char *p;
- const char *e;
- size_t      l;
- if(_ext==NULL||strchr(_ext,' ')!=NULL)return 0;
- e=glGetString(GL_EXTENSIONS);
- l=strlen(_ext);
- for(p=e;;p=e+l){
-  p=strstr(p,_ext);
-  if(p==NULL)break;
-  if((p==e||*(p-1)==' ')&&(p[l]=='\0'||p[l]==' '))return 1;}
- return 0;}
-*/
-
-
 
 void glwClearColor(GLWcolor _c)
 {

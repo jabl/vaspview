@@ -420,7 +420,10 @@ int main(int _argc,char **_argv)
 		    return 1;
 	    }
 	    fprintf(stdout, "Status: Using GLEW %s\n", glewGetString(GLEW_VERSION));
-
+	    if (GLEW_EXT_paletted_texture)
+		    printf("EXT_paletted_texture available.\n");
+	    if (GLEW_EXT_texture3D)
+		    printf("EXT_texture3D available.\n");
         if (_argc>1)ds3ViewerOpenFile(&ds3v,_argv[1]);
         glutMainLoop();
     }
