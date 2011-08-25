@@ -1235,7 +1235,8 @@ static DS3ViewComp *ds3ViewCompAlloc(DS3View *_ds3view)
 DS3View *ds3ViewAlloc(void)
 {
     DS3View *this_;
-    this_=(DS3View *)malloc(sizeof(DS3View));
+    // TODO: Fix zeroing when/if upgrading to new/delete and vtables
+    this_=(DS3View *)calloc(1, sizeof(DS3View));
     if (this_!=NULL)
     {
         if (ds3ViewInit(this_))
@@ -1322,6 +1323,8 @@ int ds3ViewInit(DS3View *_this)
             _DAInit(&_this->view_stack,0,DS3ViewParams);
             _this->zoom=0;
             _this->yaw=1;
+	    //_this->cntr[0] = _this->cntr[1] = _this->cntr[2] = 0.;
+	    //memset(_this->box, 0, 2*3*sizeof(double));
             _this->slice_t=1;
             _this->track_cb=0;
             _this->track_pl=5;

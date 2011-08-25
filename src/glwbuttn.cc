@@ -256,7 +256,8 @@ const GLWCallbacks GLW_BUTTON_CALLBACKS=
 GLWButton *glwButtonAlloc(const char *_label)
 {
     GLWButton *this_;
-    this_=(GLWButton *)malloc(sizeof(GLWButton));
+    // TODO: Fix zeroing if switching to new/delete
+    this_=(GLWButton *)calloc(1, sizeof(GLWButton));
     if (this_!=NULL)
     {
         if (glwButtonInit(this_,_label))

@@ -785,7 +785,8 @@ static void glwGBLLayout(GLWGridBagLayout *_this,GLWComponent *_comp)
 GLWGridBagLayout *glwGridBagLayoutAlloc(void)
 {
     GLWGridBagLayout *this_;
-    this_=(GLWGridBagLayout *)malloc(sizeof(GLWGridBagLayout));
+    // TODO: Fix zeroing when swithing to new/delete
+    this_=(GLWGridBagLayout *)calloc(1, sizeof(GLWGridBagLayout));
     if (this_!=NULL)glwGridBagLayoutInit(this_);
     return this_;
 }
