@@ -200,7 +200,7 @@ static void ds3ViewerSaveBonds(DS3Viewer *_this)
         {
             long bf;
             long bt;
-            if (fprintf(file,"#Bond information for \"%s\"\n",_this->ds3->name)>=0)
+            if (fprintf(file,"#Bond information for \"%s\"\n",_this->ds3->name.c_str())>=0)
             {
                 for (bf=0; (size_t)bf+1<_this->ds3->npoints; bf++)
                 {
@@ -907,7 +907,7 @@ static void ds3ViewerFinishRead(DS3Viewer *_this)
                         _this->ds3view->iso_d);
 
         glwLabelSetLabel(_this->lb_data_set,"Data Set: ");
-        glwLabelAddLabel(_this->lb_data_set,_this->ds3->name);
+        glwLabelAddLabel(_this->lb_data_set,_this->ds3->name.c_str());
         glwLabelSetLabel(_this->lb_status,"\"");
         glwLabelAddLabel(_this->lb_status,_this->read_name);
         glwLabelAddLabel(_this->lb_status,"\" Loaded.");

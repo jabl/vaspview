@@ -22,7 +22,6 @@
 DataSet3D::DataSet3D()
 {
 	printf("DataSet3D constructor\n");
-    this->name=NULL;
     this->label[0]=this->label[1]=this->label[2]=this->label[3]=NULL;
     this->units[0]=this->units[1]=this->units[2]=this->units[3]=NULL;
     vectSet3d(this->basis[0],1,0,0);
@@ -42,7 +41,6 @@ DataSet3D::~DataSet3D()
 {
 	printf("DataSet3D destructor\n");
     int i;
-    free(this->name);
     for (i=0; i<4; i++)free(this->label[i]);
     for (i=0; i<4; i++)free(this->units[i]);
     free(this->points);

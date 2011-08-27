@@ -31,6 +31,7 @@
 #include <GL/glut.h>
 #include "glw.hh"
 #include "vect.hh"
+#include <string>
 
 # if !defined(M_PI)
 #  define M_PI (3.141592653589793238462643)
@@ -85,7 +86,7 @@ public:
 	DataSet3D& operator=(const DataSet3D&) = delete;
 	DataSet3D(const DataSet3D&) = delete;
 
-    char           *name;                                  /*Name of the data set*/
+	std::string name;                  /*Name of the data set*/
     char           *label[4];                      /*Label of three axes and data*/
     char           *units[4];                     /*Units for three axes and data*/
     Vect3d          basis[3];                         /*Basis vectors for lattice*/

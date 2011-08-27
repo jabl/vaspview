@@ -36,11 +36,7 @@ DS3VaspReader::DS3VaspReader(const char* file_name, const char* mode)
 	    return;
     _DAInit(&line,0,char);
     _DAInit(&points,0,unsigned long);
-    /*Read the data set name*/
-    if (!daFGetS(&line,file.f))goto err;
-    daTrimWS(&line);
-    daTrimToSize(&line);
-    ds3->name=line.data;
+    if (!file.fgets(ds3->name)) goto err;
     line.data=NULL;
     line.cap=line.size=0;
     /*Read the "Universal scaling factor"*/
