@@ -26,15 +26,18 @@
 #include "ds3view.hh"
 #include "ds3vasp.hh"
 
-typedef struct DS3Viewer     DS3Viewer;
-
-
-
 # define DS3V_ISO_V_RES (200)
 # define DS3V_SLIDER_SMALL_WIDTH (100)
 
-struct DS3Viewer
+class DS3Viewer
 {
+public:
+	DS3Viewer();
+	~DS3Viewer();
+	// Forbid copying
+	DS3Viewer& operator=(const DS3Viewer&) = delete;
+	DS3Viewer(const DS3Viewer&) = delete;
+
     GLWFrame         *frame;
     DS3View          *ds3view;
     GLWButton        *bn_open;
@@ -49,7 +52,7 @@ struct DS3Viewer
     GLWLabel         *lb_dataz;
     GLWLabel         *lb_datav;
     GLWTextField     *tf_slice_t;
-    GLWSlider        *sl_slice_t;
+	std::unique_ptr<GLWSlider>        sl_slice_t;
     GLWTextField     *tf_slice_p;
     GLWSlider        *sl_slice_p;
     GLWTextField     *tf_slice_d;
@@ -145,7 +148,5 @@ void ds3ViewerSetSelectedBond(DS3Viewer *_this,long _f,long _t);
 void ds3ViewerSetBond(DS3Viewer *_this,double _sz);
 # endif
 void ds3ViewerOpenFile(DS3Viewer *_this,const char *_file);
-
-int ds3ViewerInit(DS3Viewer *_this);
 
 #endif                                                           /*_ds3viewr_H*/

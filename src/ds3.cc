@@ -408,27 +408,23 @@ void dsMatrix3x3PInv(const double _m[3][3],double _i[3][3])
 
 int main(int _argc,char **_argv)
 {
-    DS3Viewer ds3v;
+
     glwInit(&_argc,_argv);
-    if (ds3ViewerInit(&ds3v))
+    DS3Viewer ds3v;
+    /*At this point, we've created a window, and so should have a current
+      rendering context: test for GL extensions*/
+    GLenum err = glewInit();
+    if (GLEW_OK != err)
     {
-        /*At this point, we've created a window, and so should have a current
-          rendering context: test for GL extensions*/
-	    GLenum err = glewInit();
-	    if (GLEW_OK != err)
-	    {
-		    /* Problem: glewInit failed, something is seriously wrong. */
-		    fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
-		    return 1;
-	    }
-	    fprintf(stdout, "Status: Using GLEW %s\n", glewGetString(GLEW_VERSION));
-	    if (GLEW_EXT_paletted_texture)
-		    printf("EXT_paletted_texture available.\n");
-	    if (GLEW_EXT_texture3D)
-		    printf("EXT_texture3D available.\n");
-        if (_argc>1)ds3ViewerOpenFile(&ds3v,_argv[1]);
-        glutMainLoop();
+	    /* Problem: glewInit failed, something is seriously wrong. */
+	    fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
+	    return 1;
     }
-    else fprintf(stderr,"Could not initialize UI.\n");
-    return 1;
+    fprintf(stdout, "Status: Using GLEW %s\n", glewGetString(GLEW_VERSION));
+    if (GLEW_EXT_paletted_texture)
+	    printf("EXT_paletted_texture available.\n");
+    if (GLEW_EXT_texture3D)
+	    printf("EXT_texture3D available.\n");
+    if (_argc>1)ds3ViewerOpenFile(&ds3v,_argv[1]);
+    glutMainLoop();
 }

@@ -588,6 +588,15 @@ class GLWSlider
 public:
     GLWSlider(int _min,int _max,int _val,int _ext);
     ~GLWSlider();
+	int            getVal();
+	void           setVal(int val,int ext);
+	void           setChangedFunc(GLWActionFunc func);
+	void           setChangedCtx(void* ctx);
+	void           setMajorTickSpacing(int s);
+	void           setMinorTickSpacing(int s);
+	int            makeLabels(int start,int inc);
+	void           setSnap(int s);
+
 
     GLWComponent   super;
     GLWActionFunc  changed;

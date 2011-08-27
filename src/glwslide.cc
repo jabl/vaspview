@@ -931,9 +931,14 @@ void glwSliderSetRange(GLWSlider *_this,int _min,int _max)
     }
 }
 
-int glwSliderGetVal(GLWSlider *_this)
+int glwSliderGetVal(GLWSlider* _this)
 {
     return _this->val;
+}
+
+int GLWSlider::getVal()
+{
+	return val;
 }
 
 int glwSliderGetExt(GLWSlider *_this)
@@ -943,42 +948,47 @@ int glwSliderGetExt(GLWSlider *_this)
 
 void glwSliderSetVal(GLWSlider *_this,int _val,int _ext)
 {
-    if (_this->min<=_this->max)
+	_this->setVal(_val, _ext);
+}
+
+void GLWSlider::setVal(int val, int ext)
+{
+    if (this->min<=this->max)
     {
-        if (_ext>=0)
+        if (ext>=0)
         {
-            if (_val+_ext>_this->max)_val=_this->max-_ext;
-            if (_val<_this->min)_val=_this->min;
-            if (_val+_ext>_this->max)_ext=_this->max-_val;
+            if (val+ext>this->max)val=this->max-ext;
+            if (val<this->min)val=this->min;
+            if (val+ext>this->max)ext=this->max-val;
         }
         else
         {
-            if (_val+_ext<_this->min)_val=_this->min-_ext;
-            if (_val>_this->max)_val=_this->max;
-            if (_val+_ext<_this->min)_ext=_this->min-_val;
+            if (val+ext<this->min)val=this->min-ext;
+            if (val>this->max)val=this->max;
+            if (val+ext<this->min)ext=this->min-val;
         }
     }
     else
     {
-        if (_ext>=0)
+        if (ext>=0)
         {
-            if (_val+_ext>_this->min)_val=_this->min-_ext;
-            if (_val<_this->max)_val=_this->max;
-            if (_val+_ext>_this->min)_ext=_this->min-_val;
+            if (val+ext>this->min)val=this->min-ext;
+            if (val<this->max)val=this->max;
+            if (val+ext>this->min)ext=this->min-val;
         }
         else
         {
-            if (_val+_ext<_this->max)_val=_this->max-_ext;
-            if (_val>_this->min)_val=_this->min;
-            if (_val+_ext<_this->max)_ext=_this->max-_val;
+            if (val+ext<this->max)val=this->max-ext;
+            if (val>this->min)val=this->min;
+            if (val+ext<this->max)ext=this->max-val;
         }
     }
-    if (_val!=_this->val||_ext!=_this->ext)
+    if (val!=this->val||ext!=this->ext)
     {
-        _this->val=_val;
-        _this->ext=_ext;
-        if (_this->changed!=NULL)_this->changed(_this->changed_ctx,&_this->super);
-        glwSliderUpdateThumb(_this);
+        this->val=val;
+        this->ext=ext;
+        if (this->changed!=NULL)this->changed(this->changed_ctx,&this->super);
+        glwSliderUpdateThumb(this);
     }
 }
 
@@ -989,10 +999,15 @@ int glwSliderGetMajorTickSpacing(GLWSlider *_this)
 
 void glwSliderSetMajorTickSpacing(GLWSlider *_this,int _s)
 {
-    if (_s!=_this->major_ticks)
+	_this->setMajorTickSpacing(_s);
+}
+
+void GLWSlider::setMajorTickSpacing(int s)
+{
+    if (s != this->major_ticks)
     {
-        _this->major_ticks=_s;
-        glwCompRevalidate(&_this->super);
+        this->major_ticks = s;
+        glwCompRevalidate(&this->super);
     }
 }
 
@@ -1017,10 +1032,15 @@ int glwSliderGetMinorTickSpacing(GLWSlider *_this)
 
 void glwSliderSetMinorTickSpacing(GLWSlider *_this,int _s)
 {
-    if (_s!=_this->minor_ticks)
+	_this->setMinorTickSpacing(_s);
+}
+
+void GLWSlider::setMinorTickSpacing(int s)
+{
+    if (s != this->minor_ticks)
     {
-        _this->minor_ticks=_s;
-        glwCompRevalidate(&_this->super);
+        this->minor_ticks = s;
+        glwCompRevalidate(&this->super);
     }
 }
 
@@ -1046,6 +1066,11 @@ int glwSliderGetSnap(GLWSlider *_this)
 void glwSliderSetSnap(GLWSlider *_this,int _s)
 {
     _this->snap=_s;
+}
+
+void GLWSlider::setSnap(int s)
+{
+	snap = s;
 }
 
 int glwSliderGetOrientation(GLWSlider *_this)
@@ -1114,47 +1139,56 @@ int glwSliderDelLabel(GLWSlider *_this,int _val)
 
 int glwSliderMakeLabels(GLWSlider *_this,int _start,int _inc)
 {
+	return _this->makeLabels(_start, _inc);
+}
+
+int GLWSlider::makeLabels(int start, int inc)
+{
     int  i;
     int  s;
-    if (!_inc)return 0;
-    if (_inc>0)
+    if (!inc) return 0;
+    if (inc > 0)
     {
-        if (_this->min<_this->max)
+        if (this->min < this->max)
         {
-            s=_this->max;
-            if (_start<_this->min)_start+=(_this->min-_start+_inc-1)/_inc*_inc;
+            s = this->max;
+            if (start < this->min) 
+		    start += (this->min - start + inc - 1) / inc * inc;
         }
         else
         {
-            s=_this->min;
-            if (_start<_this->max)_start+=(_this->max-_start+_inc-1)/_inc*_inc;
+            s = this->min;
+            if (start < this->max)
+		    start += (this->max - start + inc - 1) / inc * inc;
         }
     }
     else
     {
-        if (_this->min<_this->max)
+        if (this->min < this->max)
         {
-            s=_this->min;
-            if (_start>_this->max)_start-=(_start-_this->max+_inc-1)/_inc*_inc;
+            s = this->min;
+            if (start > this->max)
+		    start -= (start - this->max + inc - 1) / inc * inc;
         }
         else
         {
-            s=_this->max;
-            if (_start>_this->max)_start-=(_start-_this->max+_inc-1)/_inc*_inc;
+            s = this->max;
+            if (start > this->max)
+		    start -= (start - this->max + inc - 1) / inc * inc;
         }
-        i=s;
-        s=_start;
-        _start=i;
-        _inc=-_inc;
+        i = s;
+        s = start;
+        start = i;
+        inc = -inc;
     }
-    for (i=_start; i<=s; i+=_inc)
+    for (i = start; i <= s; i += inc)
     {
         char n[32];
         sprintf(n,"%i",i);
-        if (!glwSliderAddLabel(_this,i,n))
+        if (!glwSliderAddLabel(this, i, n))
         {
             int j;
-            for (j=_start; j<i; j+=_inc)glwSliderDelLabel(_this,j);
+            for (j = start; j < i; j += inc) glwSliderDelLabel(this, j);
             return 0;
         }
     }
@@ -1171,6 +1205,11 @@ void glwSliderSetChangedFunc(GLWSlider *_this,GLWActionFunc _func)
     _this->changed=_func;
 }
 
+void GLWSlider::setChangedFunc(GLWActionFunc _func)
+{
+	changed = _func;
+}
+
 void *glwSliderGetChangedCtx(GLWSlider *_this)
 {
     return _this->changed_ctx;
@@ -1179,4 +1218,9 @@ void *glwSliderGetChangedCtx(GLWSlider *_this)
 void glwSliderSetChangedCtx(GLWSlider *_this,void *_ctx)
 {
     _this->changed_ctx=_ctx;
+}
+
+void GLWSlider::setChangedCtx(void* ctx)
+{
+	changed_ctx = ctx;
 }

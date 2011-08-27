@@ -337,7 +337,7 @@ static void ds3ViewerSliceTextChanged(DS3Viewer *_this,GLWComponent *_c)
 static void ds3ViewerSliceTSliderChanged(DS3Viewer *_this,GLWComponent *_c)
 {
     int v;
-    v=glwSliderGetVal(_this->sl_slice_t);
+    v = _this->sl_slice_t->getVal();
     ds3ViewerSetSlice(_this,v,_this->ds3view->slice_p,_this->ds3view->slice_d);
 }
 
@@ -883,7 +883,9 @@ static void ds3ViewerProjTChanged(DS3Viewer *_this,GLWComponent *_c)
 static void ds3ViewerFinishRead(DS3Viewer *_this)
 {
     double iso_v;
+    fprintf(stderr, "about to delete old ds3\n");
     delete _this->ds3;
+    fprintf(stderr, "deleted old ds3\n");
     _this->ds3 = _this->reader->release_ds3();
     iso_v=dsScale(_this->ds3view->ds,_this->ds3view->iso_v);
     if (ds3ViewSetDataSet(_this->ds3view, _this->ds3))
@@ -974,7 +976,7 @@ static void ds3ViewerOpen(DS3Viewer *_this,GLWComponent *_c)
     ds3ViewerOpenFile(_this,file);
 }
 
-int ds3ViewerInit(DS3Viewer *_this)
+DS3Viewer::DS3Viewer()
 {
     GLWLabel     *lb_file;
     GLWLabel     *lb_slice_t;
@@ -1022,6 +1024,7 @@ int ds3ViewerInit(DS3Viewer *_this)
     GLWComponent *cm_view;
     GLWComponent *cm_view_btns;
     GLWComponent *cm_opts;
+    DS3Viewer* _this = this;
     _this->read_id=0;
     _this->ds3 = new DataSet3D();
     dsLinearScaleInit(&_this->scale_linear, _this->ds3->min, _this->ds3->max);
@@ -1053,7 +1056,7 @@ int ds3ViewerInit(DS3Viewer *_this)
     _this->cb_draw_slice=glwCheckBoxAlloc("Draw Slice",1,NULL);
     lb_slice_t=glwLabelAlloc("Azimuthal slice angle:");
     _this->tf_slice_t=glwTextFieldAlloc(NULL,5);
-    _this->sl_slice_t= new GLWSlider(0,360,0,0);
+    _this->sl_slice_t.reset(new GLWSlider(0,360,0,0));
     lb_slice_p=glwLabelAlloc("Polar slice angle:");
     _this->tf_slice_p=glwTextFieldAlloc(NULL,5);
     _this->sl_slice_p= new GLWSlider(0,360,0,0);
@@ -1160,8 +1163,8 @@ int ds3ViewerInit(DS3Viewer *_this)
             _this->tp_ctrl!=NULL&&_this->legend!=NULL&&_this->lb_status!=NULL&&
             _this->lb_datax!=NULL&&_this->lb_datay!=NULL&&_this->lb_dataz!=NULL&&
             _this->lb_datav!=NULL&&_this->cb_draw_slice!=NULL&&lb_slice_t!=NULL&&
-            _this->tf_slice_t!=NULL&&_this->sl_slice_t!=NULL&&lb_slice_p!=NULL&&
-            _this->tf_slice_p!=NULL&&_this->sl_slice_p!=NULL&&lb_slice_d!=NULL&&
+	_this->tf_slice_t!=NULL&&_this->sl_slice_t.get()!=NULL&&lb_slice_p!=NULL&&
+	_this->tf_slice_p!=NULL&&_this->sl_slice_p!=NULL&&lb_slice_d!=NULL&&
             _this->tf_slice_d!=NULL&&_this->sl_slice_d!=NULL&&
             _this->cb_draw_iso!=NULL&&lb_iso_v!=NULL&&_this->tf_iso_v!=NULL&&
             _this->sl_iso_v!=NULL&&lb_iso_d!=NULL&&/*_this->tf_iso_d!=NULL&&*/
@@ -1430,13 +1433,12 @@ int ds3ViewerInit(DS3Viewer *_this)
         glwSliderSetMinorTickSpacing(_this->sl_point_r,5);
         ds3ViewerUpdatePointRLabels(_this);
         glwSliderSetSnap(_this->sl_point_r,1);
-        glwSliderSetChangedFunc(_this->sl_slice_t,
-                                (GLWActionFunc)ds3ViewerSliceTSliderChanged);
-        glwSliderSetChangedCtx(_this->sl_slice_t,_this);
-        glwSliderSetMajorTickSpacing(_this->sl_slice_t,90);
-        glwSliderSetMinorTickSpacing(_this->sl_slice_t,15);
-        glwSliderMakeLabels(_this->sl_slice_t,0,90);
-        glwSliderSetSnap(_this->sl_slice_t,1);
+        _this->sl_slice_t->setChangedFunc((GLWActionFunc)ds3ViewerSliceTSliderChanged);
+        _this->sl_slice_t->setChangedCtx(_this);
+        _this->sl_slice_t->setMajorTickSpacing(90);
+        _this->sl_slice_t->setMinorTickSpacing(15);
+        _this->sl_slice_t->makeLabels(0, 90);
+        _this->sl_slice_t->setSnap(1);
         glwSliderSetChangedFunc(_this->sl_slice_p,
                                 (GLWActionFunc)ds3ViewerSlicePSliderChanged);
         glwSliderSetChangedCtx(_this->sl_slice_p,_this);
@@ -2018,79 +2020,88 @@ int ds3ViewerInit(DS3Viewer *_this)
                         _this->ds3view->box[0][Z],_this->ds3view->box[1][X],
                         _this->ds3view->box[1][Y],_this->ds3view->box[1][Z]);
         glwFramePack(_this->frame);
-        return 1;
     }
+    else
+    {
+	    throw "DS3Viewer initialization failed\n";
+    }
+}
+
+DS3Viewer::~DS3Viewer()
+{
+	printf("Destroying DS3Viewer\n");
+    DS3Viewer* _this = this;
     glwCheckBoxFree(_this->cb_projt_ortho);
     glwCheckBoxFree(_this->cb_projt_persp);
     glwCheckBoxGroupDstr(&_this->cg_projt);
-    glwLabelFree(lb_projt);
+//    glwLabelFree(lb_projt);
     glwCheckBoxFree(_this->cb_backc_white);
     glwCheckBoxFree(_this->cb_backc_black);
     glwCheckBoxGroupDstr(&_this->cg_backc);
-    glwLabelFree(lb_backc);
+//    glwLabelFree(lb_backc);
     glwCheckBoxFree(_this->cb_color_grayscale);
     glwCheckBoxFree(_this->cb_color_rainbow);
     glwCheckBoxGroupDstr(&_this->cg_color);
-    glwLabelFree(lb_color);
+//    glwLabelFree(lb_color);
     glwCheckBoxFree(_this->cb_scale_log);
     glwCheckBoxFree(_this->cb_scale_linear);
     glwCheckBoxGroupDstr(&_this->cg_scale);
-    glwLabelFree(lb_scale);
-    glwButtonFree(bn_align);
-    glwButtonFree(bn_cntr);
-    glwButtonFree(bn_ornt);
+    // glwLabelFree(lb_scale);
+    // glwButtonFree(bn_align);
+    // glwButtonFree(bn_cntr);
+    // glwButtonFree(bn_ornt);
     delete _this->sl_cntr_z;
     glwTextFieldFree(_this->tf_cntr_z);
-    glwLabelFree(lb_cntr_z);
+//    glwLabelFree(lb_cntr_z);
     delete _this->sl_cntr_y;
     glwTextFieldFree(_this->tf_cntr_y);
-    glwLabelFree(lb_cntr_y);
+//    glwLabelFree(lb_cntr_y);
     delete _this->sl_cntr_x;
     glwTextFieldFree(_this->tf_cntr_x);
-    glwLabelFree(lb_cntr_x);
-    glwLabelFree(lb_cntr);
+//    glwLabelFree(lb_cntr_x);
+//    glwLabelFree(lb_cntr);
     delete _this->sl_ornt_r;
     glwTextFieldFree(_this->tf_ornt_r);
-    glwLabelFree(lb_ornt_r);
+//    glwLabelFree(lb_ornt_r);
     delete _this->sl_ornt_p;
     glwTextFieldFree(_this->tf_ornt_p);
-    glwLabelFree(lb_ornt_p);
+//    glwLabelFree(lb_ornt_p);
     delete _this->sl_ornt_y;
     glwTextFieldFree(_this->tf_ornt_y);
-    glwLabelFree(lb_ornt_y);
-    glwLabelFree(lb_ornt);
+//    glwLabelFree(lb_ornt_y);
+//    glwLabelFree(lb_ornt);
     delete _this->sl_zoom;
     glwTextFieldFree(_this->tf_zoom);
-    glwLabelFree(lb_zoom);
+//    glwLabelFree(lb_zoom);
     glwCheckBoxFree(_this->cb_draw_coords);
     delete _this->sl_maxz;
     glwTextFieldFree(_this->tf_maxz);
-    glwLabelFree(lb_maxz);
+//    glwLabelFree(lb_maxz);
     delete _this->sl_minz;
     glwTextFieldFree(_this->tf_minz);
-    glwLabelFree(lb_minz);
+//    glwLabelFree(lb_minz);
     delete _this->sl_maxy;
     glwTextFieldFree(_this->tf_maxy);
-    glwLabelFree(lb_maxy);
+//    glwLabelFree(lb_maxy);
     delete _this->sl_miny;
     glwTextFieldFree(_this->tf_miny);
-    glwLabelFree(lb_miny);
+//    glwLabelFree(lb_miny);
     delete _this->sl_maxx;
     glwTextFieldFree(_this->tf_maxx);
-    glwLabelFree(lb_maxx);
+//    glwLabelFree(lb_maxx);
     delete _this->sl_minx;
     glwTextFieldFree(_this->tf_minx);
-    glwLabelFree(lb_minx);
+//    glwLabelFree(lb_minx);
 # if defined(__DS3_ADD_BONDS__)
     glwButtonFree(_this->bn_bond_d);
     glwButtonFree(_this->bn_bond_a);
     delete _this->sl_bond_s;
     glwTextFieldFree(_this->tf_bond_s);
-    glwLabelFree(lb_bond_s);
+//    glwLabelFree(lb_bond_s);
     glwTextFieldFree(_this->tf_bond_t);
-    glwLabelFree(lb_bond_t);
+//    glwLabelFree(lb_bond_t);
     glwTextFieldFree(_this->tf_bond_f);
-    glwLabelFree(lb_bond_f);
+//    glwLabelFree(lb_bond_f);
 # endif
     glwButtonFree(_this->bn_point_sa);
     glwButtonFree(_this->bn_point_v);
@@ -2098,27 +2109,27 @@ int ds3ViewerInit(DS3Viewer *_this)
     glwLabelFree(_this->lb_point_l);
     glwLabelFree(_this->lb_point_t);
     glwTextFieldFree(_this->tf_point_s);
-    glwLabelFree(lb_point_s);
+//    glwLabelFree(lb_point_s);
     delete _this->sl_point_r;
     glwTextFieldFree(_this->tf_point_r);
-    glwLabelFree(lb_point_r);
+//    glwLabelFree(lb_point_r);
     glwCheckBoxFree(_this->cb_draw_points);
     delete _this->sl_iso_d;
     /*glwTextFieldFree(_this->tf_iso_d);*/
-    glwLabelFree(lb_iso_d);
+//    glwLabelFree(lb_iso_d);
     delete _this->sl_iso_v;
     glwTextFieldFree(_this->tf_iso_v);
-    glwLabelFree(lb_iso_v);
+//    glwLabelFree(lb_iso_v);
     glwCheckBoxFree(_this->cb_draw_iso);
     delete _this->sl_slice_d;
     glwTextFieldFree(_this->tf_slice_d);
-    glwLabelFree(lb_slice_d);
+//    glwLabelFree(lb_slice_d);
     delete _this->sl_slice_p;
     glwTextFieldFree(_this->tf_slice_p);
-    glwLabelFree(lb_slice_p);
-    delete _this->sl_slice_t;
+//    glwLabelFree(lb_slice_p);
+//    delete _this->sl_slice_t; // unique_ptr auto-delete?
     glwTextFieldFree(_this->tf_slice_t);
-    glwLabelFree(lb_slice_t);
+//    glwLabelFree(lb_slice_t);
     glwCheckBoxFree(_this->cb_draw_slice);
     glwLabelFree(_this->lb_datav);
     glwLabelFree(_this->lb_dataz);
@@ -2127,24 +2138,23 @@ int ds3ViewerInit(DS3Viewer *_this)
     glwLabelFree(_this->lb_status);
     dsColorLegendFree(_this->legend);
     glwTabbedPaneFree(_this->tp_ctrl);
-    glwCompFree(cm_opts);
-    glwCompFree(cm_view_btns);
-    glwCompFree(cm_view);
-    glwCompFree(cm_bnds);
+//    glwCompFree(cm_opts);
+//    glwCompFree(cm_view_btns);
+//    glwCompFree(cm_view);
+//    glwCompFree(cm_bnds);
 # if defined(__DS3_ADD_BONDS__)
-    glwCompFree(cm_bond_btns);
+//    glwCompFree(cm_bond_btns);
 # endif
-    glwCompFree(cm_point_btns);
-    glwCompFree(cm_strc);
-    glwCompFree(cm_data);
+//    glwCompFree(cm_point_btns);
+//    glwCompFree(cm_strc);
+//    glwCompFree(cm_data);
     glwLabelFree(_this->lb_data_set);
     glwTextFieldFree(_this->tf_file);
     glwButtonFree(_this->bn_open);
-    glwLabelFree(lb_file);
-    glwCompFree(cm_vals);
+//    glwLabelFree(lb_file);
+//    glwCompFree(cm_vals);
     ds3ViewFree(_this->ds3view);
     glwFrameFree(_this->frame);
-    return 0;
 }
 
 void ds3ViewerUpdatePointRLabels(DS3Viewer *_this)
@@ -2216,9 +2226,9 @@ void ds3ViewerSetSlice(DS3Viewer *_this,double _t,double _p,double _d)
     glwTextFieldSetText(_this->tf_slice_t,text);
     glwTextFieldSetChangedFunc(_this->tf_slice_t,
                                (GLWActionFunc)ds3ViewerTextChanged);
-    glwSliderSetChangedFunc(_this->sl_slice_t,NULL);
-    glwSliderSetVal(_this->sl_slice_t,(int)(_t+0.5),0);
-    glwSliderSetChangedFunc(_this->sl_slice_t,
+    _this->sl_slice_t->setChangedFunc(NULL);
+    _this->sl_slice_t->setVal((int)(_t+0.5),0);
+    _this->sl_slice_t->setChangedFunc(
                             (GLWActionFunc)ds3ViewerSliceTSliderChanged);
     sprintf(text,"%0.3lg",_p);
     glwTextFieldSetChangedFunc(_this->tf_slice_p,
@@ -2559,7 +2569,7 @@ void ds3ViewerOpenFile(DS3Viewer *_this,const char *_file)
 	}
 	else
 	{
-		int    ret;
+		int    ret = 1;
 		size_t name_sz;
 		name_sz = (strlen(_file)+1)*sizeof(char);
 		if ((_this->read_name=(char *)malloc(name_sz))==NULL)
@@ -2578,6 +2588,7 @@ void ds3ViewerOpenFile(DS3Viewer *_this,const char *_file)
 		}
 		else
 		{
+			_this->read_prog = 0;
 			memcpy(_this->read_name,_file,name_sz);
 			_this->read_id=glwCompAddIdler(&_this->frame->super,
 						       (GLWActionFunc)ds3ViewerAsyncRead,_this);

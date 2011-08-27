@@ -192,11 +192,14 @@ int DS3VaspReader::read()
 
 int DS3VaspReader::cancel()
 {
+	fprintf(stderr, "Canceling chgcar read\n");
     ds3.reset();
     return 1;
 }
 
 DataSet3D* DS3VaspReader::release_ds3()
 {
-	return ds3.release();
+	std::unique_ptr<DataSet3D> tmpds3(new DataSet3D);
+	ds3.swap(tmpds3);
+	return tmpds3.release();
 }
