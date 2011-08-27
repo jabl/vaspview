@@ -887,6 +887,8 @@ static void ds3ViewerFinishRead(DS3Viewer *_this)
     delete _this->ds3;
     fprintf(stderr, "deleted old ds3\n");
     _this->ds3 = _this->reader->release_ds3();
+    fprintf(stderr, "ds3==NULL: %i, ds3->data[0:2]: %f %f\n", _this->ds3 == NULL,
+	    _this->ds3->data[0], _this->ds3->data[1]);
     iso_v=dsScale(_this->ds3view->ds,_this->ds3view->iso_v);
     if (ds3ViewSetDataSet(_this->ds3view, _this->ds3))
     {
@@ -903,33 +905,25 @@ static void ds3ViewerFinishRead(DS3Viewer *_this)
                           _this->ds3view->slice_d);
         ds3ViewerSetIso(_this,dsUnscale(_this->ds3view->ds,iso_v),
                         _this->ds3view->iso_d);
-# if defined(__DS3_ADD_BONDS__)&&defined(__DS3_SAVE_BONDS__)
+
         glwLabelSetLabel(_this->lb_data_set,"Data Set: ");
         glwLabelAddLabel(_this->lb_data_set,_this->ds3->name);
         glwLabelSetLabel(_this->lb_status,"\"");
         glwLabelAddLabel(_this->lb_status,_this->read_name);
         glwLabelAddLabel(_this->lb_status,"\" Loaded.");
-        {
-            size_t name_sz;
-            free(_this->bond_name);
-            name_sz=strlen(_this->read_name)+5;
-            _this->bond_name=(char *)malloc(name_sz);
-            if (_this->bond_name!=NULL)
-            {
+# if defined(__DS3_ADD_BONDS__)&&defined(__DS3_SAVE_BONDS__)
+	size_t name_sz;
+	free(_this->bond_name);
+	name_sz=strlen(_this->read_name)+5;
+	_this->bond_name=(char *)malloc(name_sz);
+	if (_this->bond_name!=NULL)
+	{
                 memcpy(_this->bond_name,_this->read_name,name_sz-5);
                 memcpy(_this->bond_name+name_sz-5,".aux",5);
                 ds3ViewerLoadBonds(_this);
-            }
-        }
+	}
+#endif
     }
-# else
-        glwLabelSetLabel(_this->lb_data_set,"Data Set: ");
-        glwLabelAddLabel(_this->lb_data_set,_this->ds3.name);
-        glwLabelSetLabel(_this->lb_status,"\"");
-        glwLabelAddLabel(_this->lb_status,_this->read_name);
-        glwLabelAddLabel(_this->lb_status,"\" Loaded.");
-    }
-# endif
     else
     {
         ds3ViewSetDataSet(_this->ds3view,NULL);
@@ -955,7 +949,7 @@ static void ds3ViewerAsyncRead(DS3Viewer *_this,GLWComponent *_c)
         }
         else ds3ViewerFinishRead(_this);
         free(_this->read_name);
-        _this->reader.reset();
+	_this->reader.reset();
     }
     else if (_this->read_prog!=--ret)
     {
