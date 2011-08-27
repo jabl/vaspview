@@ -17,13 +17,15 @@
   along with this program; if not, write to the Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA*/
 #include "ds3vasp.hh"
+#include "strutil.hh"
+#include <vector>
 
 /*Reads the VASP header, and sets up for reading the data asynchronously*/
 DS3VaspReader::DS3VaspReader(const char* file_name, const char* mode) 
 	: file(file_name, mode), ds3(new DataSet3D())
 {
-    CDynArray      line;
-    CDynArray      points;
+    std::string    str;
+    std::vector<int>    atypes;  // Atom types
     char          *p;
     size_t         npoints;
     double         d;
@@ -34,11 +36,8 @@ DS3VaspReader::DS3VaspReader(const char* file_name, const char* mode)
 
     if (file.f == NULL)
 	    return;
-    _DAInit(&line,0,char);
-    _DAInit(&points,0,unsigned long);
     if (!file.fgets(ds3->name)) goto err;
-    line.data=NULL;
-    line.cap=line.size=0;
+    trimlr(ds3->name);
     /*Read the "Universal scaling factor"*/
     if (fscanf(file.f,"%lf",&scale)<1)goto err;
     /*Read the basis for the box*/
@@ -54,36 +53,37 @@ DS3VaspReader::DS3VaspReader(const char* file_name, const char* mode)
     for (i=0; i<3; i++)vectAdd3d(ds3->center,ds3->center,ds3->basis[i]);
     vectMul3d(ds3->center,ds3->center,0.5);
     /*Read the atom types*/
-    if (!daFGetS(&line,file.f))goto err;
-    p=_DAGetAt(&line,0,char);
+    if (!file.fgets(str)) goto err;
+    trimlr(str);
+    p = &str[0];
     for (npoints=0; *p!='\0';)
     {
         char          *e;
         unsigned long  u;
         u=strtoul(p,&e,0);
         if (e == p || (*e != '\0' && !isspace((unsigned char)*e))) goto err;
-        if (u!=0&&!daInsTail(&points,&u))goto err;
+        if (u != 0) atypes.push_back(u);
         npoints+=u;
         p=e;
     }
-    ds3->points=(DSPoint3D *)malloc(npoints*sizeof(DSPoint3D));
-    if (ds3->points==NULL)goto err;
+    ds3->points.resize(npoints);
     ds3->npoints=npoints;
     /*Read in the atom positions*/
     /*First line specifies the coordinate mode*/
-    if (fscanf(file.f," ")<0||!daFGetS(&line,file.f)||line.size<1)goto err;
-    d=points.size>1?1.0/(points.size-1):1;
+    if (!file.fgets(str)) goto err;
+    adjustl(str);
+    d = atypes.size() > 1 ? 1.0/(atypes.size() - 1) : 1;
     /*Only the first (non-whitespace) character of the line matters*/
-    switch (tolower(_DAGetAt(&line,0,unsigned char)[0]))
+    switch (tolower(str[0]))
     {
     case 'd':                                                         /*"Direct"*/
     {
         /*Direct coordinates are fractions of the lattice vectors*/
-        for (k=0,i=0; k<points.size; k++)
+	for (k = 0, i = 0; k < atypes.size(); k++)
         {
             double col;
             col=k*d;
-            for (l=*_DAGetAt(&points,k,unsigned long); l-->0; i++)
+            for (int ll = atypes[k]; ll-- > 0; i++)
             {
                 for (j=0; j<3; j++)if (fscanf(file.f,"%lf",ds3->points[i].pos+j)<1)goto err;
                 ds3->points[i].typ=(int)k;
@@ -98,11 +98,11 @@ DS3VaspReader::DS3VaspReader(const char* file_name, const char* mode)
           universal scaling factor. We convert them to Direct coordinates.*/
         Vect3d basinv[3];
         dsMatrix3x3Inv(ds3->basis,basinv);
-        for (k=0,i=0; k<points.size; k++)
+        for (k = 0,i = 0; k < atypes.size(); k++)
         {
             double col;
             col=k*d;
-            for (l=*_DAGetAt(&points,k,unsigned long); l-->0; i++)
+            for (int ll = atypes[k]; ll-- > 0; i++)
             {
                 Vect3d pos;
                 for (j=0; j<3; j++)if (fscanf(file.f,"%lf",&pos[j])<1)goto err;
@@ -137,13 +137,11 @@ DS3VaspReader::DS3VaspReader(const char* file_name, const char* mode)
         ds3->min = ds3->max = 0;
         this->k = 0;
     }
-    goto done;
+    return;
 err:
     ds3.reset();
     if (!errno)errno=EINVAL;
-done:
-    daDstr(&line);
-    daDstr(&points);
+    throw "Error initializing vasp reader\n";
 }
 
 /*Reads a block of data from the VASP file*/

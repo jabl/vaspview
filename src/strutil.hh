@@ -21,8 +21,8 @@
 #include <string>
 
 // Remove trailing spaces (as determined by std::isspace)
-std::string trim(std::string& str);
-std::string adjustl(std::string& str);
-std::string trimlr(std::string& str);
+std::string& trim(std::string& str);
+std::string& adjustl(std::string& str);
+std::string& trimlr(std::string& str);
 
 #endif

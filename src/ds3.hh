@@ -32,6 +32,7 @@
 #include "glw.hh"
 #include "vect.hh"
 #include <string>
+#include <vector>
 
 # if !defined(M_PI)
 #  define M_PI (3.141592653589793238462643)
@@ -92,7 +93,7 @@ public:
     Vect3d          basis[3];                         /*Basis vectors for lattice*/
     Vect3d          center;                               /*Center of the lattice*/
     size_t          npoints;                                   /*Number of points*/
-    DSPoint3D      *points;                                     /*Discrete points*/
+	std::vector<DSPoint3D> points;     /*Discrete points*/
     /*DSLine3D       *lines;*/                                 /*Lines between points*/
     size_t          density[3];       /*Dimensions of packed array of data values*/
     double         *data;                               /*3D packed array of data*/
