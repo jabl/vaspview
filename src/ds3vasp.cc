@@ -1,6 +1,7 @@
 /*VASP Data Viewer - Views 3d data sets of molecular charge distribution
   Copyright (C) 1999-2001 Timothy B. Terriberry
   (mailto:tterribe@users.sourceforge.net)
+  2011 Janne Blomqvist
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -19,7 +20,7 @@
 
 /*Reads the VASP header, and sets up for reading the data asynchronously*/
 DS3VaspReader::DS3VaspReader(const char* file_name, const char* mode) 
-	: file(new File(file_name, mode))
+	: file(file_name, mode), ds3(new DataSet3D())
 {
     CDynArray      line;
     CDynArray      points;
@@ -31,7 +32,8 @@ DS3VaspReader::DS3VaspReader(const char* file_name, const char* mode)
     size_t         k;
     unsigned long  l;
 
-    this->ds3 = new DataSet3D();
+    if (file.f == NULL)
+	    return;
     _DAInit(&line,0,char);
     _DAInit(&points,0,unsigned long);
     /*Read the data set name*/
@@ -141,19 +143,11 @@ DS3VaspReader::DS3VaspReader(const char* file_name, const char* mode)
     }
     goto done;
 err:
-    delete ds3;
-    ds3 = NULL;
+    ds3.reset();
     if (!errno)errno=EINVAL;
 done:
     daDstr(&line);
     daDstr(&points);
-}
-
-DS3VaspReader::~DS3VaspReader()
-{
-	delete ds3;
-	if (in)
-		fclose(in);
 }
 
 /*Reads a block of data from the VASP file*/
@@ -180,10 +174,10 @@ int DS3VaspReader::read()
     }
     for (k=this->k; k<s; k++)
     {
-        if (fscanf(this->in,"%lf",data+k)<1)
+        if (fscanf(this->file.f,"%lf",data+k)<1)
         {
             if (!errno)errno=ENOMEM;
-            delete this->ds3;
+            this->ds3.reset();
             ret=0;
             break;
         }
@@ -198,14 +192,11 @@ int DS3VaspReader::read()
 
 int DS3VaspReader::cancel()
 {
-    delete this->ds3;
-    ds3 = NULL;
+    ds3.reset();
     return 1;
 }
 
-DataSet3D* DS3VaspReader::transfer()
+DataSet3D* DS3VaspReader::release_ds3()
 {
-	DataSet3D* tmp = ds3;
-	ds3 = NULL;
-	return tmp;
+	return ds3.release();
 }

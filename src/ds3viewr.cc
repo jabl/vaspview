@@ -1,6 +1,7 @@
 /*VASP Data Viewer - Views 3d data sets of molecular charge distribution
   Copyright (C) 1999-2001 Timothy B. Terriberry
   (mailto:tterribe@users.sourceforge.net)
+  2011 Janne Blomqvist
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -882,8 +883,8 @@ static void ds3ViewerProjTChanged(DS3Viewer *_this,GLWComponent *_c)
 static void ds3ViewerFinishRead(DS3Viewer *_this)
 {
     double iso_v;
-    delete &_this->ds3;
-    _this->ds3 = _this->reader->transfer();
+    delete _this->ds3;
+    _this->ds3 = _this->reader->release_ds3();
     iso_v=dsScale(_this->ds3view->ds,_this->ds3view->iso_v);
     if (ds3ViewSetDataSet(_this->ds3view, _this->ds3))
     {
@@ -951,9 +952,8 @@ static void ds3ViewerAsyncRead(DS3Viewer *_this,GLWComponent *_c)
             glwLabelAddLabel(_this->lb_status,strerror(errno));
         }
         else ds3ViewerFinishRead(_this);
-        fclose(_this->read_file);
         free(_this->read_name);
-        delete _this->reader;
+        _this->reader.reset();
     }
     else if (_this->read_prog!=--ret)
     {
@@ -1023,6 +1023,7 @@ int ds3ViewerInit(DS3Viewer *_this)
     GLWComponent *cm_view_btns;
     GLWComponent *cm_opts;
     _this->read_id=0;
+    _this->ds3 = new DataSet3D();
     dsLinearScaleInit(&_this->scale_linear, _this->ds3->min, _this->ds3->max);
     dsLogScaleInit(&_this->scale_log, _this->ds3->min, _this->ds3->max);
     _this->frame=glwFrameAlloc("VASP Data Viewer");
@@ -2543,72 +2544,63 @@ void ds3ViewerSetBond(DS3Viewer *_this,double _sz)
 
 void ds3ViewerOpenFile(DS3Viewer *_this,const char *_file)
 {
-    if (_this->read_id)
-    {
-        glwCompDelIdler(&_this->frame->super,_this->read_id);
-        _this->read_id=0;
-        _this->reader->cancel();
-        fclose(_this->read_file);
-        free(_this->read_name);
-        delete _this->reader;
-    }
-    if (_file==NULL||_file[0]=='\0')
-    {
-        glwLabelSetLabel(_this->lb_status,"Please type a file name in the "
-                         "\'Open File\' field.");
-    }
-    else
-    {
-        FILE *in;
-        glwTextFieldSetText(_this->tf_file,_file);
-        in=fopen(_file,"r");
-        if (in==NULL)
-        {
-            glwLabelSetLabel(_this->lb_status,"Could not open \"");
-            glwLabelAddLabel(_this->lb_status,_file);
-            glwLabelAddLabel(_this->lb_status,"\": ");
-            glwLabelAddLabel(_this->lb_status,strerror(errno));
-        }
-        else
-        {
-            int    ret;
-            size_t name_sz;
-            _this->read_file=in;
-            _this->reader = NULL;
-            name_sz=(strlen(_file)+1)*sizeof(char);
-            if ((_this->read_name=(char *)malloc(name_sz))==NULL)
-            {
-                ret=0;
-                errno=ENOMEM;
-            }
-            else
-            {
-                memcpy(_this->read_name,_file,name_sz);
-		_this->reader = new DS3VaspReader(in);
-		_this->read_id=glwCompAddIdler(&_this->frame->super,
-					       (GLWActionFunc)ds3ViewerAsyncRead,_this);
-		if (!_this->read_id)
+	if (_this->read_id)
+	{
+		glwCompDelIdler(&_this->frame->super,_this->read_id);
+		_this->read_id=0;
+		_this->reader->cancel();
+		free(_this->read_name);
+		_this->reader.reset();
+	}
+	if (_file==NULL||_file[0]=='\0')
+	{
+		glwLabelSetLabel(_this->lb_status,"Please type a file name in the "
+				 "\'Open File\' field.");
+	}
+	else
+	{
+		int    ret;
+		size_t name_sz;
+		name_sz = (strlen(_file)+1)*sizeof(char);
+		if ((_this->read_name=(char *)malloc(name_sz))==NULL)
 		{
-			_this->reader->cancel();
 			ret=0;
 			errno=ENOMEM;
 		}
-            }
-            if (ret<=0)
-            {
-                if (!ret)
-                {
-                    if (!errno)errno=ENOMEM;
-                    glwLabelSetLabel(_this->lb_status,"Error reading \"");
-                    glwLabelAddLabel(_this->lb_status,_file);
-                    glwLabelAddLabel(_this->lb_status,"\": ");
-                    glwLabelAddLabel(_this->lb_status,strerror(errno));
-                }
-                else ds3ViewerFinishRead(_this);
-                fclose(in);
-                free(_this->read_name);
-                delete _this->reader;
-            }
+		glwTextFieldSetText(_this->tf_file,_file);
+		_this->reader.reset(new DS3VaspReader(_file, "r"));
+		if (_this->reader->file.f == NULL)
+		{
+			glwLabelSetLabel(_this->lb_status,"Could not open \"");
+			glwLabelAddLabel(_this->lb_status,_file);
+			glwLabelAddLabel(_this->lb_status,"\": ");
+			glwLabelAddLabel(_this->lb_status,strerror(errno));
+		}
+		else
+		{
+			memcpy(_this->read_name,_file,name_sz);
+			_this->read_id=glwCompAddIdler(&_this->frame->super,
+						       (GLWActionFunc)ds3ViewerAsyncRead,_this);
+			if (!_this->read_id)
+			{
+				_this->reader->cancel();
+				ret=0;
+				errno=ENOMEM;
+			}
+		}
+		if (ret<=0)
+		{
+			if (!ret)
+			{
+				if (!errno)errno=ENOMEM;
+				glwLabelSetLabel(_this->lb_status,"Error reading \"");
+				glwLabelAddLabel(_this->lb_status,_file);
+				glwLabelAddLabel(_this->lb_status,"\": ");
+				glwLabelAddLabel(_this->lb_status,strerror(errno));
+			}
+			else ds3ViewerFinishRead(_this);
+			free(_this->read_name);
+			_this->reader.reset();
+		}
         }
-    }
 }

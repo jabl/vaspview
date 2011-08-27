@@ -1,6 +1,7 @@
 /*VASP Data Viewer - Views 3d data sets of molecular charge distribution
   Copyright (C) 1999-2001 Timothy B. Terriberry
   (mailto:tterribe@users.sourceforge.net)
+  2011 Janne Blomqvist
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -19,8 +20,8 @@
 #if !defined(_ds3vasp_H)
 # define _ds3vasp_H (1)
 
-#include "ds3.hh"
 #include <memory>
+#include "ds3.hh"
 #include "file.hh"
 
 # define DS3_VASP_BLOCK_SIZE (8192)
@@ -30,7 +31,6 @@ class DS3VaspReader
 {
 public:
 	DS3VaspReader(const char* file_name, const char* mode);
-	~DS3VaspReader();
 	// Forbid copying
 	DS3VaspReader& operator=(const DS3VaspReader&) = delete;
 	DS3VaspReader(const DS3VaspReader&) = delete;
@@ -39,11 +39,16 @@ public:
 	int read();
 	// Cancels a read in progress
 	int cancel();
-	// Transfer ownership of the dataset to the caller.
-	DataSet3D* transfer();
+	// Transfer ownership of the dataset to the caller. It would
+	// be better to return a unique_ptr with std::move, but caller
+	// code passes this ptr left and right, so this is easier. At
+	// least in the short term..
+	DataSet3D* release_ds3();
 
-    DataSet3D *ds3;
-    std::unique_ptr<File>      file;
+    File       file;
+
+private:
+    std::unique_ptr<DataSet3D> ds3;
     size_t     npoints;
     size_t     k;
 };

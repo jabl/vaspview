@@ -1,6 +1,7 @@
 /*VASP Data Viewer - Views 3d data sets of molecular charge distribution
   Copyright (C) 1999-2001 Timothy B. Terriberry
   (mailto:tterribe@users.sourceforge.net)
+  2011 Janne Blomqvist
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -19,6 +20,7 @@
 #if !defined(_ds3viewr_H)
 # define _ds3viewr_H (1)
 
+#include <memory>
 #include "ds3.hh"
 #include "ds3legnd.hh"
 #include "ds3view.hh"
@@ -119,9 +121,8 @@ struct DS3Viewer
 # if defined(__DS3_ADD_BONDS__)&&defined(__DS3_SAVE_BONDS__)
     char             *bond_name;
 # endif
-    FILE             *read_file;
     char             *read_name;
-    DS3VaspReader    *reader;
+    std::unique_ptr<DS3VaspReader>    reader;
     int               read_prog;
     int               read_id;
 };
