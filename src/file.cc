@@ -16,6 +16,7 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA*/
 
 #include "file.hh"
+#include <cstring>
 
 File::File(const char* name, const char* mode)
 {
@@ -26,4 +27,19 @@ File::~File()
 {
 	if (f)
 		fclose(f);
+}
+
+// fgets style function that fills a string up to the next newline or
+// EOF. Returns true if something was read, false otherwise.
+bool File::fgets(std::string& line)
+{
+	char buffer[1024];
+	line.clear();
+	do {
+		if(!std::fgets(buffer, sizeof(buffer), this->f))
+			return !line.empty();
+		
+		line.append(buffer); 
+	} while(!std::strchr(buffer, '\n'));
+	return true;
 }

@@ -19,6 +19,7 @@
 #define FILE_HH
 
 #include <cstdio>
+#include <string>
 
 class File
 {
@@ -28,7 +29,7 @@ public :
 	~File();
 	File& operator=(const File&) = delete;
 	File(const File&) = delete;
-
+	bool fgets(std::string& line);
 	std::FILE* f;
 };
 
