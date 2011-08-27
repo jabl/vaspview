@@ -826,7 +826,7 @@ int ds3IsoMake(DS3IsoSurface *_this,DataSet3D *_ds3,double _v,int _d)
     {
         ds3IsoReset(_this,_d);
         memset(edges,0xFF/*DS3V_NO_EDGE*/,sz);
-        data=_ds3->data;
+        data = &_ds3->data[0];
         for (x[0][Z]=0; x[0][Z]<dim[Z]; x[0][Z]+=_d)
         {
             long o[3];

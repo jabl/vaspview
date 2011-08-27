@@ -63,7 +63,7 @@ static int ds3SliceColor(DS3Slice *_this,DS3View *_view)
             _this->cdata=cdata;
         }
         else cdata=_this->cdata;
-        data=_view->ds3->data;
+        data = &_view->ds3->data[0];
         for (i=0; i<size; i++)
         {
             int c;
@@ -509,7 +509,7 @@ static int ds3SliceTexture3D(DS3Slice *_this,DS3View *_view)
         else
             txtr=(GLubyte *)malloc(4*sizeof(GLubyte)*w[X]*w[Y]*w[Z]);
         if (txtr==NULL)return 0;
-        data=_view->ds3->data;
+        data = &_view->ds3->data[0];
         if (!_this->t_id)glGenTextures(1,&_this->t_id);
         glBindTexture(GL_TEXTURE_3D,_this->t_id);
         glPixelStorei(GL_UNPACK_ALIGNMENT,1);

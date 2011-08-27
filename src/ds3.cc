@@ -30,7 +30,6 @@ DataSet3D::DataSet3D()
     vectSet3d(this->center,0.5,0.5,0.5);
     this->npoints=0;
     this->density[0]=this->density[1]=this->density[2]=0;
-    this->data=NULL;
     this->min=0;
     this->max=1;
 }
@@ -42,7 +41,6 @@ DataSet3D::~DataSet3D()
     int i;
     for (i=0; i<4; i++)free(this->label[i]);
     for (i=0; i<4; i++)free(this->units[i]);
-    free(this->data);
 }
 
 

@@ -96,7 +96,7 @@ public:
 	std::vector<DSPoint3D> points;     /*Discrete points*/
     /*DSLine3D       *lines;*/                                 /*Lines between points*/
     size_t          density[3];       /*Dimensions of packed array of data values*/
-    double         *data;                               /*3D packed array of data*/
+	std::vector<double> data;          /*3D packed array of data*/
     double          min;                                     /*Minimum data value*/
     double          max;
 };                                   /*Maximum data value*/

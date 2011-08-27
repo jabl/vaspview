@@ -124,11 +124,12 @@ DS3VaspReader::DS3VaspReader(const char* file_name, const char* mode)
     }
     /*Read in the data*/
     this->npoints = ds3->density[0]*ds3->density[1]*ds3->density[2];
-    ds3->data=(double *)malloc(this->npoints*sizeof(double));
-    if (ds3->data==NULL)goto err;
+    ds3->data.reserve(this->npoints);
     if (this->npoints)
     {
-        if (fscanf(file.f,"%lf",ds3->data)<1)goto err;
+	double val;
+        if (fscanf(file.f, "%lf", &val) < 1) goto err;
+	ds3->data.push_back(val);
         ds3->min = ds3->max = ds3->data[0];
         this->k = 1;
     }
@@ -147,13 +148,12 @@ err:
 /*Reads a block of data from the VASP file*/
 int DS3VaspReader::read()
 {
-    double *data;
+    double  val;
     double  min;
     double  max;
     size_t  k;
     size_t  s;
     int     ret;
-    data = this->ds3->data;
     min = this->ds3->min;
     max= this->ds3->max;
     if (this->npoints - this->k > DS3_VASP_BLOCK_SIZE)
@@ -168,15 +168,16 @@ int DS3VaspReader::read()
     }
     for (k=this->k; k<s; k++)
     {
-        if (fscanf(this->file.f,"%lf",data+k)<1)
+        if (fscanf(this->file.f, "%lf", &val) < 1)
         {
             if (!errno)errno=ENOMEM;
             this->ds3.reset();
             ret=0;
             break;
         }
-        if (data[k]<min)min=data[k];
-        else if (data[k]>max)max=data[k];
+	this->ds3->data.push_back(val);
+        if (ds3->data[k] < min) min = ds3->data[k];
+        else if (ds3->data[k] > max) max = ds3->data[k];
     }
     this->k=k;
     this->ds3->min=min;
