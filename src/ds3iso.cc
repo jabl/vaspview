@@ -1007,4 +1007,5 @@ int ds3IsoMake(DS3IsoSurface *_this,DataSet3D *_ds3,double _v,int _d)
         free(edges);
         return 1;
     }
+    return 0;
 }
