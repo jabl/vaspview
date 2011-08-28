@@ -230,8 +230,13 @@ void              glwGridBagLayoutFree(GLWGridBagLayout *_this);
 
 
 
-struct GLWComponent
+class GLWComponent
 {
+public:
+	GLWComponent();
+	~GLWComponent();
+	GLWComponent(const GLWComponent&) = delete;
+	GLWComponent& operator=(const GLWComponent&) = delete;
     GLWComponent     *parent;
     const GLWCallbacks     *callbacks;
     GLWRect           bounds;
@@ -258,11 +263,6 @@ struct GLWComponent
 
 
 extern const GLWCallbacks GLW_COMPONENT_CALLBACKS;
-
-void           glwCompInit(GLWComponent *_this);
-GLWComponent  *glwCompAlloc(void);
-void           glwCompDstr(GLWComponent *_this);
-void           glwCompFree(GLWComponent *_this);
 
 int            glwCompIsVisible(GLWComponent *_this);
 int            glwCompIsShowing(GLWComponent *_this);
@@ -381,17 +381,14 @@ void           glwCompSuperDispose(GLWComponent *_this,
 
 struct GLWFrame
 {
+	GLWFrame() = delete;
+	GLWFrame(const char*);
     GLWComponent  super;
     CDynArray     title;
 };
 
 
 extern const GLWCallbacks GLW_FRAME_CALLBACKS;
-
-GLWFrame *glwFrameAlloc(const char *_title);
-int       glwFrameInit(GLWFrame *_this,const char *_title);
-void      glwFrameDstr(GLWFrame *_this);
-void      glwFrameFree(GLWFrame *_this);
 
 int       glwFrameSetTitle(GLWFrame *_this,const char *_title);
 const char     *glwFrameGetTitle(GLWFrame *_this);
@@ -403,6 +400,8 @@ void      glwFramePack(GLWFrame *_this);
 
 struct GLWLabel
 {
+	GLWLabel() = delete;
+	GLWLabel(const char*);
     GLWComponent super;
     CDynArray    label;
 };
@@ -410,19 +409,17 @@ struct GLWLabel
 
 extern const GLWCallbacks GLW_LABEL_CALLBACKS;
 
-GLWLabel *glwLabelAlloc(const char *_label);
-int       glwLabelInit(GLWLabel *_this,const char *_label);
-void      glwLabelDstr(GLWLabel *_this);
-void      glwLabelFree(GLWLabel *_this);
-
 const char     *glwLabelGetLabel(GLWLabel *_this);
 int       glwLabelSetLabel(GLWLabel *_this,const char *_label);
 int       glwLabelAddLabel(GLWLabel *_this,const char *_label);
 
 
 
-struct GLWButton
+class GLWButton
 {
+public:
+	GLWButton() = delete;
+	GLWButton(const char*);
     GLWComponent   super;
     CDynArray      label;
     GLWActionFunc  pressed;
@@ -433,11 +430,6 @@ struct GLWButton
 
 
 extern const GLWCallbacks GLW_BUTTON_CALLBACKS;
-
-GLWButton     *glwButtonAlloc(const char *_label);
-int            glwButtonInit(GLWButton *_this,const char *_label);
-void           glwButtonDstr(GLWButton *_this);
-void           glwButtonFree(GLWButton *_this);
 
 const char          *glwButtonGetLabel(GLWButton *_this);
 int            glwButtonSetLabel(GLWButton *_this,const char *_label);
@@ -451,6 +443,8 @@ void           glwButtonSetPressedCtx(GLWButton *_this,void *_ctx);
 
 struct GLWTextField
 {
+	GLWTextField() = delete;
+	GLWTextField(const char*, int);
     GLWComponent   super;
     GLWActionFunc  action;                      /*Enter pressed callback function*/
     void          *action_ctx;                     /*Extra parameter for callback*/
@@ -472,12 +466,6 @@ struct GLWTextField
 
 
 extern const GLWCallbacks GLW_TEXT_FIELD_CALLBACKS;
-
-GLWTextField  *glwTextFieldAlloc(const char *_text,int _cols);
-int            glwTextFieldInit(GLWTextField *_this,
-                                const char *_text,int _cols);
-void           glwTextFieldDstr(GLWTextField *_this);
-void           glwTextFieldFree(GLWTextField *_this);
 
 int            glwTextFieldIsEditable(GLWTextField *_this);
 void           glwTextFieldSetEditable(GLWTextField *_this,int _b);
@@ -544,6 +532,8 @@ void              glwCheckBoxGroupSetChangedCtx(GLWCheckBoxGroup *_this,
 
 struct GLWCheckBox
 {
+	GLWCheckBox() = delete;
+	GLWCheckBox(const char*, int, GLWCheckBoxGroup*);
     GLWComponent      super;
     GLWActionFunc     changed;
     void             *changed_ctx;
@@ -555,14 +545,6 @@ struct GLWCheckBox
 
 
 extern const GLWCallbacks GLW_CHECK_BOX_CALLBACKS;
-
-GLWCheckBox      *glwCheckBoxAlloc(const char *_label,int _state,
-                                   GLWCheckBoxGroup *_group);
-int               glwCheckBoxInit(GLWCheckBox *_this,
-                                  const char *_label,int _state,
-                                  GLWCheckBoxGroup *_group);
-void              glwCheckBoxDstr(GLWCheckBox *_this);
-void              glwCheckBoxFree(GLWCheckBox *_this);
 
 int               glwCheckBoxGetState(GLWCheckBox *_this);
 void              glwCheckBoxSetState(GLWCheckBox *_this,int _state);
@@ -586,8 +568,8 @@ void              glwCheckBoxSetChangedCtx(GLWCheckBox *_this,
 class GLWSlider
 {
 public:
-    GLWSlider(int _min,int _max,int _val,int _ext);
-    ~GLWSlider();
+	GLWSlider() = delete;
+	GLWSlider(int _min,int _max,int _val,int _ext);
 	int            getVal();
 	void           setVal(int val,int ext);
 	void           setChangedFunc(GLWActionFunc func);
@@ -657,8 +639,10 @@ void           glwSliderSetChangedCtx(GLWSlider *_this,void *_ctx);
 
 
 
-struct GLWTabbedPane
+class GLWTabbedPane
 {
+public:
+	GLWTabbedPane();
     GLWComponent super;
     CDynArray    tabs;
     CDynArray    runs;
@@ -672,12 +656,6 @@ struct GLWTabbedPane
 
 
 extern const GLWCallbacks GLW_TABBED_PANE_CALLBACKS;
-
-
-GLWTabbedPane *glwTabbedPaneAlloc(void);
-void           glwTabbedPaneInit(GLWTabbedPane *_this);
-void           glwTabbedPaneDstr(GLWTabbedPane *_this);
-void           glwTabbedPaneFree(GLWTabbedPane *_this);
 
 int            glwTabbedPaneGetPlacement(GLWTabbedPane *_this);
 void           glwTabbedPaneSetPlacement(GLWTabbedPane *_this,

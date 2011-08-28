@@ -1,6 +1,7 @@
 /*GL Widget Set - simple, portable OpenGL/GLUT widget set
   Copyright (C) 1999-2001 Timothy B. Terriberry
   (mailto:tterribe@users.sourceforge.net)
+  2011 Janne Blomqvist
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -1092,38 +1093,20 @@ const GLWCallbacks GLW_TABBED_PANE_CALLBACKS=
     NULL
 };
 
-GLWTabbedPane *glwTabbedPaneAlloc(void)
-{
-    GLWTabbedPane *this_;
-    this_=(GLWTabbedPane *)malloc(sizeof(GLWTabbedPane));
-    if (this_!=NULL)glwTabbedPaneInit(this_);
-    return this_;
-}
 
-void glwTabbedPaneInit(GLWTabbedPane *_this)
+GLWTabbedPane::GLWTabbedPane()
 {
-    glwCompInit(&_this->super);
-    _this->super.callbacks=&GLW_TABBED_PANE_CALLBACKS;
-    glwCompSetFocusable(&_this->super,1);
-    glwCompSetLayout(&_this->super,&glw_tabbed_pane_layout);
-    _DAInit(&_this->tabs,0,GLWTabPage);
-    _DAInit(&_this->runs,0,int);
-    _this->tplc=GLWC_NORTH;
-    _this->seld=-1;
-    _this->max_tab_w=0;
-    _this->max_tab_h=0;
-    _this->valid=0;
-    glwRectInit(&_this->area,0,0,0,0);
-}
-
-void glwTabbedPaneDstr(GLWTabbedPane *_this)
-{
-    glwCompDstr(&_this->super);
-}
-
-void glwTabbedPaneFree(GLWTabbedPane *_this)
-{
-    glwCompFree(&_this->super);
+    this->super.callbacks=&GLW_TABBED_PANE_CALLBACKS;
+    glwCompSetFocusable(&this->super,1);
+    glwCompSetLayout(&this->super,&glw_tabbed_pane_layout);
+    _DAInit(&this->tabs,0,GLWTabPage);
+    _DAInit(&this->runs,0,int);
+    this->tplc=GLWC_NORTH;
+    this->seld=-1;
+    this->max_tab_w=0;
+    this->max_tab_h=0;
+    this->valid=0;
+    glwRectInit(&this->area,0,0,0,0);
 }
 
 

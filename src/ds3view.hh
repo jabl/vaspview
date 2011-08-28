@@ -33,7 +33,7 @@ typedef struct DS3ViewComp DS3ViewComp;
 # endif
 # include "ds3slice.hh"
 # include "ds3iso.hh"
-
+#include <memory>
 
 
 # define DS3V_CAPTURE_COLOR GLW_COLOR_RED
@@ -46,6 +46,8 @@ typedef struct DS3ViewComp DS3ViewComp;
 
 struct DS3ViewComp
 {
+	DS3ViewComp() = delete;
+	DS3ViewComp(DS3View*);
     GLWComponent  super;
     DS3View      *ds3view;
 };
@@ -54,15 +56,16 @@ struct DS3ViewComp
 
 struct DS3View
 {
+	DS3View();
     GLWComponent   super;
-    DS3ViewComp   *cm_axes;
-    DS3ViewComp   *cm_box;
-    DS3ViewComp   *cm_pts;
+	std::unique_ptr<DS3ViewComp>   cm_axes;
+	std::unique_ptr<DS3ViewComp>   cm_box;
+	std::unique_ptr<DS3ViewComp>   cm_pts;
 # if defined(__DS3_ADD_BONDS__)
-    DS3ViewComp   *cm_bnds;
+	std::unique_ptr<DS3ViewComp>   cm_bnds;
 # endif
-    DS3ViewComp   *cm_slice;
-    DS3ViewComp   *cm_iso;
+	std::unique_ptr<DS3ViewComp>   cm_slice;
+	std::unique_ptr<DS3ViewComp>   cm_iso;
     GLWActionFunc  data_changed_func;
     void          *data_changed_ctx;
     GLWActionFunc  slice_changed_func;
@@ -163,11 +166,6 @@ struct DS3View
 
 
 void     ds3ViewExpandRot(double _y,double _p,double _r,double _rot[3][3]);
-
-DS3View *ds3ViewAlloc(void);
-int      ds3ViewInit(DS3View *_this);
-void     ds3ViewDstr(DS3View *_this);
-void     ds3ViewFree(DS3View *_this);
 
 void     ds3ViewGetUnprojRay(DS3View *_this,int _x,int _y,
                              Vect3d _p0,Vect3d _p1);

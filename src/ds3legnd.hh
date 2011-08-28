@@ -1,6 +1,7 @@
 /*VASP Data Viewer - Views 3d data sets of molecular charge distribution
   Copyright (C) 1999-2001 Timothy B. Terriberry
   (mailto:tterribe@users.sourceforge.net)
+  2011 Janne Blomqvist
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -27,20 +28,16 @@ typedef struct DSColorLegend DSColorLegend;
 
 struct DSColorLegend
 {
+	DSColorLegend();
     GLWComponent  super;
     const DSColorScale *cs;
     GLubyte       ctable[UCHAR_MAX+1][4];
-    GLWComponent *cm_scale;
-    GLWLabel     *lb_min;
-    GLWLabel     *lb_max;
-    GLWLabel     *lb_label;
+    GLWComponent cm_scale;
+    GLWLabel     lb_min;
+    GLWLabel     lb_max;
+    GLWLabel     lb_label;
 };
 
-
-DSColorLegend *dsColorLegendAlloc(void);
-int            dsColorLegendInit(DSColorLegend *_this);
-void           dsColorLegendDstr(DSColorLegend *_this);
-void           dsColorLegendFree(DSColorLegend *_this);
 
 int            dsColorLegendSetDataSet(DSColorLegend *_this,DataSet3D *_ds3);
 void           dsColorLegendSetColorScale(DSColorLegend *_this,

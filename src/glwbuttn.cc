@@ -1,6 +1,7 @@
 /*GL Widget Set - simple, portable OpenGL/GLUT widget set
   Copyright (C) 1999-2001 Timothy B. Terriberry
   (mailto:tterribe@users.sourceforge.net)
+  2011 Janne Blomqvist
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -253,51 +254,21 @@ const GLWCallbacks GLW_BUTTON_CALLBACKS=
     NULL
 };
 
-GLWButton *glwButtonAlloc(const char *_label)
+GLWButton::GLWButton(const char *_label)
 {
-    GLWButton *this_;
-    // TODO: Fix zeroing if switching to new/delete
-    this_=(GLWButton *)calloc(1, sizeof(GLWButton));
-    if (this_!=NULL)
+    _DAInit(&this->label,0,char);
+    this->pressed=NULL;
+    this->pressed_ctx=NULL;
+    if (glwButtonSetLabel(this,_label))
     {
-        if (glwButtonInit(this_,_label))
-        {
-            return this_;
-        }
-        free(this_);
+        this->super.callbacks=&GLW_BUTTON_CALLBACKS;
+        glwCompSetLayout(&this->super,&glw_button_layout);
+        glwCompSetFocusable(&this->super,1);
+        this->down=0;
+        return;
     }
-    return NULL;
+    daDstr(&this->label);
 }
-
-int glwButtonInit(GLWButton *_this,const char *_label)
-{
-    glwCompInit(&_this->super);
-    _DAInit(&_this->label,0,char);
-    _this->pressed=NULL;
-    _this->pressed_ctx=NULL;
-    if (glwButtonSetLabel(_this,_label))
-    {
-        _this->super.callbacks=&GLW_BUTTON_CALLBACKS;
-        glwCompSetLayout(&_this->super,&glw_button_layout);
-        glwCompSetFocusable(&_this->super,1);
-        _this->down=0;
-        return 1;
-    }
-    daDstr(&_this->label);
-    glwCompDstr(&_this->super);
-    return 0;
-}
-
-void glwButtonDstr(GLWButton *_this)
-{
-    glwCompDstr(&_this->super);
-}
-
-void glwButtonFree(GLWButton *_this)
-{
-    glwCompFree(&_this->super);
-}
-
 
 const char *glwButtonGetLabel(GLWButton *_this)
 {

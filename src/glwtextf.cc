@@ -1,6 +1,7 @@
 /*GL Widget Set - simple, portable OpenGL/GLUT widget set
   Copyright (C) 1999-2001 Timothy B. Terriberry
   (mailto:tterribe@users.sourceforge.net)
+  2011 Janne Blomqvist
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -581,54 +582,29 @@ const GLWCallbacks GLW_TEXT_FIELD_CALLBACKS=
 };
 
 
-GLWTextField *glwTextFieldAlloc(const char *_text,int _cols)
+GLWTextField::GLWTextField(const char* _text, int _cols)
 {
-    GLWTextField *this_;
-    this_=(GLWTextField *)malloc(sizeof(GLWTextField));
-    if (this_!=NULL)
+    _DAInit(&this->text,0,char);
+    _DAInit(&this->seld,0,char);
+    this->changed=NULL;
+    this->changed_ctx=NULL;
+    this->action=NULL;
+    this->action_ctx=NULL;
+    this->blink_timer=0;
+    if (glwTextFieldSetText(this,_text))
     {
-        if (glwTextFieldInit(this_,_text,_cols))return this_;
-        free(this_);
+        this->super.callbacks=&GLW_TEXT_FIELD_CALLBACKS;
+        glwCompSetFont(&this->super,glwFontGet(GLW_FONT_FIXED,0));
+        glwCompSetCursor(&this->super,GLUT_CURSOR_TEXT);
+        glwCompSetLayout(&this->super,&glw_text_field_layout);
+        glwCompSetFocusable(&this->super,1);
+        this->cols=_cols;
+        this->echo=0;
+        this->editable=1;
+        return;
     }
-    return NULL;
-}
-
-int glwTextFieldInit(GLWTextField *_this,const char *_text,int _cols)
-{
-    glwCompInit(&_this->super);
-    _DAInit(&_this->text,0,char);
-    _DAInit(&_this->seld,0,char);
-    _this->changed=NULL;
-    _this->changed_ctx=NULL;
-    _this->action=NULL;
-    _this->action_ctx=NULL;
-    _this->blink_timer=0;
-    if (glwTextFieldSetText(_this,_text))
-    {
-        _this->super.callbacks=&GLW_TEXT_FIELD_CALLBACKS;
-        glwCompSetFont(&_this->super,glwFontGet(GLW_FONT_FIXED,0));
-        glwCompSetCursor(&_this->super,GLUT_CURSOR_TEXT);
-        glwCompSetLayout(&_this->super,&glw_text_field_layout);
-        glwCompSetFocusable(&_this->super,1);
-        _this->cols=_cols;
-        _this->echo=0;
-        _this->editable=1;
-        return 1;
-    }
-    daDstr(&_this->seld);
-    daDstr(&_this->text);
-    glwCompDstr(&_this->super);
-    return 0;
-}
-
-void  glwTextFieldDstr(GLWTextField *_this)
-{
-    glwCompDstr(&_this->super);
-}
-
-void glwTextFieldFree(GLWTextField *_this)
-{
-    glwCompFree(&_this->super);
+    daDstr(&this->seld);
+    daDstr(&this->text);
 }
 
 int glwTextFieldIsEditable(GLWTextField *_this)

@@ -1,6 +1,7 @@
 /*GL Widget Set - simple, portable OpenGL/GLUT widget set
   Copyright (C) 1999-2001 Timothy B. Terriberry
   (mailto:tterribe@users.sourceforge.net)
+  2011 Janne Blomqvist
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -462,55 +463,28 @@ const GLWCallbacks GLW_CHECK_BOX_CALLBACKS=
     NULL
 };
 
-GLWCheckBox *glwCheckBoxAlloc(const char *_label,int _state,
-                              GLWCheckBoxGroup *_group)
+GLWCheckBox::GLWCheckBox(const char* _label, int _state,
+			 GLWCheckBoxGroup* _group)
 {
-    GLWCheckBox *this_;
-    this_=(GLWCheckBox *)malloc(sizeof(GLWCheckBox));
-    if (this_!=NULL)
+    _DAInit(&this->label,0,char);
+    this->changed=NULL;
+    this->changed_ctx=NULL;
+    if (glwCheckBoxSetLabel(this,_label))
     {
-        if (glwCheckBoxInit(this_,_label,_state,_group))return this_;
-        free(this_);
-    }
-    return NULL;
-}
-
-int glwCheckBoxInit(GLWCheckBox *_this,const char *_label,int _state,
-                    GLWCheckBoxGroup *_group)
-{
-    glwCompInit(&_this->super);
-    _DAInit(&_this->label,0,char);
-    _this->changed=NULL;
-    _this->changed_ctx=NULL;
-    if (glwCheckBoxSetLabel(_this,_label))
-    {
-        _this->super.callbacks=&GLW_CHECK_BOX_CALLBACKS;
-        glwCompSetLayout(&_this->super,&glw_check_box_layout);
-        glwCompSetFocusable(&_this->super,1);
-        glwCompSetAlignX(&_this->super,0);
-        _this->state=_state?1:0;
-        _this->down=0;
-        _this->group=NULL;
-        if (_group==NULL||glwCheckBoxSetGroup(_this,_group))
+        this->super.callbacks=&GLW_CHECK_BOX_CALLBACKS;
+        glwCompSetLayout(&this->super,&glw_check_box_layout);
+        glwCompSetFocusable(&this->super,1);
+        glwCompSetAlignX(&this->super,0);
+        this->state=_state?1:0;
+        this->down=0;
+        this->group=NULL;
+        if (_group==NULL||glwCheckBoxSetGroup(this,_group))
         {
-            return 1;
+            return;
         }
     }
-    daDstr(&_this->label);
-    glwCompDstr(&_this->super);
-    return 0;
+    daDstr(&this->label);
 }
-
-void  glwCheckBoxDstr(GLWCheckBox *_this)
-{
-    glwCompDstr(&_this->super);
-}
-
-void glwCheckBoxFree(GLWCheckBox *_this)
-{
-    glwCompFree(&_this->super);
-}
-
 
 int glwCheckBoxGetState(GLWCheckBox *_this)
 {

@@ -38,8 +38,8 @@ public:
 	DS3Viewer& operator=(const DS3Viewer&) = delete;
 	DS3Viewer(const DS3Viewer&) = delete;
 
-    GLWFrame         *frame;
-    DS3View          *ds3view;
+	GLWFrame*         frame;
+	DS3View*          ds3view;
     GLWButton        *bn_open;
     GLWTextField     *tf_file;
     GLWLabel         *lb_data_set;

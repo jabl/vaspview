@@ -1,6 +1,7 @@
 /*VASP Data Viewer - Views 3d data sets of molecular charge distribution
   Copyright (C) 1999-2001 Timothy B. Terriberry
   (mailto:tterribe@users.sourceforge.net)
+  2011 Janne Blomqvist
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -50,67 +51,34 @@ static const GLWCallbacks DS_COLOR_LEGEND_SCALE_CALLBACKS=
 
 
 
-DSColorLegend *dsColorLegendAlloc(void)
-{
-    DSColorLegend *this_;
-    this_=(DSColorLegend *)malloc(sizeof(DSColorLegend));
-    if (this_!=NULL)
-    {
-        if (dsColorLegendInit(this_))return this_;
-        free(this_);
-    }
-    return NULL;
-}
-
-int dsColorLegendInit(DSColorLegend *_this)
+DSColorLegend::DSColorLegend() : lb_min("0"), lb_max("1"), lb_label(NULL)
 {
     GLWGridBagLayout *layout;
-    glwCompInit(&_this->super);
-    _this->cm_scale=glwCompAlloc();
-    _this->lb_min=glwLabelAlloc("0");
-    _this->lb_max=glwLabelAlloc("1");
-    _this->lb_label=glwLabelAlloc(NULL);
     layout=glwGridBagLayoutAlloc();
-    if (_this->cm_scale!=NULL&&_this->lb_min!=NULL&&
-            _this->lb_max!=NULL&&_this->lb_label!=NULL&&layout!=NULL)
+    if (layout != NULL)
     {
-        _this->cm_scale->callbacks=&DS_COLOR_LEGEND_SCALE_CALLBACKS;
-        if (glwCompAdd(&_this->super,_this->cm_scale,-1)&&
-                glwCompAdd(&_this->super,&_this->lb_min->super,-1)&&
-                glwCompAdd(&_this->super,&_this->lb_label->super,-1)&&
-                glwCompAdd(&_this->super,&_this->lb_max->super,-1))
+        this->cm_scale.callbacks = &DS_COLOR_LEGEND_SCALE_CALLBACKS;
+        if (glwCompAdd(&this->super,&this->cm_scale,-1)&&
+                glwCompAdd(&this->super,&this->lb_min.super,-1)&&
+                glwCompAdd(&this->super,&this->lb_label.super,-1)&&
+                glwCompAdd(&this->super,&this->lb_max.super,-1))
         {
-            glwCompSetMinWidth(_this->cm_scale,64);
-            glwCompSetMinHeight(_this->cm_scale,16);
-            glwCompSetGridWidth(_this->cm_scale,GLWC_REMAINDER);
-            glwCompSetWeightX(_this->cm_scale,1);
-            glwCompSetWeightY(_this->cm_scale,1);
-            glwCompSetFill(_this->cm_scale,GLWC_BOTH);
-            glwCompSetAlignX(&_this->lb_label->super,0.5);
-            glwCompSetAlignX(&_this->lb_max->super,1);
-            glwCompSetLayout(&_this->super,&layout->super);
-            dsColorLegendSetColorScale(_this,NULL);
-            return 1;
+            glwCompSetMinWidth(&this->cm_scale,64);
+            glwCompSetMinHeight(&this->cm_scale,16);
+            glwCompSetGridWidth(&this->cm_scale,GLWC_REMAINDER);
+            glwCompSetWeightX(&this->cm_scale,1);
+            glwCompSetWeightY(&this->cm_scale,1);
+            glwCompSetFill(&this->cm_scale,GLWC_BOTH);
+            glwCompSetAlignX(&this->lb_label.super,0.5);
+            glwCompSetAlignX(&this->lb_max.super,1);
+            glwCompSetLayout(&this->super,&layout->super);
+            dsColorLegendSetColorScale(this,NULL);
+            return;
         }
-        glwCompDelAll(&_this->super);
+        glwCompDelAll(&this->super);
     }
-    glwCompFree(_this->cm_scale);
-    glwLabelFree(_this->lb_min);
-    glwLabelFree(_this->lb_max);
-    glwLabelFree(_this->lb_label);
     glwGridBagLayoutFree(layout);
-    return 0;
-}
-
-
-void dsColorLegendDstr(DSColorLegend *_this)
-{
-    glwCompDstr(&_this->super);
-}
-
-void dsColorLegendFree(DSColorLegend *_this)
-{
-    glwCompFree(&_this->super);
+    return;
 }
 
 
@@ -160,7 +128,7 @@ void dsColorLegendSetColorScale(DSColorLegend *_this,const DSColorScale *_cs)
         _this->ctable[i][2]=(GLubyte)(c>>16&0xFF);
         _this->ctable[i][3]=(GLubyte)(c>>24&0xFF);
     }
-    glwCompRepaint(_this->cm_scale,0);
+    glwCompRepaint(&_this->cm_scale,0);
 }
 
 /*Sets the data range to display
@@ -171,9 +139,9 @@ int dsColorLegendSetRange(DSColorLegend *_this,double _min,double _max)
     char text[32];
     int  ret;
     sprintf(text,"%0.5lg",_min);
-    ret=glwLabelSetLabel(_this->lb_min,text);
+    ret = glwLabelSetLabel(&_this->lb_min,text);
     sprintf(text,"%0.5lg",_max);
-    ret=glwLabelSetLabel(_this->lb_max,text)&&ret;
+    ret = glwLabelSetLabel(&_this->lb_max,text)&&ret;
     return ret;
 }
 
@@ -181,12 +149,12 @@ int dsColorLegendSetRange(DSColorLegend *_this,double _min,double _max)
   label: The new label for data values*/
 int dsColorLegendSetLabel(DSColorLegend *_this,const char *_label)
 {
-    return glwLabelSetLabel(_this->lb_label,_label);
+    return glwLabelSetLabel(&_this->lb_label,_label);
 }
 
 /*Adds to the label for data values
   label: The additional text to add to the label for data values*/
 int dsColorLegendAddLabel(DSColorLegend *_this,const char *_label)
 {
-    return glwLabelAddLabel(_this->lb_label,_label);
+    return glwLabelAddLabel(&_this->lb_label,_label);
 }

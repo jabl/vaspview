@@ -1,6 +1,7 @@
 /*GL Widget Set - simple, portable OpenGL/GLUT widget set
   Copyright (C) 1999-2001 Timothy B. Terriberry
   (mailto:tterribe@users.sourceforge.net)
+  2011 Janne Blomqvist
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -117,47 +118,18 @@ const GLWCallbacks GLW_LABEL_CALLBACKS=
     NULL
 };
 
-GLWLabel *glwLabelAlloc(const char *_label)
+GLWLabel::GLWLabel(const char* _label)
 {
-    GLWLabel *this_;
-    this_=(GLWLabel *)malloc(sizeof(GLWLabel));
-    if (this_!=NULL)
+    _DAInit(&this->label,0,char);
+    if (glwLabelSetLabel(this,_label))
     {
-        if (glwLabelInit(this_,_label))
-        {
-            return this_;
-        }
-        free(this_);
+        this->super.callbacks=&GLW_LABEL_CALLBACKS;
+        glwCompSetAlignX(&this->super,0);
+        glwCompSetLayout(&this->super,&glw_label_layout);
+        return;
     }
-    return NULL;
+    daDstr(&this->label);
 }
-
-int glwLabelInit(GLWLabel *_this,const char *_label)
-{
-    glwCompInit(&_this->super);
-    _DAInit(&_this->label,0,char);
-    if (glwLabelSetLabel(_this,_label))
-    {
-        _this->super.callbacks=&GLW_LABEL_CALLBACKS;
-        glwCompSetAlignX(&_this->super,0);
-        glwCompSetLayout(&_this->super,&glw_label_layout);
-        return 1;
-    }
-    daDstr(&_this->label);
-    glwCompDstr(&_this->super);
-    return 0;
-}
-
-void glwLabelDstr(GLWLabel *_this)
-{
-    glwCompDstr(&_this->super);
-}
-
-void glwLabelFree(GLWLabel *_this)
-{
-    glwCompFree(&_this->super);
-}
-
 
 const char *glwLabelGetLabel(GLWLabel *_this)
 {

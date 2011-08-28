@@ -1,6 +1,7 @@
 /*VASP Data Viewer - Views 3d data sets of molecular charge distribution
   Copyright (C) 1999-2001 Timothy B. Terriberry
   (mailto:tterribe@users.sourceforge.net)
+  2011 Janne Blomqvist
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -1218,151 +1219,98 @@ const GLWCallbacks DS3_VIEW_CALLBACKS=
     (GLWMotionFunc)ds3ViewPeerPassiveMotion
 };
 
-static DS3ViewComp *ds3ViewCompAlloc(DS3View *_ds3view)
+DS3ViewComp::DS3ViewComp(DS3View* ds3view)
 {
-    DS3ViewComp *this_;
-    this_=(DS3ViewComp *)malloc(sizeof(DS3ViewComp));
-    if (this_!=NULL)
-    {
-        glwCompInit(&this_->super);
-        this_->ds3view=_ds3view;
-        return this_;
-    }
-    return NULL;
+        this->ds3view = ds3view;
 }
 
-
-DS3View *ds3ViewAlloc(void)
+DS3View::DS3View() : cm_axes(new DS3ViewComp(this)), 
+		     cm_box(new DS3ViewComp(this)),
+		     cm_pts(new DS3ViewComp(this)),
+#if defined(__DS3_ADD_BONDS__)
+		     cm_bnds(new DS3ViewComp(this)),
+#endif
+		     cm_slice(new DS3ViewComp(this)),
+		     cm_iso(new DS3ViewComp(this))
 {
-    DS3View *this_;
-    // TODO: Fix zeroing when/if upgrading to new/delete and vtables
-    this_=(DS3View *)calloc(1, sizeof(DS3View));
-    if (this_!=NULL)
-    {
-        if (ds3ViewInit(this_))
-        {
-            return this_;
-        }
-        free(this_);
-    }
-    return NULL;
-}
-
-int ds3ViewInit(DS3View *_this)
-{
-    glwCompInit(&_this->super);
-    _this->cm_axes=ds3ViewCompAlloc(_this);
-    _this->cm_box=ds3ViewCompAlloc(_this);
-    _this->cm_pts=ds3ViewCompAlloc(_this);
+        if (glwCompAdd(&this->super,&this->cm_axes->super,-1)&&
+                glwCompAdd(&this->super,&this->cm_box->super,-1)&&
+                glwCompAdd(&this->super,&this->cm_slice->super,-1)&&
+                glwCompAdd(&this->super,&this->cm_iso->super,-1)&&
 # if defined(__DS3_ADD_BONDS__)
-    _this->cm_bnds=ds3ViewCompAlloc(_this);
-# endif
-    _this->cm_slice=ds3ViewCompAlloc(_this);
-    _this->cm_iso=ds3ViewCompAlloc(_this);
-    if (_this->cm_axes!=NULL&&_this->cm_box!=NULL&&
-# if defined(__DS3_ADD_BONDS__)
-            _this->cm_bnds!=NULL&&
-# endif
-            _this->cm_pts!=NULL&&_this->cm_slice!=NULL&&_this->cm_iso!=NULL)
-    {
-        if (glwCompAdd(&_this->super,&_this->cm_axes->super,-1)&&
-                glwCompAdd(&_this->super,&_this->cm_box->super,-1)&&
-                glwCompAdd(&_this->super,&_this->cm_slice->super,-1)&&
-                glwCompAdd(&_this->super,&_this->cm_iso->super,-1)&&
-# if defined(__DS3_ADD_BONDS__)
-                glwCompAdd(&_this->super,&_this->cm_pts->super,-1)&&
-                glwCompAdd(&_this->super,&_this->cm_bnds->super,-1))
+                glwCompAdd(&this->super,&this->cm_pts->super,-1)&&
+                glwCompAdd(&this->super,&this->cm_bnds->super,-1))
         {
 # else
-                glwCompAdd(&_this->super,&_this->cm_pts->super,-1))
+                glwCompAdd(&this->super,&this->cm_pts->super,-1))
         {
 # endif
-            _this->super.callbacks=&DS3_VIEW_CALLBACKS;
-            glwCompSetBackColor(&_this->super,GLW_COLOR_BLACK);
-            glwCompSetForeColor(&_this->super,GLW_COLOR_WHITE);
-            glwCompSetCursor(&_this->super,GLUT_CURSOR_CROSSHAIR);
-            glwCompSetLayout(&_this->super,&ds3_view_layout);
-            _this->cm_axes->super.callbacks=&DS3_VIEW_AXES_CALLBACKS;
-            _this->cm_box->super.callbacks=&DS3_VIEW_BOX_CALLBACKS;
-            _this->cm_pts->super.callbacks=&DS3_VIEW_PTS_CALLBACKS;
+            this->super.callbacks=&DS3_VIEW_CALLBACKS;
+            glwCompSetBackColor(&this->super,GLW_COLOR_BLACK);
+            glwCompSetForeColor(&this->super,GLW_COLOR_WHITE);
+            glwCompSetCursor(&this->super,GLUT_CURSOR_CROSSHAIR);
+            glwCompSetLayout(&this->super,&ds3_view_layout);
+            this->cm_axes->super.callbacks=&DS3_VIEW_AXES_CALLBACKS;
+            this->cm_box->super.callbacks=&DS3_VIEW_BOX_CALLBACKS;
+            this->cm_pts->super.callbacks=&DS3_VIEW_PTS_CALLBACKS;
 # if defined(__DS3_ADD_BONDS__)
-            _this->cm_bnds->super.callbacks=&DS3_VIEW_BNDS_CALLBACKS;
+            this->cm_bnds->super.callbacks=&DS3_VIEW_BNDS_CALLBACKS;
 # endif
-            _this->cm_iso->super.callbacks=&DS3_VIEW_ISO_CALLBACKS;
-            _this->cm_slice->super.callbacks=&DS3_VIEW_SLICE_CALLBACKS;
+            this->cm_iso->super.callbacks=&DS3_VIEW_ISO_CALLBACKS;
+            this->cm_slice->super.callbacks=&DS3_VIEW_SLICE_CALLBACKS;
             /*Win32 version of GLUT does not support these cursors!*/
-            /*glwCompSetCursor(&_this->cm_axes->super,GLUT_CURSOR_CYCLE);*/
-            /*glwCompSetCursor(&_this->cm_pts->super,GLUT_CURSOR_INFO);*/
-            _this->data_changed_func=NULL;
-            _this->data_changed_ctx=NULL;
-            _this->slice_changed_func=NULL;
-            _this->slice_changed_ctx=NULL;
-            _this->ornt_changed_func=NULL;
-            _this->ornt_changed_ctx=NULL;
-            _this->zoom_changed_func=NULL;
-            _this->zoom_changed_ctx=NULL;
-            _this->cntr_changed_func=NULL;
-            _this->cntr_changed_ctx=NULL;
-            _this->box_changed_func=NULL;
-            _this->box_changed_ctx=NULL;
-            _this->point_changed_func=NULL;
-            _this->point_changed_ctx=NULL;
+            /*glwCompSetCursor(&this->cm_axes->super,GLUT_CURSOR_CYCLE);*/
+            /*glwCompSetCursor(&this->cm_pts->super,GLUT_CURSOR_INFO);*/
+            this->data_changed_func=NULL;
+            this->data_changed_ctx=NULL;
+            this->slice_changed_func=NULL;
+            this->slice_changed_ctx=NULL;
+            this->ornt_changed_func=NULL;
+            this->ornt_changed_ctx=NULL;
+            this->zoom_changed_func=NULL;
+            this->zoom_changed_ctx=NULL;
+            this->cntr_changed_func=NULL;
+            this->cntr_changed_ctx=NULL;
+            this->box_changed_func=NULL;
+            this->box_changed_ctx=NULL;
+            this->point_changed_func=NULL;
+            this->point_changed_ctx=NULL;
 # if defined(__DS3_ADD_BONDS__)
-            _this->bond_changed_func=NULL;
-            _this->bond_changed_ctx=NULL;
+            this->bond_changed_func=NULL;
+            this->bond_changed_ctx=NULL;
 #  if defined(__DS3_SAVE_BONDS__)
-            _this->bonds_changed_func=NULL;
-            _this->bonds_changed_ctx=NULL;
+            this->bonds_changed_func=NULL;
+            this->bonds_changed_ctx=NULL;
 #  endif
 # endif
-            ds3SliceInit(&_this->slice,NULL);
-            ds3IsoInit(&_this->iso,NULL);
+            ds3SliceInit(&this->slice,NULL);
+            ds3IsoInit(&this->iso,NULL);
 # if defined(__DS3_ADD_BONDS__)
-            ds3BondsInit(&_this->bonds);
+            ds3BondsInit(&this->bonds);
 # endif
-            _DAInit(&_this->view_stack,0,DS3ViewParams);
-            _this->zoom=0;
-            _this->yaw=1;
-	    //_this->cntr[0] = _this->cntr[1] = _this->cntr[2] = 0.;
-	    //memset(_this->box, 0, 2*3*sizeof(double));
-            _this->slice_t=1;
-            _this->track_cb=0;
-            _this->track_pl=5;
-            _DAInit(&_this->draw_point,0,int);
-            _this->draw_coords=1;
-            _this->draw_points=1;
-            _this->draw_slice=1;
-            _this->draw_iso=1;
-            _this->proj=DS3V_PROJECT_PERSPECTIVE;
-            _this->ds=&DS_LINEAR_SCALE_IDENTITY.super;
-            ds3ViewSetColorScale(_this,NULL);
-            ds3ViewSetDataSet(_this,NULL);
-            ds3ViewSetPointR(_this,0.03);
-            ds3ViewSetSlice(_this,0,0,0);
-            ds3ViewSetIso(_this,0.5,2);
-            return 1;
+            _DAInit(&this->view_stack,0,DS3ViewParams);
+            this->zoom=0;
+            this->yaw=1;
+	    //this->cntr[0] = this->cntr[1] = this->cntr[2] = 0.;
+	    //memset(this->box, 0, 2*3*sizeof(double));
+            this->slice_t=1;
+            this->track_cb=0;
+            this->track_pl=5;
+            _DAInit(&this->draw_point,0,int);
+            this->draw_coords=1;
+            this->draw_points=1;
+            this->draw_slice=1;
+            this->draw_iso=1;
+            this->proj=DS3V_PROJECT_PERSPECTIVE;
+            this->ds=&DS_LINEAR_SCALE_IDENTITY.super;
+            ds3ViewSetColorScale(this,NULL);
+            ds3ViewSetDataSet(this,NULL);
+            ds3ViewSetPointR(this,0.03);
+            ds3ViewSetSlice(this,0,0,0);
+            ds3ViewSetIso(this,0.5,2);
+            return;
         }
-        glwCompDelAll(&_this->super);
-    }
-    glwCompFree(&_this->cm_axes->super);
-    glwCompFree(&_this->cm_box->super);
-    glwCompFree(&_this->cm_pts->super);
-# if defined(__DS3_ADD_BONDS__)
-    glwCompFree(&_this->cm_bnds->super);
-# endif
-    glwCompFree(&_this->cm_slice->super);
-    glwCompFree(&_this->cm_iso->super);
-    return 0;
-}
-
-void ds3ViewDstr(DS3View *_this)
-{
-    glwCompDstr(&_this->super);
-}
-
-void ds3ViewFree(DS3View *_this)
-{
-    glwCompFree(&_this->super);
+        glwCompDelAll(&this->super);
 }
 
 

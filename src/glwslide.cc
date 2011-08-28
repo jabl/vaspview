@@ -870,7 +870,6 @@ const GLWCallbacks GLW_SLIDER_CALLBACKS=
 
 GLWSlider::GLWSlider(int _min,int _max,int _val,int _ext)
 {
-    glwCompInit(&this->super);
     this->super.callbacks=&GLW_SLIDER_CALLBACKS;
     glwCompSetLayout(&this->super,&glw_slider_layout);
     glwCompSetFocusable(&this->super,1);
@@ -888,12 +887,6 @@ GLWSlider::GLWSlider(int _min,int _max,int _val,int _ext)
     this->val = _val;
     this->ext = _ext;
     glwSliderSetVal(this,_val,_ext);
-}
-
-GLWSlider::~GLWSlider()
-{
-    glwCompDstr(&this->super);
-    glwCompFree(&this->super);
 }
 
 int glwSliderIsCenteringLabels(GLWSlider *_this)

@@ -970,7 +970,42 @@ static void ds3ViewerOpen(DS3Viewer *_this,GLWComponent *_c)
     ds3ViewerOpenFile(_this,file);
 }
 
-DS3Viewer::DS3Viewer()
+DS3Viewer::DS3Viewer() : 
+	frame(new GLWFrame("VASP Data Viewer")),
+	ds3view(new DS3View()),
+	bn_open(new GLWButton("Open")),
+	tf_file(new GLWTextField(NULL, 20)),
+	lb_data_set(new GLWLabel("Data Set: ")),
+	tp_ctrl(new GLWTabbedPane()),
+	lb_status(new GLWLabel(NULL)),
+	lb_datax(new GLWLabel(NULL)),
+	lb_datay(new GLWLabel(NULL)),
+	lb_dataz(new GLWLabel(NULL)),
+	lb_datav(new GLWLabel(NULL)),
+	cb_draw_slice(new GLWCheckBox("Draw Slice",1,NULL)),
+	tf_slice_t(new GLWTextField(NULL,5)),
+	tf_slice_p(new GLWTextField(NULL,5)),
+	tf_slice_d(new GLWTextField(NULL,5)),
+	cb_draw_iso(new GLWCheckBox("Draw Iso-Surface",1,NULL)),
+	tf_iso_v(new GLWTextField(NULL,5)),
+	legend(new DSColorLegend()),
+	cb_draw_points(new GLWCheckBox("Draw Atoms",1,NULL)),
+	tf_point_r(new GLWTextField(NULL,5)),
+	tf_point_s(new GLWTextField(NULL,5)),
+	lb_point_t(new GLWLabel("Atom type:")),
+	lb_point_l(new GLWLabel("Atom location:")),
+	bn_point_c(new GLWButton("Look at Atom")),
+	bn_point_v(new GLWButton("Hide Atom")),
+	bn_point_sa(new GLWButton("Show All Atoms")),
+#if defined(__DS3_ADD_BONDS__)
+	tf_bond_f(new GLWTextField(NULL,5)),
+	tf_bond_t(new GLWTextField(NULL,5)),
+	tf_bond_s(new GLWTextField(NULL,5)),
+	sl_bond_s(new GLWSlider(1,5,1,0)),
+	bn_bond_a(new GLWButton("Add Bond")),
+	bn_bond_d(new GLWButton("Delete Bond")),
+#endif
+	tf_minx(new GLWTextField(NULL,5))
 {
     GLWLabel     *lb_file;
     GLWLabel     *lb_slice_t;
@@ -1018,135 +1053,103 @@ DS3Viewer::DS3Viewer()
     GLWComponent *cm_view;
     GLWComponent *cm_view_btns;
     GLWComponent *cm_opts;
+
     DS3Viewer* _this = this;
     _this->read_id=0;
     _this->ds3 = new DataSet3D();
     dsLinearScaleInit(&_this->scale_linear, _this->ds3->min, _this->ds3->max);
     dsLogScaleInit(&_this->scale_log, _this->ds3->min, _this->ds3->max);
-    _this->frame=glwFrameAlloc("VASP Data Viewer");
-    _this->ds3view=ds3ViewAlloc();
-    cm_vals=glwCompAlloc();
-    lb_file=glwLabelAlloc("Open File:");
-    _this->bn_open=glwButtonAlloc("Open");
-    _this->tf_file=glwTextFieldAlloc(NULL,20);
-    _this->lb_data_set=glwLabelAlloc("Data Set: ");
-    cm_data=glwCompAlloc();
-    cm_strc=glwCompAlloc();
-    cm_point_btns=glwCompAlloc();
+    cm_vals = new GLWComponent();
+    lb_file = new GLWLabel("Open File:");
+    cm_data = new GLWComponent();
+    cm_strc = new GLWComponent();
+    cm_point_btns = new GLWComponent();
 # if defined(__DS3_ADD_BONDS__)
-    cm_bond_btns=glwCompAlloc();
+    cm_bond_btns = new GLWComponent();
 # endif
-    cm_bnds=glwCompAlloc();
-    cm_view=glwCompAlloc();
-    cm_view_btns=glwCompAlloc();
-    cm_opts=glwCompAlloc();
-    _this->tp_ctrl=glwTabbedPaneAlloc();
-    _this->legend=dsColorLegendAlloc();
-    _this->lb_status=glwLabelAlloc(NULL);
-    _this->lb_datax=glwLabelAlloc(NULL);
-    _this->lb_datay=glwLabelAlloc(NULL);
-    _this->lb_dataz=glwLabelAlloc(NULL);
-    _this->lb_datav=glwLabelAlloc(NULL);
-    _this->cb_draw_slice=glwCheckBoxAlloc("Draw Slice",1,NULL);
-    lb_slice_t=glwLabelAlloc("Azimuthal slice angle:");
-    _this->tf_slice_t=glwTextFieldAlloc(NULL,5);
+    cm_bnds = new GLWComponent();
+    cm_view = new GLWComponent();
+    cm_view_btns = new GLWComponent();
+    cm_opts = new GLWComponent();
     _this->sl_slice_t.reset(new GLWSlider(0,360,0,0));
-    lb_slice_p=glwLabelAlloc("Polar slice angle:");
-    _this->tf_slice_p=glwTextFieldAlloc(NULL,5);
+    lb_slice_p = new GLWLabel("Polar slice angle:");
     _this->sl_slice_p= new GLWSlider(0,360,0,0);
-    lb_slice_d=glwLabelAlloc("Slice offset:");
-    _this->tf_slice_d=glwTextFieldAlloc(NULL,5);
+    lb_slice_d = new GLWLabel("Slice offset:");
     _this->sl_slice_d= new GLWSlider(-260,260,0,0);
-    _this->cb_draw_iso=glwCheckBoxAlloc("Draw Iso-Surface",1,NULL);
-    lb_iso_v=glwLabelAlloc("Iso-surface value:");
-    _this->tf_iso_v=glwTextFieldAlloc(NULL,5);
+    lb_slice_t = new GLWLabel("Azimuthal slice angle:");
+    lb_iso_v= new GLWLabel("Iso-surface value:");
     _this->sl_iso_v= new GLWSlider(0,DS3V_ISO_V_RES,DS3V_ISO_V_RES>>1,0);
-    lb_iso_d=glwLabelAlloc("Iso-surface detail:");
+    lb_iso_d = new GLWLabel("Iso-surface detail:");
     /*_this->tf_iso_d=glwTextFieldAlloc(NULL,5);*/
     _this->sl_iso_d= new GLWSlider(4,1,2,0);
-    _this->cb_draw_points=glwCheckBoxAlloc("Draw Atoms",1,NULL);
-    lb_point_r=glwLabelAlloc("Atom radius:");
-    _this->tf_point_r=glwTextFieldAlloc(NULL,5);
+    lb_point_r = new GLWLabel("Atom radius:");
     _this->sl_point_r= new GLWSlider(0,100,30,0);
-    lb_point_s=glwLabelAlloc("Current Atom:");
-    _this->tf_point_s=glwTextFieldAlloc(NULL,5);
-    _this->lb_point_t=glwLabelAlloc("Atom type:");
-    _this->lb_point_l=glwLabelAlloc("Atom location:");
-    _this->bn_point_c=glwButtonAlloc("Look at Atom");
-    _this->bn_point_v=glwButtonAlloc("Hide Atom");
-    _this->bn_point_sa=glwButtonAlloc("Show All Atoms");
+    lb_point_s = new GLWLabel("Current Atom:");
 # if defined(__DS3_ADD_BONDS__)
-    lb_bond_f=glwLabelAlloc("Bond from:");
-    _this->tf_bond_f=glwTextFieldAlloc(NULL,5);
-    lb_bond_t=glwLabelAlloc("Bond to:");
-    _this->tf_bond_t=glwTextFieldAlloc(NULL,5);
-    lb_bond_s=glwLabelAlloc("Bond size:");
-    _this->tf_bond_s=glwTextFieldAlloc(NULL,5);
-    _this->sl_bond_s= new GLWSlider(1,5,1,0);
-    _this->bn_bond_a=glwButtonAlloc("Add Bond");
-    _this->bn_bond_d=glwButtonAlloc("Delete Bond");
+    lb_bond_f = new GLWLabel("Bond from:");
+    lb_bond_t = new GLWLabel("Bond to:");
+    lb_bond_s = new GLWLabel("Bond size:");
 # endif
-    lb_minx=glwLabelAlloc("Minimum X:");
-    _this->tf_minx=glwTextFieldAlloc(NULL,5);
+    lb_minx = new GLWLabel("Minimum X:");
     _this->sl_minx= new GLWSlider(-100,200,0,0);
-    lb_maxx=glwLabelAlloc("Maximum X:");
-    _this->tf_maxx=glwTextFieldAlloc(NULL,5);
+    lb_maxx = new GLWLabel("Maximum X:");
+    _this->tf_maxx = new GLWTextField(NULL,5);
     _this->sl_maxx= new GLWSlider(-100,200,100,0);
-    lb_miny=glwLabelAlloc("Minimum Y:");
-    _this->tf_miny=glwTextFieldAlloc(NULL,5);
+    lb_miny= new GLWLabel("Minimum Y:");
+    _this->tf_miny = new GLWTextField(NULL,5);
     _this->sl_miny= new GLWSlider(-100,200,0,0);
-    lb_maxy=glwLabelAlloc("Maximum Y:");
-    _this->tf_maxy=glwTextFieldAlloc(NULL,5);
+    lb_maxy = new GLWLabel("Maximum Y:");
+    _this->tf_maxy = new GLWTextField(NULL,5);
     _this->sl_maxy= new GLWSlider(-100,200,100,0);
-    lb_minz=glwLabelAlloc("Minimum Z:");
-    _this->tf_minz=glwTextFieldAlloc(NULL,5);
+    lb_minz = new GLWLabel("Minimum Z:");
+    _this->tf_minz = new GLWTextField(NULL,5);
     _this->sl_minz= new GLWSlider(-100,200,0,0);
-    lb_maxz=glwLabelAlloc("Maximum Z:");
-    _this->tf_maxz=glwTextFieldAlloc(NULL,5);
+    lb_maxz = new GLWLabel("Maximum Z:");
+    _this->tf_maxz = new GLWTextField(NULL,5);
     _this->sl_maxz= new GLWSlider(-100,200,100,0);
-    _this->cb_draw_coords=glwCheckBoxAlloc("Draw Coordinate System",1,NULL);
-    lb_zoom=glwLabelAlloc("Zoom:");
-    _this->tf_zoom=glwTextFieldAlloc(NULL,5);
+    _this->cb_draw_coords = new GLWCheckBox("Draw Coordinate System",1,NULL);
+    lb_zoom = new GLWLabel("Zoom:");
+    _this->tf_zoom = new GLWTextField(NULL,5);
     _this->sl_zoom= new GLWSlider(0,200,100,0);
-    lb_ornt=glwLabelAlloc("Orientation:");
-    lb_ornt_y=glwLabelAlloc("Yaw:");
-    _this->tf_ornt_y=glwTextFieldAlloc(NULL,5);
+    lb_ornt = new GLWLabel("Orientation:");
+    lb_ornt_y = new GLWLabel("Yaw:");
+    _this->tf_ornt_y = new GLWTextField(NULL,5);
     _this->sl_ornt_y= new GLWSlider(0,360,0,0);
-    lb_ornt_p=glwLabelAlloc("Pitch:");
-    _this->tf_ornt_p=glwTextFieldAlloc(NULL,5);
+    lb_ornt_p = new GLWLabel("Pitch:");
+    _this->tf_ornt_p = new GLWTextField(NULL,5);
     _this->sl_ornt_p= new GLWSlider(0,360,0,0);
-    lb_ornt_r=glwLabelAlloc("Roll:");
-    _this->tf_ornt_r=glwTextFieldAlloc(NULL,5);
+    lb_ornt_r = new GLWLabel("Roll:");
+    _this->tf_ornt_r = new GLWTextField(NULL,5);
     _this->sl_ornt_r=new GLWSlider(0,360,0,0);
-    lb_cntr=glwLabelAlloc("Look at:");
-    lb_cntr_x=glwLabelAlloc("X:");
-    _this->tf_cntr_x=glwTextFieldAlloc(NULL,5);
+    lb_cntr = new GLWLabel("Look at:");
+    lb_cntr_x = new GLWLabel("X:");
+    _this->tf_cntr_x = new GLWTextField(NULL,5);
     _this->sl_cntr_x=new GLWSlider(-100,200,50,0);
-    lb_cntr_y=glwLabelAlloc("Y:");
-    _this->tf_cntr_y=glwTextFieldAlloc(NULL,5);
+    lb_cntr_y = new GLWLabel("Y:");
+    _this->tf_cntr_y = new GLWTextField(NULL,5);
     _this->sl_cntr_y=new GLWSlider(-100,200,50,0);
-    lb_cntr_z=glwLabelAlloc("Z:");
-    _this->tf_cntr_z=glwTextFieldAlloc(NULL,5);
+    lb_cntr_z = new GLWLabel("Z:");
+    _this->tf_cntr_z = new GLWTextField(NULL,5);
     _this->sl_cntr_z=new GLWSlider(-100,200,50,0);
-    bn_ornt=glwButtonAlloc("Reset Orientation");
-    bn_cntr=glwButtonAlloc("Reset Position");
-    bn_align=glwButtonAlloc("Align to Slice");
-    lb_scale=glwLabelAlloc("Data scale type:");
+    bn_ornt = new GLWButton("Reset Orientation");
+    bn_cntr = new GLWButton("Reset Position");
+    bn_align = new GLWButton("Align to Slice");
+    lb_scale = new GLWLabel("Data scale type:");
     glwCheckBoxGroupInit(&_this->cg_scale);
-    _this->cb_scale_linear=glwCheckBoxAlloc("Linear",1,&_this->cg_scale);
-    _this->cb_scale_log=glwCheckBoxAlloc("Logarithmic",0,&_this->cg_scale);
-    lb_color=glwLabelAlloc("Color scale type:");
+    _this->cb_scale_linear= new GLWCheckBox("Linear",1,&_this->cg_scale);
+    _this->cb_scale_log= new GLWCheckBox("Logarithmic",0,&_this->cg_scale);
+    lb_color= new GLWLabel("Color scale type:");
     glwCheckBoxGroupInit(&_this->cg_color);
-    _this->cb_color_rainbow=glwCheckBoxAlloc("Rainbow",1,&_this->cg_color);
-    _this->cb_color_grayscale=glwCheckBoxAlloc("Gray scale",0,&_this->cg_color);
-    lb_backc=glwLabelAlloc("Background color:");
+    _this->cb_color_rainbow= new GLWCheckBox("Rainbow",1,&_this->cg_color);
+    _this->cb_color_grayscale= new GLWCheckBox("Gray scale",0,&_this->cg_color);
+    lb_backc= new GLWLabel("Background color:");
     glwCheckBoxGroupInit(&_this->cg_backc);
-    _this->cb_backc_black=glwCheckBoxAlloc("Black",1,&_this->cg_backc);
-    _this->cb_backc_white=glwCheckBoxAlloc("White",0,&_this->cg_backc);
-    lb_projt=glwLabelAlloc("Projection type:");
+    _this->cb_backc_black= new GLWCheckBox("Black",1,&_this->cg_backc);
+    _this->cb_backc_white= new GLWCheckBox("White",0,&_this->cg_backc);
+    lb_projt= new GLWLabel("Projection type:");
     glwCheckBoxGroupInit(&_this->cg_projt);
-    _this->cb_projt_persp=glwCheckBoxAlloc("Perspective",1,&_this->cg_projt);
-    _this->cb_projt_ortho=glwCheckBoxAlloc("Orthographic",0,&_this->cg_projt);
+    _this->cb_projt_persp= new GLWCheckBox("Perspective",1,&_this->cg_projt);
+    _this->cb_projt_ortho= new GLWCheckBox("Orthographic",0,&_this->cg_projt);
     if (_this->frame!=NULL&&_this->ds3view!=NULL&&cm_vals!=NULL&&lb_file!=NULL&&
             _this->bn_open!=NULL&&_this->tf_file!=NULL&&_this->lb_data_set!=NULL&&
             cm_data!=NULL&&cm_strc!=NULL&&cm_point_btns!=NULL&&
@@ -2025,113 +2028,113 @@ DS3Viewer::~DS3Viewer()
 {
 	printf("Destroying DS3Viewer\n");
     DS3Viewer* _this = this;
-    glwCheckBoxFree(_this->cb_projt_ortho);
-    glwCheckBoxFree(_this->cb_projt_persp);
+    delete _this->cb_projt_ortho;
+    delete (_this->cb_projt_persp);
     glwCheckBoxGroupDstr(&_this->cg_projt);
-//    glwLabelFree(lb_projt);
-    glwCheckBoxFree(_this->cb_backc_white);
-    glwCheckBoxFree(_this->cb_backc_black);
+//    delete (lb_projt);
+    delete (_this->cb_backc_white);
+    delete (_this->cb_backc_black);
     glwCheckBoxGroupDstr(&_this->cg_backc);
-//    glwLabelFree(lb_backc);
-    glwCheckBoxFree(_this->cb_color_grayscale);
-    glwCheckBoxFree(_this->cb_color_rainbow);
+//    delete (lb_backc);
+    delete (_this->cb_color_grayscale);
+    delete (_this->cb_color_rainbow);
     glwCheckBoxGroupDstr(&_this->cg_color);
-//    glwLabelFree(lb_color);
-    glwCheckBoxFree(_this->cb_scale_log);
-    glwCheckBoxFree(_this->cb_scale_linear);
+//    delete (lb_color);
+    delete (_this->cb_scale_log);
+    delete (_this->cb_scale_linear);
     glwCheckBoxGroupDstr(&_this->cg_scale);
-    // glwLabelFree(lb_scale);
+    // delete (lb_scale);
     // glwButtonFree(bn_align);
     // glwButtonFree(bn_cntr);
     // glwButtonFree(bn_ornt);
     delete _this->sl_cntr_z;
-    glwTextFieldFree(_this->tf_cntr_z);
-//    glwLabelFree(lb_cntr_z);
+    delete (_this->tf_cntr_z);
+//    delete (lb_cntr_z);
     delete _this->sl_cntr_y;
-    glwTextFieldFree(_this->tf_cntr_y);
-//    glwLabelFree(lb_cntr_y);
+    delete (_this->tf_cntr_y);
+//    delete (lb_cntr_y);
     delete _this->sl_cntr_x;
-    glwTextFieldFree(_this->tf_cntr_x);
-//    glwLabelFree(lb_cntr_x);
-//    glwLabelFree(lb_cntr);
+    delete (_this->tf_cntr_x);
+//    delete (lb_cntr_x);
+//    delete (lb_cntr);
     delete _this->sl_ornt_r;
-    glwTextFieldFree(_this->tf_ornt_r);
-//    glwLabelFree(lb_ornt_r);
+    delete (_this->tf_ornt_r);
+//    delete (lb_ornt_r);
     delete _this->sl_ornt_p;
-    glwTextFieldFree(_this->tf_ornt_p);
-//    glwLabelFree(lb_ornt_p);
+    delete (_this->tf_ornt_p);
+//    delete (lb_ornt_p);
     delete _this->sl_ornt_y;
-    glwTextFieldFree(_this->tf_ornt_y);
-//    glwLabelFree(lb_ornt_y);
-//    glwLabelFree(lb_ornt);
+    delete (_this->tf_ornt_y);
+//    delete (lb_ornt_y);
+//    delete (lb_ornt);
     delete _this->sl_zoom;
-    glwTextFieldFree(_this->tf_zoom);
-//    glwLabelFree(lb_zoom);
-    glwCheckBoxFree(_this->cb_draw_coords);
+    delete (_this->tf_zoom);
+//    delete (lb_zoom);
+    delete (_this->cb_draw_coords);
     delete _this->sl_maxz;
-    glwTextFieldFree(_this->tf_maxz);
-//    glwLabelFree(lb_maxz);
+    delete (_this->tf_maxz);
+//    delete (lb_maxz);
     delete _this->sl_minz;
-    glwTextFieldFree(_this->tf_minz);
-//    glwLabelFree(lb_minz);
+    delete (_this->tf_minz);
+//    delete (lb_minz);
     delete _this->sl_maxy;
-    glwTextFieldFree(_this->tf_maxy);
-//    glwLabelFree(lb_maxy);
+    delete (_this->tf_maxy);
+//    delete (lb_maxy);
     delete _this->sl_miny;
-    glwTextFieldFree(_this->tf_miny);
-//    glwLabelFree(lb_miny);
+    delete (_this->tf_miny);
+//    delete (lb_miny);
     delete _this->sl_maxx;
-    glwTextFieldFree(_this->tf_maxx);
-//    glwLabelFree(lb_maxx);
+    delete (_this->tf_maxx);
+//    delete (lb_maxx);
     delete _this->sl_minx;
-    glwTextFieldFree(_this->tf_minx);
-//    glwLabelFree(lb_minx);
+    delete (_this->tf_minx);
+//    delete (lb_minx);
 # if defined(__DS3_ADD_BONDS__)
-    glwButtonFree(_this->bn_bond_d);
-    glwButtonFree(_this->bn_bond_a);
+    delete (_this->bn_bond_d);
+    delete (_this->bn_bond_a);
     delete _this->sl_bond_s;
-    glwTextFieldFree(_this->tf_bond_s);
-//    glwLabelFree(lb_bond_s);
-    glwTextFieldFree(_this->tf_bond_t);
-//    glwLabelFree(lb_bond_t);
-    glwTextFieldFree(_this->tf_bond_f);
-//    glwLabelFree(lb_bond_f);
+    delete (_this->tf_bond_s);
+//    delete (lb_bond_s);
+    delete (_this->tf_bond_t);
+//    delete (lb_bond_t);
+    delete (_this->tf_bond_f);
+//    delete (lb_bond_f);
 # endif
-    glwButtonFree(_this->bn_point_sa);
-    glwButtonFree(_this->bn_point_v);
-    glwButtonFree(_this->bn_point_c);
-    glwLabelFree(_this->lb_point_l);
-    glwLabelFree(_this->lb_point_t);
-    glwTextFieldFree(_this->tf_point_s);
-//    glwLabelFree(lb_point_s);
+    delete (_this->bn_point_sa);
+    delete (_this->bn_point_v);
+    delete (_this->bn_point_c);
+    delete (_this->lb_point_l);
+    delete (_this->lb_point_t);
+    delete (_this->tf_point_s);
+//    delete (lb_point_s);
     delete _this->sl_point_r;
-    glwTextFieldFree(_this->tf_point_r);
-//    glwLabelFree(lb_point_r);
-    glwCheckBoxFree(_this->cb_draw_points);
+    delete (_this->tf_point_r);
+//    delete (lb_point_r);
+    delete (_this->cb_draw_points);
     delete _this->sl_iso_d;
-    /*glwTextFieldFree(_this->tf_iso_d);*/
-//    glwLabelFree(lb_iso_d);
+    /*delete (_this->tf_iso_d);*/
+//    delete (lb_iso_d);
     delete _this->sl_iso_v;
-    glwTextFieldFree(_this->tf_iso_v);
-//    glwLabelFree(lb_iso_v);
-    glwCheckBoxFree(_this->cb_draw_iso);
+    delete (_this->tf_iso_v);
+//    delete (lb_iso_v);
+    delete (_this->cb_draw_iso);
     delete _this->sl_slice_d;
-    glwTextFieldFree(_this->tf_slice_d);
-//    glwLabelFree(lb_slice_d);
+    delete (_this->tf_slice_d);
+//    delete (lb_slice_d);
     delete _this->sl_slice_p;
-    glwTextFieldFree(_this->tf_slice_p);
-//    glwLabelFree(lb_slice_p);
+    delete (_this->tf_slice_p);
+//    delete (lb_slice_p);
 //    delete _this->sl_slice_t; // unique_ptr auto-delete?
-    glwTextFieldFree(_this->tf_slice_t);
-//    glwLabelFree(lb_slice_t);
-    glwCheckBoxFree(_this->cb_draw_slice);
-    glwLabelFree(_this->lb_datav);
-    glwLabelFree(_this->lb_dataz);
-    glwLabelFree(_this->lb_datay);
-    glwLabelFree(_this->lb_datax);
-    glwLabelFree(_this->lb_status);
-    dsColorLegendFree(_this->legend);
-    glwTabbedPaneFree(_this->tp_ctrl);
+    delete (_this->tf_slice_t);
+//    delete (lb_slice_t);
+    delete (_this->cb_draw_slice);
+    delete (_this->lb_datav);
+    delete (_this->lb_dataz);
+    delete (_this->lb_datay);
+    delete (_this->lb_datax);
+    delete (_this->lb_status);
+    delete _this->legend;
+    delete _this->tp_ctrl;
 //    glwCompFree(cm_opts);
 //    glwCompFree(cm_view_btns);
 //    glwCompFree(cm_view);
@@ -2142,13 +2145,13 @@ DS3Viewer::~DS3Viewer()
 //    glwCompFree(cm_point_btns);
 //    glwCompFree(cm_strc);
 //    glwCompFree(cm_data);
-    glwLabelFree(_this->lb_data_set);
-    glwTextFieldFree(_this->tf_file);
-    glwButtonFree(_this->bn_open);
-//    glwLabelFree(lb_file);
+    delete (_this->lb_data_set);
+    delete (_this->tf_file);
+    delete (_this->bn_open);
+//    delete (lb_file);
 //    glwCompFree(cm_vals);
-    ds3ViewFree(_this->ds3view);
-    glwFrameFree(_this->frame);
+    delete _this->ds3view;
+    delete _this->frame;
 }
 
 void ds3ViewerUpdatePointRLabels(DS3Viewer *_this)

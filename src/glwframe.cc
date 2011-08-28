@@ -1,6 +1,7 @@
 /*GL Widget Set - simple, portable OpenGL/GLUT widget set
   Copyright (C) 1999-2001 Timothy B. Terriberry
   (mailto:tterribe@users.sourceforge.net)
+  2011 Janne Blomqvist
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -244,35 +245,19 @@ const GLWCallbacks GLW_FRAME_CALLBACKS=
 };
 
 
-GLWFrame *glwFrameAlloc(const char *_title)
-{
-    GLWFrame *this_;
-    this_=(GLWFrame *)malloc(sizeof(GLWFrame));
-    if (this_!=NULL)
-    {
-        if (glwFrameInit(this_,_title))
-        {
-            return this_;
-        }
-        free(this_);
-    }
-    return NULL;
-}
-
-int glwFrameInit(GLWFrame *_this,const char *_title)
+GLWFrame::GLWFrame(const char* _title)
 {
     int wid;
     wid=glutCreateWindow(_title);
     if (wid!=0)
     {
-	glw_frame_table.insert(std::pair<int, GLWFrame*>(wid, _this));
-	glwCompInit(&_this->super);
-	_DAInit(&_this->title,0,char);
-	if (daInsArrayHead(&_this->title,_title,strlen(_title)+1))
+	glw_frame_table.insert(std::pair<int, GLWFrame*>(wid, this));
+	_DAInit(&this->title,0,char);
+	if (daInsArrayHead(&this->title,_title,strlen(_title)+1))
 	{
-                _this->super.wid=wid;
-                _this->super.callbacks=&GLW_FRAME_CALLBACKS;
-                glwCompSetCursor(&_this->super,GLUT_CURSOR_RIGHT_ARROW);
+                this->super.wid=wid;
+                this->super.callbacks=&GLW_FRAME_CALLBACKS;
+                glwCompSetCursor(&this->super,GLUT_CURSOR_RIGHT_ARROW);
                 glutDisplayFunc(glwFrameGlutDisplay);
                 glutReshapeFunc(glwFrameGlutReshape);
                 glutVisibilityFunc(glwFrameGlutVisibility);
@@ -282,26 +267,13 @@ int glwFrameInit(GLWFrame *_this,const char *_title)
                 glutMouseFunc(glwFrameGlutMouse);
                 glutMotionFunc(glwFrameGlutMotion);
                 glutPassiveMotionFunc(glwFrameGlutPassiveMotion);
-                return 1;
+                return;
 	}
-	daDstr(&_this->title);
-	glwCompDstr(&_this->super);
+	daDstr(&this->title);
 	glw_frame_table.erase(wid);
         glutDestroyWindow(wid);
     }
-    return 0;
 }
-
-void glwFrameDstr(GLWFrame *_this)
-{
-    glwCompDstr(&_this->super);
-}
-
-void glwFrameFree(GLWFrame *_this)
-{
-    glwCompFree(&_this->super);
-}
-
 
 int glwFrameSetTitle(GLWFrame *_this,const char *_title)
 {

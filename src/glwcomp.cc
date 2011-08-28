@@ -259,84 +259,66 @@ const GLWCallbacks GLW_COMPONENT_CALLBACKS=
 };
 
 
-GLWComponent *glwCompAlloc(void)
+GLWComponent::GLWComponent()
 {
-    GLWComponent *this_;
-    this_=(GLWComponent *)malloc(sizeof(GLWComponent));
-    if (this_!=NULL)glwCompInit(this_);
-    return this_;
+    this->parent=NULL;
+    this->callbacks=&GLW_COMPONENT_CALLBACKS;
+    glwRectInit(&this->bounds,0,0,0,0);
+    this->constraints.minw=-1;
+    this->constraints.minh=-1;
+    this->constraints.prew=-1;
+    this->constraints.preh=-1;
+    this->constraints.maxw=-1;
+    this->constraints.maxh=-1;
+    glwInsetsInit(&this->constraints.insets,0,0,0,0);
+    this->constraints.alignx=0.5;
+    this->constraints.aligny=0.5;
+    this->constraints.fill=GLWC_NONE;
+    this->constraints.gridx=GLWC_RELATIVE;
+    this->constraints.gridy=GLWC_RELATIVE;
+    this->constraints.gridw=1;
+    this->constraints.gridh=1;
+    this->constraints.weightx=0;
+    this->constraints.weighty=0;
+    this->forec=GLW_COLOR_BLACK;
+    this->backc=GLW_COLOR_LIGHT_GREY;
+    this->font=glwFontGet(GLW_FONT_SERIF,0);
+    this->cursor=GLUT_CURSOR_INHERIT;
+    _DAInit(&this->comps,0,GLWComponent *);
+    _DAInit(&this->timers,0,int);
+    _DAInit(&this->idlers,0,int);
+    this->layout=NULL;
+    this->focus=NULL;
+    this->capture=NULL;
+    this->mouse_b=0;
+    this->wid=0;
+    this->visible=0;
+    this->enabled=1;
+    this->valid=0;
+    this->validate_root=0;
+    this->focused=0;
+    this->focusable=0;
 }
 
-void glwCompInit(GLWComponent *_this)
+GLWComponent::~GLWComponent()
 {
-    _this->parent=NULL;
-    _this->callbacks=&GLW_COMPONENT_CALLBACKS;
-    glwRectInit(&_this->bounds,0,0,0,0);
-    _this->constraints.minw=-1;
-    _this->constraints.minh=-1;
-    _this->constraints.prew=-1;
-    _this->constraints.preh=-1;
-    _this->constraints.maxw=-1;
-    _this->constraints.maxh=-1;
-    glwInsetsInit(&_this->constraints.insets,0,0,0,0);
-    _this->constraints.alignx=0.5;
-    _this->constraints.aligny=0.5;
-    _this->constraints.fill=GLWC_NONE;
-    _this->constraints.gridx=GLWC_RELATIVE;
-    _this->constraints.gridy=GLWC_RELATIVE;
-    _this->constraints.gridw=1;
-    _this->constraints.gridh=1;
-    _this->constraints.weightx=0;
-    _this->constraints.weighty=0;
-    _this->forec=GLW_COLOR_BLACK;
-    _this->backc=GLW_COLOR_LIGHT_GREY;
-    _this->font=glwFontGet(GLW_FONT_SERIF,0);
-    _this->cursor=GLUT_CURSOR_INHERIT;
-    _DAInit(&_this->comps,0,GLWComponent *);
-    _DAInit(&_this->timers,0,int);
-    _DAInit(&_this->idlers,0,int);
-    _this->layout=NULL;
-    _this->focus=NULL;
-    _this->capture=NULL;
-    _this->mouse_b=0;
-    _this->wid=0;
-    _this->visible=0;
-    _this->enabled=1;
-    _this->valid=0;
-    _this->validate_root=0;
-    _this->focused=0;
-    _this->focusable=0;
-}
-
-void glwCompDstr(GLWComponent *_this)
-{
-    if (_this->parent!=NULL)glwCompDel(_this->parent,_this);
-    for (; _this->comps.size>0;)
+	delete this->parent;
+    for (; this->comps.size>0;)
     {
-        glwCompFree(*_DAGetAt(&_this->comps,_this->comps.size-1,GLWComponent *));
+        delete *_DAGetAt(&this->comps,this->comps.size-1,GLWComponent *);
     }
-    glwCompSetLayout(_this,NULL);
-    glwCompDispose(_this);
-    daDstr(&_this->comps);
-    for (; _this->timers.size>0;)
+    glwCompSetLayout(this,NULL);
+    glwCompDispose(this);
+    daDstr(&this->comps);
+    for (; this->timers.size>0;)
     {
-        glwCompDelTimer(_this,glwCompGetTimerID(_this,_this->timers.size-1));
+        glwCompDelTimer(this,glwCompGetTimerID(this,this->timers.size-1));
     }
-    for (; _this->idlers.size>0;)
+    for (; this->idlers.size>0;)
     {
-        glwCompDelIdler(_this,glwCompGetIdlerID(_this,_this->idlers.size-1));
+        glwCompDelIdler(this,glwCompGetIdlerID(this,this->idlers.size-1));
     }
 }
-
-void glwCompFree(GLWComponent *_this)
-{
-    if (_this!=NULL)
-    {
-        glwCompDstr(_this);
-        free(_this);
-    }
-}
-
 
 int glwCompIsVisible(GLWComponent *_this)
 {
