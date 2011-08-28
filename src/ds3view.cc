@@ -47,8 +47,6 @@ static int  ds3ViewGetSlicePoint(DS3View *_this,Vect3d _p,double *_t,
                                  const Vect3d _p0,const Vect3d _p1);
 static void ds3ViewTransferCapture(DS3View *_this,int _x,int _y);
 
-static DS3ViewComp *ds3ViewCompAlloc(DS3View *_ds3view);
-
 
 
 /*Expands the yaw, pitch, and roll angles into a full 3x3 rotation matrix.
@@ -1287,20 +1285,25 @@ DS3View::DS3View() : cm_axes(new DS3ViewComp(this)),
             ds3IsoInit(&this->iso,NULL);
 # if defined(__DS3_ADD_BONDS__)
             ds3BondsInit(&this->bonds);
+	    this->track_mbf = 0;
 # endif
             _DAInit(&this->view_stack,0,DS3ViewParams);
             this->zoom=0;
             this->yaw=1;
-	    //this->cntr[0] = this->cntr[1] = this->cntr[2] = 0.;
-	    //memset(this->box, 0, 2*3*sizeof(double));
+	    this->cntr[0] = this->cntr[1] = this->cntr[2] = 0.;
+	    memset(this->box, 0, 2*3*sizeof(double));
             this->slice_t=1;
             this->track_cb=0;
             this->track_pl=5;
+	    this->track_ax = this->track_dx = this->track_mp = 0;
+	    this->track_sp = this->track_sbf = this->track_sbt = 0;
+	    this->point_r = 0;
             _DAInit(&this->draw_point,0,int);
             this->draw_coords=1;
             this->draw_points=1;
             this->draw_slice=1;
             this->draw_iso=1;
+	    this->iso_v = this->iso_d = 0;
             this->proj=DS3V_PROJECT_PERSPECTIVE;
             this->ds=&DS_LINEAR_SCALE_IDENTITY.super;
             ds3ViewSetColorScale(this,NULL);
