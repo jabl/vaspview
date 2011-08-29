@@ -558,7 +558,6 @@ static void glwTextFieldPeerDispose(GLWTextField *_this,GLWCallbacks *_cb)
 {
     glwCompSuperDispose(&_this->super,_cb);
     daDstr(&_this->text);
-    daDstr(&_this->seld);
 }
 
 
@@ -584,7 +583,6 @@ const GLWCallbacks GLW_TEXT_FIELD_CALLBACKS=
 GLWTextField::GLWTextField(const char* _text, int _cols)
 {
     _DAInit(&this->text,0,char);
-    _DAInit(&this->seld,0,char);
     this->changed=NULL;
     this->changed_ctx=NULL;
     this->action=NULL;
@@ -602,7 +600,6 @@ GLWTextField::GLWTextField(const char* _text, int _cols)
         this->editable=1;
         return;
     }
-    daDstr(&this->seld);
     daDstr(&this->text);
 }
 
@@ -695,15 +692,11 @@ const char *glwTextFieldGetSelectedText(GLWTextField *_this)
     if (_this->sels<0||_this->sele<0||
             _this->sels>=_this->sele||(size_t)_this->sele+1>=_this->text.size)len=0;
     else len=_this->sele-_this->sels;
-    if (daSetSize(&_this->seld,len+1))
-    {
-        char *seld;
-        seld=_DAGetAt(&_this->seld,0,char);
-        memcpy(seld,_DAGetAt(&_this->text,_this->sels,char),len);
-        seld[len]='\0';
-        return seld;
-    }
-    return NULL;
+    _this->seld.resize(len + 1);
+    char *seld = &_this->seld[0];
+    memcpy(seld, _DAGetAt(&_this->text, _this->sels, char), len);
+    seld[len]='\0';
+    return seld;
 }
 
 int glwTextFieldGetCaretPos(GLWTextField *_this)

@@ -444,7 +444,7 @@ struct GLWTextField
     GLWActionFunc  changed;                      /*Text changed callback function*/
     void          *changed_ctx;                    /*Extra parameter for callback*/
     CDynArray      text;                                           /*Current text*/
-    CDynArray      seld;                         /*Currently selected text buffer*/
+	std::string      seld;        /*Currently selected text buffer*/
     int            sels;                                        /*Selection start*/
     int            sele;                                          /*Selection end*/
     int            carp;                                         /*Caret position*/
