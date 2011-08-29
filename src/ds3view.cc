@@ -1297,6 +1297,7 @@ DS3View::DS3View() : cm_axes(new DS3ViewComp(this)),
             this->track_pl=5;
 	    this->track_ax = this->track_dx = this->track_mp = 0;
 	    this->track_sp = this->track_sbf = this->track_sbt = 0;
+	    this->track_lbf = this->track_lbt = 0;
 	    this->point_r = 0;
             _DAInit(&this->draw_point,0,int);
             this->draw_coords=1;

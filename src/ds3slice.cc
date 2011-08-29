@@ -782,8 +782,8 @@ static void ds3ViewSlicePeerDisplay(DS3ViewComp *_this,
     DS3View       *view;
     view=_this->ds3view;
     /*If we can, use a 3D texture for the slice*/
-//    if (GLEW_EXT_texture3D)
-    if (0) // EXT_texture3D crashed on i915?!
+    if (GLEW_EXT_texture3D)
+//    if (0) // EXT_texture3D crashed on i915?!
         {if (view->t_valid||ds3SliceTexture3D(&view->slice,view))
         {
             DS3SliceVertex slice[16];
