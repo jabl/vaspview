@@ -529,7 +529,7 @@ struct GLWCheckBox
     GLWActionFunc     changed;
     void             *changed_ctx;
     GLWCheckBoxGroup *group;
-    CDynArray         label;
+	std::string label;
     unsigned          state:1;
     unsigned          down:1;
 };

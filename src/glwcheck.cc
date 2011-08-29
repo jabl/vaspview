@@ -131,8 +131,8 @@ static void glwCheckBoxLayoutMinSize(GLWLayoutManager *_this,GLWCheckBox *_cb,
     h=glwFontGetHeight(_cb->super.font);
     if (_w!=NULL)
     {
-        *_w=glwFontGetStringWidth(_cb->super.font,_DAGetAt(&_cb->label,0,char))+h+
-            (GLW_CHECK_BOX_INSET<<2);
+	    *_w = glwFontGetStringWidth(_cb->super.font, _cb->label.c_str())
+		    + h + (GLW_CHECK_BOX_INSET<<2);
     }
     if (_h!=NULL)*_h=h+(GLW_CHECK_BOX_INSET<<1);
 }
@@ -153,11 +153,9 @@ static void glwCheckBoxPeerDisplay(GLWCheckBox *_this,GLWCallbacks *_cb)
     int     h;
     int     fc;
     int     bc;
-    char   *label;
     glwCompSuperDisplay(&_this->super,_cb);
     /*Calculate text position and dimensions*/
-    label=_DAGetAt(&_this->label,0,char);
-    w=glwFontGetStringWidth(_this->super.font,label);
+    w = glwFontGetStringWidth(_this->super.font, _this->label.c_str());
     h=glwFontGetHeight(_this->super.font);
     y=(_this->super.bounds.h-h)*0.5;
     if (glwCompIsEnabled(&_this->super))
@@ -186,7 +184,8 @@ static void glwCheckBoxPeerDisplay(GLWCheckBox *_this,GLWCallbacks *_cb)
         bc=glwColorBlend(_this->super.backc,_this->super.forec);
         fc=glwColorBlend(_this->super.forec,bc);
     }
-    glwFontDrawString(_this->super.font,label,h+GLW_CHECK_BOX_INSET*3,
+    glwFontDrawString(_this->super.font, _this->label.c_str(), 
+		      h + GLW_CHECK_BOX_INSET * 3,
                       y+glwFontGetDescent(_this->super.font));
     if (_this->group==NULL)                                  /*Draw the check box*/
     {
@@ -433,7 +432,6 @@ static void glwCheckBoxPeerDispose(GLWCheckBox *_this,GLWCallbacks *_cb)
 {
     glwCompSuperDispose(&_this->super,_cb);
     glwCheckBoxSetGroup(_this,NULL);
-    daDstr(&_this->label);
 }
 
 
@@ -455,14 +453,12 @@ const GLWCallbacks GLW_CHECK_BOX_CALLBACKS=
     NULL
 };
 
-GLWCheckBox::GLWCheckBox(const char* _label, int _state,
+GLWCheckBox::GLWCheckBox(const char* label, int _state,
 			 GLWCheckBoxGroup* _group)
 {
-    _DAInit(&this->label,0,char);
-    this->changed=NULL;
-    this->changed_ctx=NULL;
-    if (glwCheckBoxSetLabel(this,_label))
-    {
+	this->changed=NULL;
+	this->changed_ctx=NULL;
+	glwCheckBoxSetLabel(this, label);
         this->super.callbacks=&GLW_CHECK_BOX_CALLBACKS;
         glwCompSetLayout(&this->super,&glw_check_box_layout);
         glwCompSetFocusable(&this->super,1);
@@ -470,12 +466,8 @@ GLWCheckBox::GLWCheckBox(const char* _label, int _state,
         this->state=_state?1:0;
         this->down=0;
         this->group=NULL;
-        if (_group==NULL||glwCheckBoxSetGroup(this,_group))
-        {
-            return;
-        }
-    }
-    daDstr(&this->label);
+	if (_group != NULL)
+		glwCheckBoxSetGroup(this, _group);
 }
 
 int glwCheckBoxGetState(GLWCheckBox *_this)
@@ -542,55 +534,30 @@ void glwCheckBoxSetState(GLWCheckBox *_this,int _state)
 
 const char *glwCheckBoxGetLabel(GLWCheckBox *_this)
 {
-    return _DAGetAt(&_this->label,0,char);
+	return _this->label.c_str();
 }
 
-int glwCheckBoxSetLabel(GLWCheckBox *_this,const char *_label)
+int glwCheckBoxSetLabel(GLWCheckBox* _this, const char* label)
 {
-    if (_label==NULL)
-    {
-        if (daSetSize(&_this->label,1))
-        {
-            *_DAGetAt(&_this->label,0,char)='\0';
-            glwCompRevalidate(&_this->super);
-            return 1;
-        }
-    }
+    if (label==NULL)
+	    _this->label.clear();
     else
-    {
-        size_t len;
-        len=strlen(_label)+1;
-        if (daSetSize(&_this->label,len))
-        {
-            char *label;
-            label=_DAGetAt(&_this->label,0,char);
-            memcpy(label,_label,len);
-            glwCompRevalidate(&_this->super);
-            return 1;
-        }
-    }
-    return 0;
+	    _this->label = label;
+    glwCompRevalidate(&_this->super);
+    return 1;
 }
 
-int glwCheckBoxAddLabel(GLWCheckBox *_this,const char *_label)
+int glwCheckBoxAddLabel(GLWCheckBox* _this,const char* label)
 {
-    if (_this->label.size<=1)return glwCheckBoxSetLabel(_this,_label);
-    else if (_label!=NULL)
-    {
-        size_t len;
-        len=strlen(_label);
-        if (len>0)
-        {
-            if (daInsArrayBefore(&_this->label,_this->label.size-1,_label,len))
-            {
+	if (_this->label.size() <= 1)
+		return glwCheckBoxSetLabel(_this, label);
+	else if (label != NULL)
+	{
+		_this->label.append(label);
                 glwCompRevalidate(&_this->super);
                 return 1;
-            }
-        }
+	}
         else return 1;
-    }
-    else return 1;
-    return 0;
 }
 
 GLWCheckBoxGroup *glwCheckBoxGetGroup(GLWCheckBox *_this)
