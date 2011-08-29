@@ -883,12 +883,8 @@ static void ds3ViewerProjTChanged(DS3Viewer *_this,GLWComponent *_c)
 static void ds3ViewerFinishRead(DS3Viewer *_this)
 {
     double iso_v;
-    fprintf(stderr, "about to delete old ds3\n");
     delete _this->ds3;
-    fprintf(stderr, "deleted old ds3\n");
     _this->ds3 = _this->reader->release_ds3();
-    fprintf(stderr, "ds3==NULL: %i, ds3->data[0:2]: %f %f\n", _this->ds3 == NULL,
-	    _this->ds3->data[0], _this->ds3->data[1]);
     iso_v=dsScale(_this->ds3view->ds,_this->ds3view->iso_v);
     if (ds3ViewSetDataSet(_this->ds3view, _this->ds3))
     {

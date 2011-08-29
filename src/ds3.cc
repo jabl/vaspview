@@ -21,7 +21,6 @@
 /*Initializes the data set to default values*/
 DataSet3D::DataSet3D()
 {
-	printf("DataSet3D constructor\n");
     this->label[0]=this->label[1]=this->label[2]=this->label[3]=NULL;
     this->units[0]=this->units[1]=this->units[2]=this->units[3]=NULL;
     vectSet3d(this->basis[0],1,0,0);
@@ -37,7 +36,6 @@ DataSet3D::DataSet3D()
 /*Frees the memory used by the data set*/
 DataSet3D::~DataSet3D()
 {
-	printf("DataSet3D destructor\n");
     int i;
     for (i=0; i<4; i++)free(this->label[i]);
     for (i=0; i<4; i++)free(this->units[i]);
@@ -185,7 +183,12 @@ void dsLinearScaleInit(DSLinearScale *_this,double _min,double _max)
 
 const DSLinearScale DS_LINEAR_SCALE_IDENTITY=
 {
-    (DSScaleFunc)dsLinearScale,(DSUnscaleFunc)dsLinearUnscale,1,0
+	{
+		(DSScaleFunc)dsLinearScale,
+		(DSUnscaleFunc)dsLinearUnscale
+	},
+	1,
+	0
 };
 
 
