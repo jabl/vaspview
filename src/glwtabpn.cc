@@ -21,7 +21,6 @@
 #include <GL/glu.h>
 #include "glw.hh"
 
-
 /*A tabbed pane component. Instead of adding children directly, components are
   added as tabs. Only the currently active tab's component is ever actually a
   child of this component. If the currently active tab does not have a child,
@@ -30,15 +29,6 @@
 # define GLW_TABBED_PANE_INSET   (4)
 # define GLW_TABBED_PANE_OVERLAY (2)
 
-typedef struct GLWTabPage
-{
-    CDynArray     title;
-    GLWRect       bounds;
-    GLWcolor      backc;
-    GLWcolor      forec;
-    int           run;
-    GLWComponent *comp;
-} GLWTabPage;
 
 static int glwTabbedPaneCalcMaxTabHeight(GLWTabbedPane *_this)
 {
@@ -58,19 +48,16 @@ static int glwTabbedPaneCalcTabAreaHeight(GLWTabbedPane *_this,int _cols)
 
 static int glwTabbedPaneCalcMaxTabWidth(GLWTabbedPane *_this)
 {
-    GLWTabPage *tabs;
-    size_t      i;
-    int         w;
-    w=0;
-    tabs=_DAGetAt(&_this->tabs,0,GLWTabPage);
-    for (i=_this->tabs.size; i-->0;)
-    {
-        int tw;
-        tw=glwFontGetStringWidth(_this->super.font,_DAGetAt(&tabs[i].title,0,char));
-        if (tw>w)w=tw;
-    }
-    w+=GLW_TABBED_PANE_INSET<<1;
-    return w;
+	int w = 0;
+	for (auto it = _this->tabs.begin(); it != _this->tabs.end(); ++it)
+	{
+		GLWTabPage& tp = *it;
+		int tw = glwFontGetStringWidth(_this->super.font, 
+					       tp.title.c_str());
+		if (tw > w) w = tw;
+	}
+	w += GLW_TABBED_PANE_INSET<<1;
+	return w;
 }
 
 static int glwTabbedPaneCalcTabAreaWidth(GLWTabbedPane *_this,int _rows)
@@ -101,7 +88,7 @@ static void glwTabbedPaneLayout(GLWLayoutManager *_this,
     {
         _tabpn->max_tab_h=glwTabbedPaneCalcMaxTabHeight(_tabpn);
     }
-    if (!_tabpn->tabs.size||_tabpn->valid)return;
+    if (!_tabpn->tabs.size()||_tabpn->valid)return;
     vert=_tabpn->tplc==GLWC_WEST||_tabpn->tplc==GLWC_EAST;
     switch (_tabpn->tplc)
     {
@@ -135,8 +122,8 @@ static void glwTabbedPaneLayout(GLWLayoutManager *_this,
     }
     }
     daSetSize(&_tabpn->runs,0);
-    tabs=_DAGetAt(&_tabpn->tabs,0,GLWTabPage);
-    for (i=0; (size_t)i<_tabpn->tabs.size; i++)
+    tabs = &_tabpn->tabs[0];
+    for (i=0; (size_t)i<_tabpn->tabs.size(); i++)
     {
         tabr=&tabs[i].bounds;
         if (vert)
@@ -162,8 +149,8 @@ static void glwTabbedPaneLayout(GLWLayoutManager *_this,
         else
         {
             tabr->w=glwFontGetStringWidth(_tabpn->super.font,
-                                          _DAGetAt(&tabs[i].title,0,char))+
-                    (GLW_TABBED_PANE_INSET<<1);
+                                          tabs[i].title.c_str())
+                    + (GLW_TABBED_PANE_INSET<<1);
             tabr->h=_tabpn->max_tab_h;
             if (i>0)
             {
@@ -191,7 +178,7 @@ static void glwTabbedPaneLayout(GLWLayoutManager *_this,
         {
             int last;
             last=((size_t)i+1<_tabpn->runs.size?*_DAGetAt(&_tabpn->runs,i+1,int):
-                  (int)_tabpn->tabs.size)-1;
+                  (int)_tabpn->tabs.size())-1;
             if (vert)
             {
                 if (tabs[last].bounds.y-r>_tabpn->max_tab_h*weight*2)
@@ -250,7 +237,7 @@ static void glwTabbedPaneLayout(GLWLayoutManager *_this,
         int end;
         start=*_DAGetAt(&_tabpn->runs,i,int);
         end=*_DAGetAt(&_tabpn->runs,(size_t)i+1<_tabpn->runs.size?i+1:0,int);
-        if (!end)end=_tabpn->tabs.size;
+        if (!end)end=_tabpn->tabs.size();
         if (vert)
         {
             int j;
@@ -435,8 +422,8 @@ static void glwTabbedPaneLayoutSize(GLWLayoutManager *_this,
     int         w;
     int         h;
     w=h=0;
-    tabs=_DAGetAt(&_tabpn->tabs,0,GLWTabPage);
-    for (i=_tabpn->tabs.size; i-->0;)
+    tabs = &_tabpn->tabs[0];
+    for (i=_tabpn->tabs.size(); i-->0;)
     {
         int tw;
         int th;
@@ -462,7 +449,7 @@ static void glwTabbedPaneLayoutSize(GLWLayoutManager *_this,
     {
     case GLWC_WEST:
     case GLWC_EAST:
-        if (_tabpn->tabs.size>0)
+	if (_tabpn->tabs.size() > 0)
         {
             if (!_tabpn->max_tab_h)
             {
@@ -474,7 +461,7 @@ static void glwTabbedPaneLayoutSize(GLWLayoutManager *_this,
                 int y;
                 int cols;
                 y=h/_tabpn->max_tab_h;
-                cols=((int)_tabpn->tabs.size+y-1)/y;
+                cols = ((int)_tabpn->tabs.size() + y - 1) / y;
                 if (!_tabpn->max_tab_w)
                 {
                     _tabpn->max_tab_w=glwTabbedPaneCalcMaxTabWidth(_tabpn);
@@ -486,17 +473,17 @@ static void glwTabbedPaneLayoutSize(GLWLayoutManager *_this,
         /*case GLWC_SOUTH:*/
         /*case GLWC_NORTH:*/
     default       :
-        if (_tabpn->tabs.size>0)
+	if (_tabpn->tabs.size() > 0)
         {
             int rows;
             int x;
             x=0;
             rows=1;
-            for (i=0; i<_tabpn->tabs.size; i++)
+            for (i=0; i < _tabpn->tabs.size(); i++)
             {
                 int tw;
                 tw=glwFontGetStringWidth(_tabpn->super.font,
-                                         _DAGetAt(&tabs[i].title,0,char))+
+                                         tabs[i].title.c_str()) +
                    (GLW_TABBED_PANE_INSET<<1);
                 if (tw>w)w=tw;
                 if (x+tw>w)
@@ -545,8 +532,8 @@ static int glwTabbedPaneGetTabAt(GLWTabbedPane *_this,int _x,int _y)
 {
     GLWTabPage *tabs;
     size_t      i;
-    tabs=_DAGetAt(&_this->tabs,0,GLWTabPage);
-    for (i=0; i<_this->tabs.size; i++)
+    tabs = &_this->tabs[0];
+    for (i=0; i<_this->tabs.size(); i++)
     {
         if (tabs[i].bounds.x<=_x&&_x<tabs[i].bounds.x+tabs[i].bounds.w&&
                 tabs[i].bounds.y<=_y&&_y<tabs[i].bounds.y+tabs[i].bounds.h)
@@ -562,13 +549,13 @@ static void glwTabbedPaneSelNext(GLWTabbedPane *_this)
     GLWTabPage *tabs;
     int         i;
     int         j;
-    i=_this->seld<0?(int)_this->tabs.size:_this->seld;
+    i = _this->seld < 0 ? (int)_this->tabs.size() : _this->seld;
     j=i;
-    tabs=_DAGetAt(&_this->tabs,0,GLWTabPage);
+    tabs = &_this->tabs[0];
     for (;;)
     {
         if (++j==i)break;
-        if (j>=(int)_this->tabs.size)j-=(int)_this->tabs.size;
+        if (j >= (int)_this->tabs.size()) j -= (int)_this->tabs.size();
         if (j==i)break;
         if (tabs[j].comp==NULL||glwCompIsEnabled(tabs[j].comp))
         {
@@ -585,12 +572,12 @@ static void glwTabbedPaneSelPrev(GLWTabbedPane *_this)
     int         j;
     i=_this->seld<0?-1:_this->seld;
     j=i;
-    tabs=_DAGetAt(&_this->tabs,0,GLWTabPage);
+    tabs = &_this->tabs[0];
     for (;;)
     {
         j--;
         if (j==i)break;
-        if (j<0)j+=(int)_this->tabs.size;
+        if (j<0)j+=(int)_this->tabs.size();
         if (j==i)break;
         if (tabs[j].comp==NULL||glwCompIsEnabled(tabs[j].comp))
         {
@@ -610,7 +597,7 @@ static void glwTabbedPaneSelAdj(GLWTabbedPane *_this,int _fwd)
     int         y;
     int         i;
     int         j;
-    tabs=_DAGetAt(&_this->tabs,0,GLWTabPage);
+    tabs = &_this->tabs[0];
     if (_this->seld<0)
     {
         run=0;
@@ -689,7 +676,7 @@ static void glwTabbedPaneSelAdj(GLWTabbedPane *_this,int _fwd)
         else dy=_fwd?-_this->max_tab_h:_this->max_tab_h;
     }
     }
-    i=_this->seld<0?(int)_this->tabs.size:_this->seld;
+    i=_this->seld<0?(int)_this->tabs.size():_this->seld;
     j=glwTabbedPaneGetTabAt(_this,x+dx,y+dy);
     if (j>=0)for (;;)
         {
@@ -699,7 +686,7 @@ static void glwTabbedPaneSelAdj(GLWTabbedPane *_this,int _fwd)
                 break;
             }
             if (++j==i)break;
-            if (j>=(int)_this->tabs.size)j-=(int)_this->tabs.size;
+            if (j>=(int)_this->tabs.size())j-=(int)_this->tabs.size();
             if (j==i)break;
         }
 }
@@ -757,7 +744,7 @@ static void glwTabbedPaneDisplayTab(GLWTabbedPane *_this,int _i)
     GLWcolor hc;
     GLWcolor sc;
     GLWTabPage *tab;
-    tab=_DAGetAt(&_this->tabs,_i,GLWTabPage);
+    tab = &_this->tabs[_i];
     if (glwCompIsEnabled(&_this->super)&&
             (tab->comp==NULL||glwCompIsEnabled(tab->comp)))fc=tab->forec;
     else fc=glwColorBlend(tab->forec,tab->backc);
@@ -848,7 +835,7 @@ static void glwTabbedPaneDisplayTab(GLWTabbedPane *_this,int _i)
     }
     break;
     }
-    w=glwFontGetStringWidth(_this->super.font,_DAGetAt(&tab->title,0,char));
+    w=glwFontGetStringWidth(_this->super.font, tab->title.c_str());
     h=glwFontGetHeight(_this->super.font);
     tx=x+0.5*(tab->bounds.w-w);
     ty=y+0.5*(tab->bounds.h-h);
@@ -883,7 +870,7 @@ static void glwTabbedPaneDisplayTab(GLWTabbedPane *_this,int _i)
     }
     glwColor(fc);
     ty+=glwFontGetDescent(_this->super.font);
-    glwFontDrawString(_this->super.font,_DAGetAt(&tab->title,0,char),tx,ty);
+    glwFontDrawString(_this->super.font, tab->title.c_str(), tx, ty);
 }
 
 static void glwTabbedPanePeerDisplay(GLWTabbedPane *_this,GLWCallbacks *_cb)
@@ -909,15 +896,15 @@ static void glwTabbedPanePeerDisplay(GLWTabbedPane *_this,GLWCallbacks *_cb)
         int j;
         start=*_DAGetAt(&_this->runs,i,int);
         end=*_DAGetAt(&_this->runs,(size_t)i+1<_this->runs.size?i+1:0,int);
-        if (!end)end=_this->tabs.size;
+        if (!end)end=_this->tabs.size();
         for (j=start; j<end; j++)glwTabbedPaneDisplayTab(_this,j);
     }
-    if (_this->seld>=0&&_DAGetAt(&_this->tabs,_this->seld,GLWTabPage)->run==0)
+    if (_this->seld>=0 && _this->tabs[_this->seld].run == 0)
     {
         glwTabbedPaneDisplayTab(_this,_this->seld);
     }
     if (_this->seld<0)selr=NULL;
-    else selr=&_DAGetAt(&_this->tabs,_this->seld,GLWTabPage)->bounds;
+    else selr = &_this->tabs[_this->seld].bounds;
     x=_this->area.x;
     y=_this->area.y;
     w=_this->area.w;
@@ -1042,8 +1029,8 @@ static int glwTabbedPanePeerSpecial(GLWTabbedPane *_this,GLWCallbacks *_cb,
             break;
         case GLUT_KEY_END  :
         {
-            glwTabbedPaneSetSelectedIdx(_this,(int)_this->tabs.size-1);
-            break;
+		glwTabbedPaneSetSelectedIdx(_this,(int)_this->tabs.size()-1);
+		break;
         }
         default            :
             ret=0;
@@ -1071,7 +1058,6 @@ static void glwTabbedPanePeerDispose(GLWTabbedPane *_this,GLWCallbacks *_cb)
 {
     glwTabbedPaneDelAll(_this);
     glwCompSuperDispose(&_this->super,_cb);
-    daDstr(&_this->tabs);
     daDstr(&_this->runs);
 }
 
@@ -1099,7 +1085,6 @@ GLWTabbedPane::GLWTabbedPane()
     this->super.callbacks=&GLW_TABBED_PANE_CALLBACKS;
     glwCompSetFocusable(&this->super,1);
     glwCompSetLayout(&this->super,&glw_tabbed_pane_layout);
-    _DAInit(&this->tabs,0,GLWTabPage);
     _DAInit(&this->runs,0,int);
     this->tplc=GLWC_NORTH;
     this->seld=-1;
@@ -1131,27 +1116,27 @@ int glwTabbedPaneGetSelectedIdx(GLWTabbedPane *_this)
 
 void glwTabbedPaneSetSelectedIdx(GLWTabbedPane *_this,int _idx)
 {
-    if (_idx>=0&&_idx<(int)_this->tabs.size&&_idx!=_this->seld)
-    {
-        _this->seld=_idx;
-        glwCompRevalidate(&_this->super);
-    }
+	if (_idx >= 0 && _idx < (int)_this->tabs.size() && _idx != _this->seld)
+	{
+		_this->seld=_idx;
+		glwCompRevalidate(&_this->super);
+	}
 }
 
 GLWComponent *glwTabbedPaneGetSelectedComp(GLWTabbedPane *_this)
 {
     if (_this->seld<0)return NULL;
-    return _DAGetAt(&_this->tabs,_this->seld,GLWTabPage)->comp;
+    return _this->tabs[_this->seld].comp;
 }
 
 void glwTabbedPaneSetSelectedComp(GLWTabbedPane *_this,GLWComponent *_comp)
 {
     if (_comp!=NULL)
     {
-        GLWTabPage *tabs;
+        GLWTabPage* tabs;
         size_t      i;
-        tabs=_DAGetAt(&_this->tabs,0,GLWTabPage);
-        for (i=_this->tabs.size; i-->0;)if (tabs[i].comp==_comp)
+        tabs = &_this->tabs[0];
+        for (i=_this->tabs.size(); i-->0;)if (tabs[i].comp==_comp)
             {
                 glwTabbedPaneSetSelectedIdx(_this,(int)i);
                 break;
@@ -1163,74 +1148,61 @@ int glwTabbedPaneAdd(GLWTabbedPane *_this,GLWComponent *_comp,
                      const char *_title,int _idx)
 {
     GLWTabPage tab;
-    if (_idx<0||(size_t)_idx>_this->tabs.size)_idx=_this->tabs.size;
-    _DAInit(&tab.title,0,char);
+    if (_idx<0||(size_t)_idx>_this->tabs.size()) _idx = _this->tabs.size();
     if (_title!=NULL)
-    {
-        size_t len;
-        len=strlen(_title)+1;
-        if (!daInsArrayTail(&tab.title,_title,len))return 0;
-    }
-    else
-    {
-        char c='\0';
-        if (!daInsTail(&tab.title,&c))return 0;
-    }
+	    tab.title = _title;
     glwRectInit(&tab.bounds,0,0,0,0);
     tab.backc=_this->super.backc;
     tab.forec=_this->super.forec;
     tab.run=0;
     tab.comp=_comp;
-    if (daInsBefore(&_this->tabs,_idx,&tab))
+    auto ind = _this->tabs.begin() + _idx;
+    _this->tabs.insert(ind, tab);
+    if (_comp==NULL||glwCompAdd(&_this->super,_comp,-1))
     {
-        if (_comp==NULL||glwCompAdd(&_this->super,_comp,-1))
-        {
             if (_comp!=NULL)glwCompVisibility(_comp,0);
             else glwCompRevalidate(&_this->super);
             if (_this->seld<0)glwTabbedPaneSetSelectedIdx(_this,0);
             else if (_this->seld>=_idx)_this->seld++;
             return 1;
-        }
-        daDelAt(&_this->tabs,_idx);
     }
-    daDstr(&tab.title);
+    _this->tabs.erase(ind);
     return 0;
 }
 
 int glwTabbedPaneDel(GLWTabbedPane *_this,GLWComponent *_comp)
 {
-    GLWTabPage *tabs;
-    size_t      i;
-    tabs=_DAGetAt(&_this->tabs,0,GLWTabPage);
-    for (i=_this->tabs.size; i-->0;)if (tabs[i].comp==_comp)
-        {
-            glwTabbedPaneDelAt(_this,(int)i);
-            return 1;
+	for (size_t i = 0; i < _this->tabs.size(); ++i)
+	{
+		if (_this->tabs[i].comp == _comp)
+		{
+			glwTabbedPaneDelAt(_this,(int)i);
+			return 1;
+		}
         }
-    return 0;
+	return 0;
 }
 
 void glwTabbedPaneDelAt(GLWTabbedPane *_this,int _idx)
 {
-    GLWTabPage *tab;
-    tab=_DAGetAt(&_this->tabs,_idx,GLWTabPage);
-    if (tab->comp==NULL||!glwCompDel(&_this->super,tab->comp))
+    GLWTabPage& tab = _this->tabs[_idx];
+    if (tab.comp==NULL||!glwCompDel(&_this->super,tab.comp))
     {
         glwCompRevalidate(&_this->super);
     }
-    daDstr(&tab->title);
-    daDelAt(&_this->tabs,_idx);
-    if (_this->seld>=(int)_this->tabs.size)_this->seld--;
+    _this->tabs.erase(_this->tabs.begin() + _idx);
+    if (_this->seld >= (int)_this->tabs.size()) _this->seld--;
 }
 
 void glwTabbedPaneDelAll(GLWTabbedPane *_this)
 {
-    while (_this->tabs.size>0)glwTabbedPaneDelAt(_this,(int)_this->tabs.size-1);
+	while (_this->tabs.size() > 0)
+		glwTabbedPaneDelAt(_this, (int)_this->tabs.size() - 1);
 }
 
 int glwTabbedPaneGetTabCount(GLWTabbedPane *_this)
 {
-    return (int)_this->tabs.size;
+	return (int)_this->tabs.size();
 }
 
 int glwTabbedPaneGetRunCount(GLWTabbedPane *_this)
@@ -1241,83 +1213,60 @@ int glwTabbedPaneGetRunCount(GLWTabbedPane *_this)
 
 GLWcolor glwTabbedPaneGetBackColorAt(GLWTabbedPane *_this,int _idx)
 {
-    return _DAGetAt(&_this->tabs,_idx,GLWTabPage)->backc;
+    return _this->tabs[_idx].backc;
 }
 
 void glwTabbedPaneSetBackColorAt(GLWTabbedPane *_this,int _idx,GLWcolor _c)
 {
-    GLWTabPage *tab;
-    tab=_DAGetAt(&_this->tabs,_idx,GLWTabPage);
-    if (tab->backc!=_c)
+    GLWTabPage& tab = _this->tabs[_idx];
+    if (tab.backc != _c)
     {
-        tab->backc=_c;
+        tab.backc = _c;
         glwCompRepaint(&_this->super,0);
     }
 }
 
 GLWcolor glwTabbedPaneGetForeColorAt(GLWTabbedPane *_this,int _idx)
 {
-    return _DAGetAt(&_this->tabs,_idx,GLWTabPage)->forec;
+    return _this->tabs[_idx].forec;
 }
 
 void glwTabbedPaneSetForeColorAt(GLWTabbedPane *_this,int _idx,GLWcolor _c)
 {
-    GLWTabPage *tab;
-    tab=_DAGetAt(&_this->tabs,_idx,GLWTabPage);
-    if (tab->forec!=_c)
+    GLWTabPage& tab = _this->tabs[_idx];
+    if (tab.forec != _c)
     {
-        tab->forec=_c;
+        tab.forec = _c;
         glwCompRepaint(&_this->super,0);
     }
 }
 
 const char *glwTabbedPaneGetTitleAt(GLWTabbedPane *_this,int _idx)
 {
-    return _DAGetAt(&_DAGetAt(&_this->tabs,_idx,GLWTabPage)->title,0,char);
+	return _this->tabs[_idx].title.c_str();
 }
 
 int glwTabbedPaneSetTitleAt(GLWTabbedPane *_this,int _idx,const char *_s)
 {
-    GLWTabPage *tab;
-    tab=_DAGetAt(&_this->tabs,_idx,GLWTabPage);
-    if (_s==NULL)
-    {
-        if (daSetSize(&tab->title,1))
-        {
-            *_DAGetAt(&tab->title,0,char)='\0';
-            glwCompRevalidate(&_this->super);
-            return 1;
-        }
-    }
+    GLWTabPage& tab = _this->tabs[_idx];
+    if (_s == NULL)
+	    tab.title.clear();
     else
-    {
-        size_t len;
-        len=strlen(_s)+1;
-        if (daSetSize(&tab->title,len))
-        {
-            memcpy(_DAGetAt(&tab->title,0,char),_s,len);
-            glwCompRevalidate(&_this->super);
-            return 1;
-        }
-    }
-    return 0;
+	    tab.title = _s;
+    glwCompRevalidate(&_this->super);
+    return 1;
 }
 
 int glwTabbedPaneAddTitleAt(GLWTabbedPane *_this,int _idx,const char *_s)
 {
-    GLWTabPage *tab;
-    tab=_DAGetAt(&_this->tabs,_idx,GLWTabPage);
-    if (tab->title.size<=1)return glwTabbedPaneSetTitleAt(_this,_idx,_s);
+    GLWTabPage& tab = _this->tabs[_idx];
+    if (tab.title.size() <= 1)
+	    return glwTabbedPaneSetTitleAt(_this,_idx,_s);
     else if (_s!=NULL)
     {
-        size_t len;
-        len=strlen(_s);
-        if (daInsArrayBefore(&tab->title,tab->title.size-1,_s,len))
-        {
+	    tab.title.append(_s);
             glwCompRevalidate(&_this->super);
             return 1;
-        }
     }
     else return 1;
-    return 0;
 }

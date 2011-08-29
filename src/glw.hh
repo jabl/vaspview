@@ -629,13 +629,22 @@ void          *glwSliderGetChangedCtx(GLWSlider *_this);
 void           glwSliderSetChangedCtx(GLWSlider *_this,void *_ctx);
 
 
+struct GLWTabPage
+{
+	std::string     title;
+    GLWRect       bounds;
+    GLWcolor      backc;
+    GLWcolor      forec;
+    int           run;
+    GLWComponent *comp;
+};
 
 class GLWTabbedPane
 {
 public:
 	GLWTabbedPane();
     GLWComponent super;
-    CDynArray    tabs;
+	std::vector<GLWTabPage>    tabs;
     CDynArray    runs;
     GLWRect      area;
     int          tplc;
