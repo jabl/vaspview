@@ -378,15 +378,13 @@ struct GLWFrame
 {
 	GLWFrame() = delete;
 	GLWFrame(const char*);
-    GLWComponent  super;
-    CDynArray     title;
+	GLWComponent  super;
+	std::string     title;
 };
 
 
 extern const GLWCallbacks GLW_FRAME_CALLBACKS;
 
-int       glwFrameSetTitle(GLWFrame *_this,const char *_title);
-const char     *glwFrameGetTitle(GLWFrame *_this);
 void      glwFrameShow(GLWFrame *_this);
 void      glwFrameHide(GLWFrame *_this);
 void      glwFramePack(GLWFrame *_this);

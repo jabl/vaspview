@@ -30,7 +30,6 @@ std::unordered_map<int, GLWFrame*> glw_frame_table;
 static void glwFramePeerDispose(GLWFrame *_this,const GLWCallbacks *_cb)
 {
     glwCompSuperDispose(&_this->super,_cb);
-    daDstr(&_this->title);
     glw_frame_table.erase(_this->super.wid);
     glutDestroyWindow(_this->super.wid);
 }
@@ -245,57 +244,30 @@ const GLWCallbacks GLW_FRAME_CALLBACKS=
 };
 
 
-GLWFrame::GLWFrame(const char* _title)
+GLWFrame::GLWFrame(const char* title)
 {
-    int wid;
-    wid=glutCreateWindow(_title);
-    if (wid!=0)
-    {
-	glw_frame_table.insert(std::pair<int, GLWFrame*>(wid, this));
-	_DAInit(&this->title,0,char);
-	if (daInsArrayHead(&this->title,_title,strlen(_title)+1))
+	int wid;
+	wid=glutCreateWindow(title);
+	if (wid!=0)
 	{
-                this->super.wid=wid;
-                this->super.callbacks=&GLW_FRAME_CALLBACKS;
-                glwCompSetCursor(&this->super,GLUT_CURSOR_RIGHT_ARROW);
-                glutDisplayFunc(glwFrameGlutDisplay);
-                glutReshapeFunc(glwFrameGlutReshape);
-                glutVisibilityFunc(glwFrameGlutVisibility);
-                glutEntryFunc(glwFrameGlutEntry);
-                glutKeyboardFunc(glwFrameGlutKeyboard);
-                glutSpecialFunc(glwFrameGlutSpecial);
-                glutMouseFunc(glwFrameGlutMouse);
-                glutMotionFunc(glwFrameGlutMotion);
-                glutPassiveMotionFunc(glwFrameGlutPassiveMotion);
-                return;
+		glw_frame_table.insert(std::pair<int, GLWFrame*>(wid, this));
+		this->title = title;
+		this->super.wid=wid;
+		this->super.callbacks=&GLW_FRAME_CALLBACKS;
+		glwCompSetCursor(&this->super,GLUT_CURSOR_RIGHT_ARROW);
+		glutDisplayFunc(glwFrameGlutDisplay);
+		glutReshapeFunc(glwFrameGlutReshape);
+		glutVisibilityFunc(glwFrameGlutVisibility);
+		glutEntryFunc(glwFrameGlutEntry);
+		glutKeyboardFunc(glwFrameGlutKeyboard);
+		glutSpecialFunc(glwFrameGlutSpecial);
+		glutMouseFunc(glwFrameGlutMouse);
+		glutMotionFunc(glwFrameGlutMotion);
+		glutPassiveMotionFunc(glwFrameGlutPassiveMotion);
+		return;
 	}
-	daDstr(&this->title);
 	glw_frame_table.erase(wid);
-        glutDestroyWindow(wid);
-    }
-}
-
-int glwFrameSetTitle(GLWFrame *_this,const char *_title)
-{
-    size_t len;
-    len=strlen(_title)+1;
-    if (daSetSize(&_this->title,len))
-    {
-        int wid;
-        memcpy(_DAGetAt(&_this->title,0,char),_title,len);
-        wid=glutGetWindow();
-        if (wid!=_this->super.wid)glutSetWindow(_this->super.wid);
-        glutSetWindowTitle(_title);
-        glutSetIconTitle(_title);
-        if (wid!=_this->super.wid)glutSetWindow(wid);
-        return 1;
-    }
-    return 0;
-}
-
-const char *glwFrameGetTitle(GLWFrame *_this)
-{
-    return _DAGetAt(&_this->title,0,char);
+	glutDestroyWindow(wid);
 }
 
 void glwFrameShow(GLWFrame *_this)
