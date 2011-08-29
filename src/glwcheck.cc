@@ -31,7 +31,6 @@
 
 GLWCheckBoxGroup::GLWCheckBoxGroup(void)
 {
-    _DAInit(&this->cbs,0,GLWCheckBox *);
     this->seld=-1;
     this->changed=NULL;
     this->changed_ctx=NULL;
@@ -39,36 +38,38 @@ GLWCheckBoxGroup::GLWCheckBoxGroup(void)
 
 GLWCheckBoxGroup::~GLWCheckBoxGroup()
 {
-    size_t        i;
-    GLWCheckBox **cbs;
     this->changed = NULL;
-    cbs = _DAGetAt(&this->cbs, 0, GLWCheckBox *);
-    for (i = this->cbs.size; i-- > 0;) glwCheckBoxSetGroup(cbs[i],NULL);
-    daDstr(&this->cbs);
+    for (auto it = cbs.begin(); it != cbs.end(); ++it)
+	    glwCheckBoxSetGroup(*it, NULL);
 }
 
-static int glwCheckBoxGroupAdd(GLWCheckBoxGroup *_this,GLWCheckBox *_cb)
+static int glwCheckBoxGroupAdd(GLWCheckBoxGroup* _this, GLWCheckBox* cb)
 {
-    return daInsTail(&_this->cbs,&_cb);
+	_this->cbs.push_back(cb);
+	return 1;
 }
 
-static int glwCheckBoxGroupDel(GLWCheckBoxGroup *_this,GLWCheckBox *_cb)
+static int glwCheckBoxGroupDel(GLWCheckBoxGroup* _this, GLWCheckBox* cb)
 {
-    size_t        i;
-    GLWCheckBox **cbs;
-    cbs=_DAGetAt(&_this->cbs,0,GLWCheckBox *);
-    for (i=_this->cbs.size; i-->0;)if (cbs[i]==_cb)
-        {
-            daDelAt(&_this->cbs,i);
-            if ((int)i==_this->seld)
-            {
-                _this->seld=-1;
-                if (_this->changed!=NULL)_this->changed(_this->changed_ctx,NULL);
-            }
-            else if ((int)i<_this->seld)_this->seld--;
-            return 1;
-        }
-    return 0;
+	int i = 0;
+	for (auto it = _this->cbs.begin(); it != _this->cbs.end(); ++it)
+	{
+		if (*it == cb)
+		{
+			_this->cbs.erase(it);
+			if (i == _this->seld)
+			{
+				_this->seld=-1;
+				if (_this->changed != NULL)
+					_this->changed(_this->changed_ctx, 
+						       NULL);
+			}
+			else if ((int)i<_this->seld)_this->seld--;
+			return 1;
+		}
+		++i;
+	}
+	return 0;
 }
 
 int glwCheckBoxGroupGetSelectedIdx(GLWCheckBoxGroup *_this)
@@ -76,24 +77,28 @@ int glwCheckBoxGroupGetSelectedIdx(GLWCheckBoxGroup *_this)
     return _this->seld;
 }
 
-void glwCheckBoxGroupSetSelectedIdx(GLWCheckBoxGroup *_this,int _i)
+void glwCheckBoxGroupSetSelectedIdx(GLWCheckBoxGroup* _this, int ii)
 {
-    if (_i>=0&&(size_t)_i<_this->cbs.size)
-    {
-        glwCheckBoxSetState(*_DAGetAt(&_this->cbs,_i,GLWCheckBox *),1);
-    }
+	if (ii >= 0 && (size_t)ii < _this->cbs.size())
+	{
+		glwCheckBoxSetState(_this->cbs[ii], 1);
+	}
 }
 
 void glwCheckBoxGroupSelectNext(GLWCheckBoxGroup *_this)
 {
-    if ((size_t)_this->seld+1>=_this->cbs.size)glwCheckBoxGroupSetSelectedIdx(_this,0);
-    else glwCheckBoxGroupSetSelectedIdx(_this,_this->seld+1);
+	if ((size_t)_this->seld + 1 >= _this->cbs.size())
+		glwCheckBoxGroupSetSelectedIdx(_this, 0);
+	else 
+		glwCheckBoxGroupSetSelectedIdx(_this, _this->seld + 1);
 }
 
 void glwCheckBoxGroupSelectPrev(GLWCheckBoxGroup *_this)
 {
-    if (_this->seld-1<0)glwCheckBoxGroupSetSelectedIdx(_this,(int)_this->cbs.size-1);
-    else glwCheckBoxGroupSetSelectedIdx(_this,_this->seld-1);
+    if (_this->seld - 1 < 0)
+	    glwCheckBoxGroupSetSelectedIdx(_this, (int)_this->cbs.size() - 1);
+    else 
+	    glwCheckBoxGroupSetSelectedIdx(_this, _this->seld - 1);
 }
 
 GLWActionFunc glwCheckBoxGroupGetChangedFunc(GLWCheckBoxGroup *_this)
@@ -299,35 +304,38 @@ static int glwCheckBoxPeerSpecial(GLWCheckBox *_this,const GLWCallbacks *_cb,
     {
         if (_this->group!=NULL)
         {
-            GLWCheckBox **cbs;
             int           i;
-            cbs=_DAGetAt(&_this->group->cbs,0,GLWCheckBox *);
-            for (i=(int)_this->group->cbs.size; i-->0;)if (cbs[i]==_this)break;
+	    for (auto it = _this->group->cbs.begin(), i = 0; 
+		 it != _this->group->cbs.end(); ++it, ++i)
+		    if (*it == _this) break;
             switch (_k)
             {
             case GLUT_KEY_UP   :
             case GLUT_KEY_LEFT :
             {
                 if (i>0)i--;
-                else i=(int)_this->group->cbs.size-1;
+                else i = (int)_this->group->cbs.size() - 1;
                 if (i>=0)
                 {
-                    if (_this->state)glwCheckBoxSetState(cbs[i],1);
-                    glwCompRequestFocus(&cbs[i]->super);
+                    if (_this->state)
+			    glwCheckBoxSetState(_this->group->cbs[i], 1);
+                    glwCompRequestFocus(&_this->group->cbs[i]->super);
                 }
                 return -1;
             }
             case GLUT_KEY_DOWN :
             case GLUT_KEY_RIGHT:
             {
-                if ((size_t)i+1<_this->group->cbs.size)i++;
-                else i=0;
-                if ((size_t)i<_this->group->cbs.size)
-                {
-                    if (_this->state)glwCheckBoxSetState(cbs[i],1);
-                    glwCompRequestFocus(&cbs[i]->super);
-                }
-                return -1;
+		    if ((size_t)i + 1 < _this->group->cbs.size()) i++;
+		    else i = 0;
+		    if ((size_t)i < _this->group->cbs.size())
+		    {
+			    if (_this->state)
+				    glwCheckBoxSetState(_this->group->cbs[i],
+							1);
+			    glwCompRequestFocus(&_this->group->cbs[i]->super);
+		    }
+		    return -1;
             }
             }
         }
@@ -486,21 +494,21 @@ void glwCheckBoxSetState(GLWCheckBox *_this,int _state)
             if (_state&&_this->group->seld>=0)     /*Unselect a previously selected box*/
             {
                 _this->group->seld=-1;
-                glwCheckBoxSetState(*_DAGetAt(&_this->group->cbs,idx,GLWCheckBox *),0);
+                glwCheckBoxSetState(_this->group->cbs[idx], 0);
             }
             if (_state)
             {
                 if (_this->group->seld<0)              /*If nothing is selected, select us*/
                 {
-                    GLWCheckBox **cbs;
-                    size_t        i;
-                    cbs=_DAGetAt(&_this->group->cbs,0,GLWCheckBox *);
-                    for (i=_this->group->cbs.size; i-->0;)if (cbs[i]==_this)
-                        {
-                            _this->group->seld=(int)i;
-                            break;
-                        }
-                    if (_this->group->seld<0)_state=0;
+			int ii;
+			for (auto it = _this->group->cbs.begin(), ii = 0;
+			     it != _this->group->cbs.end(); ++it, ++ii)
+				if (*it == _this)
+				{
+					_this->group->seld = (int)ii;
+					break;
+				}
+			if (_this->group->seld<0) _state=0;
                 }        /*We're not in the group! (BAD)*/
                 /*If we tried to unselect a previously selected checkbox, and something
                   has remained selected, allow it to override the request to select this

@@ -494,13 +494,13 @@ void          *glwTextFieldGetChangedCtx(GLWTextField *_this);
 void           glwTextFieldSetChangedCtx(GLWTextField *_this,
         void *_ctx);
 
-
+struct GLWCheckBox;
 
 struct GLWCheckBoxGroup
 {
 	GLWCheckBoxGroup();
 	~GLWCheckBoxGroup();
-    CDynArray      cbs;
+	std::vector<GLWCheckBox*>      cbs;
     int            seld;
     GLWActionFunc  changed;
     void          *changed_ctx;
