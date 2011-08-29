@@ -413,8 +413,8 @@ class GLWButton
 public:
 	GLWButton() = delete;
 	GLWButton(const char*);
-    GLWComponent   super;
-    CDynArray      label;
+	GLWComponent   super;
+	std::string      label;
     GLWActionFunc  pressed;
     void          *pressed_ctx;
     unsigned       down:1;
