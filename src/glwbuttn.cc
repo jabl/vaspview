@@ -40,7 +40,6 @@ static GLWLayoutManager glw_button_layout=
     NULL,
     (GLWLayoutSizeFunc)glwButtonLayoutMinSize,
     NULL,
-    NULL,
     NULL
 };
 

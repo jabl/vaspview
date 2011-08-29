@@ -1582,7 +1582,7 @@ DS3Viewer::DS3Viewer() :
         glwSliderSetMajorTickSpacing(_this->sl_cntr_z,100);
         glwSliderSetMinorTickSpacing(_this->sl_cntr_z,25);
         glwSliderSetSnap(_this->sl_cntr_z,1);
-        glwCompSetLayout(&_this->frame->super,&glwGridBagLayoutAlloc()->super);
+        glwCompSetLayout(&_this->frame->super, &(new GLWGridBagLayout())->super);
         glwCompSetMinWidth(&_this->ds3view->super,360);
         glwCompSetMinHeight(&_this->ds3view->super,360);
         glwCompSetInsets(&_this->ds3view->super,2,2,2,2);
@@ -1623,7 +1623,7 @@ DS3Viewer::DS3Viewer() :
         glwCompAdd(&_this->frame->super,&_this->legend->super,-1);
         glwCompAdd(&_this->frame->super,cm_vals,-1);
         glwCompAdd(&_this->frame->super,&_this->lb_status->super,-1);
-        glwCompSetLayout(cm_vals,&glwGridBagLayoutAlloc()->super);
+        glwCompSetLayout(cm_vals,&(new GLWGridBagLayout())->super);
         glwCompSetInsets(&_this->lb_datax->super,2,2,2,2);
         glwCompSetPreWidth(&_this->lb_datax->super,80);
         glwCompSetInsets(&_this->lb_datay->super,2,2,2,2);
@@ -1651,7 +1651,7 @@ DS3Viewer::DS3Viewer() :
         glwTabbedPaneAdd(_this->tp_ctrl,cm_bnds,"Bounds",-1);
         glwTabbedPaneAdd(_this->tp_ctrl,cm_view,"View",-1);
         glwTabbedPaneAdd(_this->tp_ctrl,cm_opts,"Options",-1);
-        glwCompSetLayout(cm_data,&glwGridBagLayoutAlloc()->super);
+        glwCompSetLayout(cm_data,&(new GLWGridBagLayout())->super);
         glwCompSetInsets(&_this->cb_draw_slice->super,0,0,2,2);
         glwCompSetGridWidth(&_this->cb_draw_slice->super,GLWC_REMAINDER);
         glwCompSetInsets(&lb_slice_t->super,0,0,10,2);
@@ -1713,7 +1713,7 @@ DS3Viewer::DS3Viewer() :
         glwCompAdd(cm_data,&lb_iso_d->super,-1);
         /*glwCompAdd(cm_data,&_this->tf_iso_d->super,-1);*/
         glwCompAdd(cm_data,&_this->sl_iso_d->super,-1);
-        glwCompSetLayout(cm_strc,&glwGridBagLayoutAlloc()->super);
+        glwCompSetLayout(cm_strc,&(new GLWGridBagLayout())->super);
         glwCompSetInsets(&_this->cb_draw_points->super,0,0,2,2);
         glwCompSetGridWidth(&_this->cb_draw_points->super,GLWC_REMAINDER);
         glwCompSetInsets(&lb_point_r->super,0,0,10,2);
@@ -1784,7 +1784,7 @@ DS3Viewer::DS3Viewer() :
         glwCompSetInsets(&_this->bn_point_sa->super,0,0,2,2);
         glwCompSetAlignX(&_this->bn_point_sa->super,0);
         glwCompSetGridWidth(&_this->bn_point_sa->super,GLWC_REMAINDER);
-        glwCompSetLayout(cm_point_btns,&glwGridBagLayoutAlloc()->super);
+        glwCompSetLayout(cm_point_btns,&(new GLWGridBagLayout())->super);
         glwCompAdd(cm_point_btns,&_this->bn_point_c->super,-1);
         glwCompAdd(cm_point_btns,&_this->bn_point_v->super,-1);
         glwCompAdd(cm_point_btns,&_this->bn_point_sa->super,-1);
@@ -1794,11 +1794,11 @@ DS3Viewer::DS3Viewer() :
         glwCompSetInsets(&_this->bn_bond_d->super,0,0,2,2);
         glwCompSetAlignX(&_this->bn_bond_d->super,0);
         glwCompSetGridWidth(&_this->bn_bond_d->super,GLWC_REMAINDER);
-        glwCompSetLayout(cm_bond_btns,&glwGridBagLayoutAlloc()->super);
+        glwCompSetLayout(cm_bond_btns,&(new GLWGridBagLayout())->super);
         glwCompAdd(cm_bond_btns,&_this->bn_bond_a->super,-1);
         glwCompAdd(cm_bond_btns,&_this->bn_bond_d->super,-1);
 # endif
-        glwCompSetLayout(cm_bnds,&glwGridBagLayoutAlloc()->super);
+        glwCompSetLayout(cm_bnds,&(new GLWGridBagLayout())->super);
         glwCompSetInsets(&lb_minx->super,0,0,2,2);
         glwCompSetWeightX(&lb_minx->super,1);
         glwCompSetInsets(&_this->tf_minx->super,0,0,2,2);
@@ -1865,7 +1865,7 @@ DS3Viewer::DS3Viewer() :
         glwCompAdd(cm_bnds,&lb_maxz->super,-1);
         glwCompAdd(cm_bnds,&_this->tf_maxz->super,-1);
         glwCompAdd(cm_bnds,&_this->sl_maxz->super,-1);
-        glwCompSetLayout(cm_view,&glwGridBagLayoutAlloc()->super);
+        glwCompSetLayout(cm_view,&(new GLWGridBagLayout())->super);
         glwCompSetInsets(&_this->cb_draw_coords->super,0,0,2,2);
         glwCompSetGridWidth(&_this->cb_draw_coords->super,GLWC_REMAINDER);
         glwCompSetInsets(&lb_zoom->super,2,2,2,2);
@@ -1962,11 +1962,11 @@ DS3Viewer::DS3Viewer() :
         glwCompSetGridWidth(&bn_cntr->super,GLWC_REMAINDER);
         glwCompSetInsets(&bn_align->super,2,2,2,2);
         glwCompSetGridWidth(&bn_align->super,GLWC_REMAINDER);
-        glwCompSetLayout(cm_view_btns,&glwGridBagLayoutAlloc()->super);
+        glwCompSetLayout(cm_view_btns,&(new GLWGridBagLayout())->super);
         glwCompAdd(cm_view_btns,&bn_ornt->super,-1);
         glwCompAdd(cm_view_btns,&bn_cntr->super,-1);
         glwCompAdd(cm_view_btns,&bn_align->super,-1);
-        glwCompSetLayout(cm_opts,&glwGridBagLayoutAlloc()->super);
+        glwCompSetLayout(cm_opts,&(new GLWGridBagLayout())->super);
         glwCompSetInsets(&lb_scale->super,0,0,2,2);
         glwCompSetGridWidth(&lb_scale->super,GLWC_REMAINDER);
         glwCompSetInsets(&_this->cb_scale_linear->super,0,0,2,2);

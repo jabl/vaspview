@@ -758,9 +758,9 @@ void glwCompSetLayout(GLWComponent *_this,GLWLayoutManager *_layout)
 {
     if (_this->layout!=_layout)
     {
-        if (_this->layout!=NULL&&_this->layout->dispose!=NULL)
+        if (_this->layout != NULL)
         {
-            _this->layout->dispose(_this->layout,_this);
+            delete _this->layout;
         }
         _this->layout=_layout;
     }

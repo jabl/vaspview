@@ -53,32 +53,26 @@ static const GLWCallbacks DS_COLOR_LEGEND_SCALE_CALLBACKS=
 
 DSColorLegend::DSColorLegend() : lb_min("0"), lb_max("1"), lb_label(NULL)
 {
-    GLWGridBagLayout *layout;
-    layout=glwGridBagLayoutAlloc();
-    if (layout != NULL)
-    {
-        this->cm_scale.callbacks = &DS_COLOR_LEGEND_SCALE_CALLBACKS;
+	GLWGridBagLayout *layout = new GLWGridBagLayout();
+	this->cm_scale.callbacks = &DS_COLOR_LEGEND_SCALE_CALLBACKS;
         if (glwCompAdd(&this->super,&this->cm_scale,-1)&&
-                glwCompAdd(&this->super,&this->lb_min.super,-1)&&
-                glwCompAdd(&this->super,&this->lb_label.super,-1)&&
-                glwCompAdd(&this->super,&this->lb_max.super,-1))
+	    glwCompAdd(&this->super,&this->lb_min.super,-1)&&
+	    glwCompAdd(&this->super,&this->lb_label.super,-1)&&
+	    glwCompAdd(&this->super,&this->lb_max.super,-1))
         {
-            glwCompSetMinWidth(&this->cm_scale,64);
-            glwCompSetMinHeight(&this->cm_scale,16);
-            glwCompSetGridWidth(&this->cm_scale,GLWC_REMAINDER);
-            glwCompSetWeightX(&this->cm_scale,1);
-            glwCompSetWeightY(&this->cm_scale,1);
-            glwCompSetFill(&this->cm_scale,GLWC_BOTH);
-            glwCompSetAlignX(&this->lb_label.super,0.5);
-            glwCompSetAlignX(&this->lb_max.super,1);
-            glwCompSetLayout(&this->super,&layout->super);
-            dsColorLegendSetColorScale(this,NULL);
-            return;
+		glwCompSetMinWidth(&this->cm_scale,64);
+		glwCompSetMinHeight(&this->cm_scale,16);
+		glwCompSetGridWidth(&this->cm_scale,GLWC_REMAINDER);
+		glwCompSetWeightX(&this->cm_scale,1);
+		glwCompSetWeightY(&this->cm_scale,1);
+		glwCompSetFill(&this->cm_scale,GLWC_BOTH);
+		glwCompSetAlignX(&this->lb_label.super,0.5);
+		glwCompSetAlignX(&this->lb_max.super,1);
+		glwCompSetLayout(&this->super,&layout->super);
+		dsColorLegendSetColorScale(this,NULL);
+		return;
         }
         glwCompDelAll(&this->super);
-    }
-    glwGridBagLayoutFree(layout);
-    return;
 }
 
 

@@ -182,7 +182,6 @@ struct GLWLayoutManager
     GLWLayoutSizeFunc min_size;
     GLWLayoutSizeFunc pre_size;
     GLWLayoutSizeFunc max_size;
-    GLWLayoutFunc     dispose;
 };
 
 
@@ -203,6 +202,8 @@ typedef struct GLWGBLCInfo
 
 struct GLWGridBagLayout
 {
+	GLWGridBagLayout();
+	~GLWGridBagLayout();
     GLWLayoutManager  super;
     int               w;
     int               h;
@@ -221,13 +222,6 @@ struct GLWGridBagLayout
     unsigned          valid:1;
     unsigned          validating:1;
 };
-
-
-GLWGridBagLayout *glwGridBagLayoutAlloc(void);
-void              glwGridBagLayoutInit(GLWGridBagLayout *_this);
-void              glwGridBagLayoutDstr(GLWGridBagLayout *_this);
-void              glwGridBagLayoutFree(GLWGridBagLayout *_this);
-
 
 
 class GLWComponent
@@ -708,14 +702,6 @@ int     glwFontDrawChar(GLWfont _font,int _c,double _x,double _y);
 void glwRectInit(GLWRect *_this,int _x,int _y,int _w,int _h);
 
 void glwInsetsInit(GLWInsets *_this,int _t,int _b,int _l,int _r);
-
-
-
-GLWGridBagLayout *glwGridBagLayoutAlloc(void);
-void              glwGridBagLayoutInit(GLWGridBagLayout *_this);
-void              glwGridBagLayoutDstr(GLWGridBagLayout *_this);
-void              glwGridBagLayoutFree(GLWGridBagLayout *_this);
-
 
 
 void glwInit(int *_argc,char **_argv);

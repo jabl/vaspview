@@ -55,7 +55,6 @@ static GLWLayoutManager glw_text_field_layout=
     NULL,
     (GLWLayoutSizeFunc)glwTextFieldLayoutMinSize,
     NULL,
-    NULL,
     NULL
 };
 

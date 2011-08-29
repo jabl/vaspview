@@ -138,7 +138,6 @@ static GLWLayoutManager glw_check_box_layout=
     NULL,
     (GLWLayoutSizeFunc)glwCheckBoxLayoutMinSize,
     NULL,
-    NULL,
     NULL
 };
 

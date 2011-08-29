@@ -45,7 +45,6 @@ static GLWLayoutManager glw_label_layout=
     NULL,
     (GLWLayoutSizeFunc)glwLabelLayoutMinSize,
     NULL,
-    NULL,
     NULL
 };
 

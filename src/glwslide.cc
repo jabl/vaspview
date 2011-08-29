@@ -366,7 +366,6 @@ static GLWLayoutManager glw_slider_layout=
     NULL,
     (GLWLayoutSizeFunc)glwSliderLayoutMinSize,
     (GLWLayoutSizeFunc)glwSliderLayoutPreSize,
-    NULL,
     NULL
 };
 

@@ -782,43 +782,29 @@ static void glwGBLLayout(GLWGridBagLayout *_this,GLWComponent *_comp)
 }
 
 
-GLWGridBagLayout *glwGridBagLayoutAlloc(void)
+GLWGridBagLayout::GLWGridBagLayout()
 {
-    GLWGridBagLayout *this_;
-    // TODO: Fix zeroing when swithing to new/delete
-    this_=(GLWGridBagLayout *)calloc(1, sizeof(GLWGridBagLayout));
-    if (this_!=NULL)glwGridBagLayoutInit(this_);
-    return this_;
+    this->super.layout = (GLWLayoutFunc)glwGBLLayout;
+    this->super.invalidate = (GLWLayoutFunc)glwGBLInvalidate;
+    this->super.min_size = (GLWLayoutSizeFunc)glwGBLMinSize;
+    this->super.pre_size = (GLWLayoutSizeFunc)glwGBLPreSize;
+    this->super.max_size = NULL;
+    this->min_w = NULL;
+    this->min_h = NULL;
+    this->pre_w = NULL;
+    this->pre_h = NULL;
+    this->adj_w = NULL;
+    this->adj_h = NULL;
+    this->weight_x = NULL;
+    this->weight_y = NULL;
+    this->cache = NULL;
+    this->comp = NULL;
+    this->valid = 0;
+    this->validating = 0;
 }
 
-void glwGridBagLayoutInit(GLWGridBagLayout *_this)
+GLWGridBagLayout::~GLWGridBagLayout()
 {
-    _this->super.layout=(GLWLayoutFunc)glwGBLLayout;
-    _this->super.invalidate=(GLWLayoutFunc)glwGBLInvalidate;
-    _this->super.min_size=(GLWLayoutSizeFunc)glwGBLMinSize;
-    _this->super.pre_size=(GLWLayoutSizeFunc)glwGBLPreSize;
-    _this->super.max_size=NULL;
-    _this->super.dispose=(GLWLayoutFunc)glwGridBagLayoutFree;
-    _this->min_w=NULL;
-    _this->min_h=NULL;
-    _this->pre_w=NULL;
-    _this->pre_h=NULL;
-    _this->adj_w=NULL;
-    _this->adj_h=NULL;
-    _this->weight_x=NULL;
-    _this->weight_y=NULL;
-    _this->cache=NULL;
-    _this->comp=NULL;
-    _this->valid=0;
+    glwGBLInvalidate(this, NULL);
 }
 
-void glwGridBagLayoutDstr(GLWGridBagLayout *_this)
-{
-    glwGBLInvalidate(_this,NULL);
-}
-
-void glwGridBagLayoutFree(GLWGridBagLayout *_this)
-{
-    glwGridBagLayoutDstr(_this);
-    free(_this);
-}
