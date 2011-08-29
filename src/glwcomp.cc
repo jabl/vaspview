@@ -285,7 +285,6 @@ GLWComponent::GLWComponent()
     this->font=glwFontGet(GLW_FONT_SERIF,0);
     this->cursor=GLUT_CURSOR_INHERIT;
     _DAInit(&this->comps,0,GLWComponent *);
-    _DAInit(&this->timers,0,int);
     _DAInit(&this->idlers,0,int);
     this->layout=NULL;
     this->focus=NULL;
@@ -310,10 +309,6 @@ GLWComponent::~GLWComponent()
     glwCompSetLayout(this,NULL);
     glwCompDispose(this);
     daDstr(&this->comps);
-    for (; this->timers.size>0;)
-    {
-        glwCompDelTimer(this,glwCompGetTimerID(this,this->timers.size-1));
-    }
     for (; this->idlers.size>0;)
     {
         glwCompDelIdler(this,glwCompGetIdlerID(this,this->idlers.size-1));
@@ -1094,27 +1089,21 @@ int glwCompAddTimer(GLWComponent *_this,GLWActionFunc _func,
     timer.ctx=_ctx;
     timer.func=_func;
     glw_timer_table.insert(std::pair<int, GLWTimerEntry>(id, timer));
-    if (daInsTail(&_this->timers,&id))
-    {
-            glutTimerFunc(_millis,glwCompGlutTimer,id);
-            return id;
-    }
-    glw_timer_table.erase(id);
-    return 0;
+    _this->timers.push_back(id);
+    glutTimerFunc(_millis,glwCompGlutTimer,id);
+    return id;
 }
 
-int glwCompDelTimer(GLWComponent *_this,int _id)
+int glwCompDelTimer(GLWComponent *_this, int id)
 {
-    int    *ids;
-    size_t  i;
-    ids=_DAGetAt(&_this->timers,0,int);
-    for (i=_this->timers.size; i-->0;)if (ids[i]==_id)
-        {
-            daDelAt(&_this->timers,i);
-            glw_timer_table.erase(_id);
-            return 1;
-        }
-    return 0;
+	for (auto it = _this->timers.begin(); it != _this->timers.end(); ++it)
+		if (*it == id)
+		{
+			_this->timers.erase(it);
+			glw_timer_table.erase(id);
+			return 1;
+		}
+	return 0;
 }
 
 GLWActionFunc glwCompGetTimerFunc(GLWComponent *_this,int _id)
@@ -1141,12 +1130,12 @@ void *glwCompGetTimerCtx(GLWComponent *_this,int _id)
 
 int glwCompGetTimerCount(GLWComponent *_this)
 {
-    return (int)_this->timers.size;
+	return (int)_this->timers.size();
 }
 
 int glwCompGetTimerID(GLWComponent *_this,int _idx)
 {
-    return *_DAGetAt(&_this->timers,_idx,int);
+	return _this->timers[_idx];
 }
 
 int glwCompAddIdler(GLWComponent *_this,GLWActionFunc _func,void *_ctx)

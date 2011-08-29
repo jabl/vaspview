@@ -29,6 +29,7 @@
 #include <unordered_map>
 #include <string>
 #include "DynArray.hh"
+#include <vector>
 
 /*This is a small, portable component library that is dependent only on OpenGL
   and GLUT. It is not very general purpose, and in order to be made so
@@ -240,7 +241,7 @@ public:
     GLWfont           font;
     GLWcursor         cursor;
     CDynArray         comps;
-    CDynArray         timers;
+	std::vector<int>         timers;
     CDynArray         idlers;
     GLWLayoutManager *layout;
     GLWComponent     *focus;                 /*Currently focused descendant*/
