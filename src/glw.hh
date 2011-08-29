@@ -395,8 +395,8 @@ struct GLWLabel
 {
 	GLWLabel() = delete;
 	GLWLabel(const char*);
-    GLWComponent super;
-    CDynArray    label;
+	GLWComponent super;
+	std::string    label;
 };
 
 

@@ -55,12 +55,10 @@ static void glwLabelPeerDisplay(GLWLabel *_this,GLWCallbacks *_cb)
     int       h;
     double    x;
     double    y;
-    char     *label;
     glwCompSuperDisplay(&_this->super,_cb);
     if (glwCompIsEnabled(&_this->super))fc=_this->super.forec;
     else fc=glwColorBlend(_this->super.forec,_this->super.backc);
-    label=_DAGetAt(&_this->label,0,char);
-    w=glwFontGetStringWidth(_this->super.font,label);
+    w=glwFontGetStringWidth(_this->super.font, _this->label.c_str());
     h=glwFontGetHeight(_this->super.font);
     x=_this->super.bounds.w-w-(GLW_LABEL_INSET<<1);
     y=_this->super.bounds.h-h-(GLW_LABEL_INSET<<1);
@@ -84,7 +82,7 @@ static void glwLabelPeerDisplay(GLWLabel *_this,GLWCallbacks *_cb)
     }
     y+=glwFontGetDescent(_this->super.font);
     glwColor(fc);
-    glwFontDrawString(_this->super.font,label,x,y);
+    glwFontDrawString(_this->super.font, _this->label.c_str(), x, y);
 }
 
 static void glwLabelPeerEnable(GLWLabel *_this,GLWCallbacks *_cb,int _s)
@@ -96,7 +94,6 @@ static void glwLabelPeerEnable(GLWLabel *_this,GLWCallbacks *_cb,int _s)
 static void glwLabelPeerDispose(GLWLabel *_this,GLWCallbacks *_cb)
 {
     glwCompSuperDispose(&_this->super,_cb);
-    daDstr(&_this->label);
 }
 
 const GLWCallbacks GLW_LABEL_CALLBACKS=
@@ -117,62 +114,40 @@ const GLWCallbacks GLW_LABEL_CALLBACKS=
     NULL
 };
 
-GLWLabel::GLWLabel(const char* _label)
+GLWLabel::GLWLabel(const char* label)
 {
-    _DAInit(&this->label,0,char);
-    if (glwLabelSetLabel(this,_label))
-    {
+	glwLabelSetLabel(this, label);
         this->super.callbacks=&GLW_LABEL_CALLBACKS;
         glwCompSetAlignX(&this->super,0);
         glwCompSetLayout(&this->super,&glw_label_layout);
         return;
-    }
-    daDstr(&this->label);
 }
 
 const char *glwLabelGetLabel(GLWLabel *_this)
 {
-    return _DAGetAt(&_this->label,0,char);
+	return _this->label.c_str();
 }
 
-int glwLabelSetLabel(GLWLabel *_this,const char *_label)
+int glwLabelSetLabel(GLWLabel *_this, const char* label)
 {
-    if (_label==NULL)
-    {
-        if (daSetSize(&_this->label,1))
-        {
-            *_DAGetAt(&_this->label,0,char)='\0';
-            glwCompRevalidate(&_this->super);
-            return 1;
-        }
-    }
-    else
-    {
-        size_t len;
-        len=strlen(_label)+1;
-        if (daSetSize(&_this->label,len))
-        {
-            memcpy(_DAGetAt(&_this->label,0,char),_label,len);
-            glwCompRevalidate(&_this->super);
-            return 1;
-        }
-    }
-    return 0;
+	if (label == NULL)
+		_this->label.clear();
+	else
+		_this->label = label;
+	glwCompRevalidate(&_this->super);
+	return 1;
 }
 
-int glwLabelAddLabel(GLWLabel *_this,const char *_label)
+int glwLabelAddLabel(GLWLabel *_this, const char* label)
 {
-    if (_this->label.size<=1)return glwLabelSetLabel(_this,_label);
-    else if (_label!=NULL)
-    {
-        size_t len;
-        len=strlen(_label);
-        if (daInsArrayBefore(&_this->label,_this->label.size-1,_label,len))
-        {
-            glwCompRevalidate(&_this->super);
-            return 1;
-        }
-    }
-    else return 1;
-    return 0;
+	if (_this->label.size() <= 1) 
+		return glwLabelSetLabel(_this, label);
+	else if (label != NULL)
+	{
+		_this->label.append(label);
+		glwCompRevalidate(&_this->super);
+		return 1;
+	}
+	else return 1;
+	return 0;
 }
