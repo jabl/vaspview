@@ -977,18 +977,18 @@ DS3Viewer::DS3Viewer() :
 	tf_file(new GLWTextField(NULL, 20)),
 	lb_data_set(new GLWLabel("Data Set: ")),
 	tp_ctrl(new GLWTabbedPane()),
+	legend(new DSColorLegend()),
 	lb_status(new GLWLabel(NULL)),
+	cb_draw_slice(new GLWCheckBox("Draw Slice",1,NULL)),
 	lb_datax(new GLWLabel(NULL)),
 	lb_datay(new GLWLabel(NULL)),
 	lb_dataz(new GLWLabel(NULL)),
 	lb_datav(new GLWLabel(NULL)),
-	cb_draw_slice(new GLWCheckBox("Draw Slice",1,NULL)),
 	tf_slice_t(new GLWTextField(NULL,5)),
 	tf_slice_p(new GLWTextField(NULL,5)),
 	tf_slice_d(new GLWTextField(NULL,5)),
 	cb_draw_iso(new GLWCheckBox("Draw Iso-Surface",1,NULL)),
 	tf_iso_v(new GLWTextField(NULL,5)),
-	legend(new DSColorLegend()),
 	cb_draw_points(new GLWCheckBox("Draw Atoms",1,NULL)),
 	tf_point_r(new GLWTextField(NULL,5)),
 	tf_point_s(new GLWTextField(NULL,5)),
@@ -1135,19 +1135,15 @@ DS3Viewer::DS3Viewer() :
     bn_cntr = new GLWButton("Reset Position");
     bn_align = new GLWButton("Align to Slice");
     lb_scale = new GLWLabel("Data scale type:");
-    glwCheckBoxGroupInit(&_this->cg_scale);
     _this->cb_scale_linear= new GLWCheckBox("Linear",1,&_this->cg_scale);
     _this->cb_scale_log= new GLWCheckBox("Logarithmic",0,&_this->cg_scale);
     lb_color= new GLWLabel("Color scale type:");
-    glwCheckBoxGroupInit(&_this->cg_color);
     _this->cb_color_rainbow= new GLWCheckBox("Rainbow",1,&_this->cg_color);
     _this->cb_color_grayscale= new GLWCheckBox("Gray scale",0,&_this->cg_color);
     lb_backc= new GLWLabel("Background color:");
-    glwCheckBoxGroupInit(&_this->cg_backc);
     _this->cb_backc_black= new GLWCheckBox("Black",1,&_this->cg_backc);
     _this->cb_backc_white= new GLWCheckBox("White",0,&_this->cg_backc);
     lb_projt= new GLWLabel("Projection type:");
-    glwCheckBoxGroupInit(&_this->cg_projt);
     _this->cb_projt_persp= new GLWCheckBox("Perspective",1,&_this->cg_projt);
     _this->cb_projt_ortho= new GLWCheckBox("Orthographic",0,&_this->cg_projt);
     if (_this->frame!=NULL&&_this->ds3view!=NULL&&cm_vals!=NULL&&lb_file!=NULL&&
@@ -2030,19 +2026,15 @@ DS3Viewer::~DS3Viewer()
     DS3Viewer* _this = this;
     delete _this->cb_projt_ortho;
     delete (_this->cb_projt_persp);
-    glwCheckBoxGroupDstr(&_this->cg_projt);
 //    delete (lb_projt);
     delete (_this->cb_backc_white);
     delete (_this->cb_backc_black);
-    glwCheckBoxGroupDstr(&_this->cg_backc);
 //    delete (lb_backc);
     delete (_this->cb_color_grayscale);
     delete (_this->cb_color_rainbow);
-    glwCheckBoxGroupDstr(&_this->cg_color);
 //    delete (lb_color);
     delete (_this->cb_scale_log);
     delete (_this->cb_scale_linear);
-    glwCheckBoxGroupDstr(&_this->cg_scale);
     // delete (lb_scale);
     // glwButtonFree(bn_align);
     // glwButtonFree(bn_cntr);

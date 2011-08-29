@@ -505,6 +505,8 @@ void           glwTextFieldSetChangedCtx(GLWTextField *_this,
 
 struct GLWCheckBoxGroup
 {
+	GLWCheckBoxGroup();
+	~GLWCheckBoxGroup();
     CDynArray      cbs;
     int            seld;
     GLWActionFunc  changed;
@@ -512,10 +514,6 @@ struct GLWCheckBoxGroup
 };
 
 
-GLWCheckBoxGroup *glwCheckBoxGroupAlloc(void);
-void              glwCheckBoxGroupInit(GLWCheckBoxGroup *_this);
-void              glwCheckBoxGroupDstr(GLWCheckBoxGroup *_this);
-void              glwCheckBoxGroupFree(GLWCheckBoxGroup *_this);
 int               glwCheckBoxGroupGetSelectedIdx(GLWCheckBoxGroup *_this);
 void              glwCheckBoxGroupSetSelectedIdx(GLWCheckBoxGroup *_this,
         int _i);

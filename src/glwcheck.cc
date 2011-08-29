@@ -29,38 +29,23 @@
 
 # define GLW_CHECK_BOX_INSET (2)
 
-GLWCheckBoxGroup *glwCheckBoxGroupAlloc(void)
+GLWCheckBoxGroup::GLWCheckBoxGroup(void)
 {
-    GLWCheckBoxGroup *this_;
-    this_=(GLWCheckBoxGroup *)malloc(sizeof(GLWCheckBoxGroup));
-    if (this_!=NULL)glwCheckBoxGroupInit(this_);
-    return this_;
+    _DAInit(&this->cbs,0,GLWCheckBox *);
+    this->seld=-1;
+    this->changed=NULL;
+    this->changed_ctx=NULL;
 }
 
-void glwCheckBoxGroupInit(GLWCheckBoxGroup *_this)
-{
-    _DAInit(&_this->cbs,0,GLWCheckBox *);
-    _this->seld=-1;
-    _this->changed=NULL;
-    _this->changed_ctx=NULL;
-}
-
-void glwCheckBoxGroupDstr(GLWCheckBoxGroup *_this)
+GLWCheckBoxGroup::~GLWCheckBoxGroup()
 {
     size_t        i;
     GLWCheckBox **cbs;
-    _this->changed=NULL;
-    cbs=_DAGetAt(&_this->cbs,0,GLWCheckBox *);
-    for (i=_this->cbs.size; i-->0;)glwCheckBoxSetGroup(cbs[i],NULL);
-    daDstr(&_this->cbs);
+    this->changed = NULL;
+    cbs = _DAGetAt(&this->cbs, 0, GLWCheckBox *);
+    for (i = this->cbs.size; i-- > 0;) glwCheckBoxSetGroup(cbs[i],NULL);
+    daDstr(&this->cbs);
 }
-
-void glwCheckBoxGroupFree(GLWCheckBoxGroup *_this)
-{
-    glwCheckBoxGroupDstr(_this);
-    free(_this);
-}
-
 
 static int glwCheckBoxGroupAdd(GLWCheckBoxGroup *_this,GLWCheckBox *_cb)
 {
