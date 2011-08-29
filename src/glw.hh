@@ -242,7 +242,7 @@ public:
     GLWcursor         cursor;
     CDynArray         comps;
 	std::vector<int>         timers;
-    CDynArray         idlers;
+	std::vector<int>         idlers;
     GLWLayoutManager *layout;
     GLWComponent     *focus;                 /*Currently focused descendant*/
     GLWComponent     *capture;           /*Current child with mouse capture*/
