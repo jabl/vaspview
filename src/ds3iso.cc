@@ -55,11 +55,10 @@ static void ds3IsoReset(DS3IsoSurface *_this,long _d)
   x,y,z: The index of the center of the node*/
 static long ds3IsoAddNode(DS3IsoSurface *_this)
 {
-    _this->nodes.resize(_this->nodes.size() + 1);
-    long ret= (long)_this->nodes.size() - 1;
-    DS3IsoOctNode& node = _this->nodes[ret];
-    for (int i = 0; i<8; i++) node.node[i] = DS3V_NO_CHILD;
-    return ret;
+    DS3IsoOctNode node;
+    for (size_t i = 0; i < 8; i++) node.node[i] = DS3V_NO_CHILD;
+    _this->nodes.push_back(node);
+    return _this->nodes.size() - 1;
 }
 
 /*Adds a leaf node to the iso-surface
