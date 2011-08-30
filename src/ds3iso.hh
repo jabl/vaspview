@@ -21,12 +21,6 @@
 
 #include "ds3.hh"
 
-typedef struct DS3IsoVertex  DS3IsoVertex;
-typedef struct DS3IsoOctNode DS3IsoOctNode;
-typedef struct DS3IsoOctLeaf DS3IsoOctLeaf;
-typedef struct DS3IsoSurface DS3IsoSurface;
-
-
 
 # define DS3V_NO_EDGE  (-1L)
 # define DS3V_NO_CHILD (-1L)
