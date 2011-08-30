@@ -132,7 +132,7 @@ static int ds3ViewGetClipBox(DS3View *_this,int _x0,int _y0,int _x1,int _y1,
     Vect3d       z;
     Vect3d       eye;
     double       d[4][8];
-    double       id;
+    double       id = 0; // "may be used uninitialized"
     int          i;
     int          j;
     int          k;
@@ -1012,7 +1012,7 @@ static int ds3ViewGetSlicePoint(DS3View *_this,Vect3d _p,double *_t,
 static void ds3ViewTransferCapture(DS3View *_this,int _x,int _y)
 {
     Vect3d        p;
-    double        t;
+    double        t = 0;
     GLWComponent *cap;
     cap=NULL;
     if (_this->ds3!=NULL)

@@ -199,7 +199,7 @@ static void ds3ViewerSaveBonds(DS3Viewer *_this)
         if (file!=NULL)
         {
             long bf;
-            long bt;
+            long bt = 0;  // Just to shut up "may be used uninitialized" warning
             if (fprintf(file,"#Bond information for \"%s\"\n",_this->ds3->name.c_str())>=0)
             {
                 for (bf=0; (size_t)bf+1<_this->ds3->npoints; bf++)
