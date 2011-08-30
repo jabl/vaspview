@@ -56,16 +56,19 @@ struct DS3IsoOctLeaf
 
 struct DS3IsoSurface
 {
+	DS3IsoSurface() = delete;
+	DS3IsoSurface(size_t[3]);
+	~DS3IsoSurface();
+	DS3IsoSurface(const DS3IsoSurface&) = delete;
+	DS3IsoSurface& operator=(const DS3IsoSurface&) = delete;
+	void clear();
+	void init(size_t[3]);
     CDynArray verts;
     CDynArray nodes;
     CDynArray leafs;
     long      dim;
     long      stp;
 };
-
-
-void ds3IsoInit(DS3IsoSurface *_this,size_t _dens[3]);
-void ds3IsoDstr(DS3IsoSurface *_this);
 
 int ds3IsoMake(DS3IsoSurface *_this,DataSet3D *_ds3,double _v,int _d);
 

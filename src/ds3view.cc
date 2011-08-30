@@ -1187,7 +1187,7 @@ static void ds3ViewPeerDispose(DS3View *_this,const GLWCallbacks *_cb)
     ds3BondsDstr(&_this->bonds);
 # endif
     ds3SliceDstr(&_this->slice,_this);
-    ds3IsoDstr(&_this->iso);
+    _this->iso.clear();
 }
 
 
@@ -1221,7 +1221,8 @@ DS3View::DS3View() : cm_axes(new DS3ViewComp(this)),
 		     cm_bnds(new DS3ViewComp(this)),
 #endif
 		     cm_slice(new DS3ViewComp(this)),
-		     cm_iso(new DS3ViewComp(this))
+		     cm_iso(new DS3ViewComp(this)),
+		     iso(NULL)
 {
         if (glwCompAdd(&this->super,&this->cm_axes->super,-1)&&
                 glwCompAdd(&this->super,&this->cm_box->super,-1)&&
@@ -1274,7 +1275,6 @@ DS3View::DS3View() : cm_axes(new DS3ViewComp(this)),
 #  endif
 # endif
             ds3SliceInit(&this->slice,NULL);
-            ds3IsoInit(&this->iso,NULL);
 # if defined(__DS3_ADD_BONDS__)
             ds3BondsInit(&this->bonds);
 	    this->track_mbf = 0;
@@ -1483,7 +1483,7 @@ int ds3ViewSetDataSet(DS3View *_this,DataSet3D *_ds3)
     _this->t_valid=0;
     _this->c_valid=0;
     /*Free existing iso-surface*/
-    ds3IsoDstr(&_this->iso);
+    _this->iso.clear();
     _this->s_valid=0;
     /*Do the only things that can fail:*/
     if (_ds3!=NULL)
@@ -1512,7 +1512,7 @@ int ds3ViewSetDataSet(DS3View *_this,DataSet3D *_ds3)
         }
         _this->offs=2*sqrt(_this->offs);
         ds3SliceInit(&_this->slice,_ds3->density);
-        ds3IsoInit(&_this->iso,_ds3->density);
+        _this->iso.init(_ds3->density);
         for (i=0; i<3; i++)
         {
             for (j=0; j<3; j++)_this->basis[(j<<2)+i]=_ds3->basis[i][j];

@@ -455,27 +455,36 @@ const GLWCallbacks DS3_VIEW_ISO_CALLBACKS=
 /*Initializes the iso-surface structure
   dens: The dimensions of the data set to create surfaces for, or NULL if no
          data set will be used*/
-void ds3IsoInit(DS3IsoSurface *_this,size_t _dens[3])
+void DS3IsoSurface::init(size_t _dens[3])
 {
     int i;
-    _DAInit(&_this->verts,0,DS3IsoVertex);
-    _DAInit(&_this->nodes,0,DS3IsoOctNode);
-    _DAInit(&_this->leafs,0,GLint);
-    _this->dim=2;
+    _DAInit(&this->verts,0,DS3IsoVertex);
+    _DAInit(&this->nodes,0,DS3IsoOctNode);
+    _DAInit(&this->leafs,0,GLint);
+    this->dim=2;
     if (_dens!=NULL)for (i=0; i<3; i++)
         {
-            for (; (size_t)_this->dim<_dens[i]; _this->dim<<=1);
+            for (; (size_t)this->dim<_dens[i]; this->dim<<=1);
         }
 }
 
-/*Frees the memory used by the iso-surface structure*/
-void ds3IsoDstr(DS3IsoSurface *_this)
+DS3IsoSurface::DS3IsoSurface(size_t dens[3])
 {
-    daDstr(&_this->verts);
-    daDstr(&_this->nodes);
-    daDstr(&_this->leafs);
+	this->init(dens);
 }
 
+/*Frees the memory used by the iso-surface structure*/
+DS3IsoSurface::~DS3IsoSurface()
+{
+	this->clear();
+}
+
+void DS3IsoSurface::clear()
+{
+	daDstr(&this->verts);
+	daDstr(&this->nodes);
+	daDstr(&this->leafs);
+}
 
 /*Creates an iso-surface for the given data set using the given data value
   and detail level. Every 'd' values from the data set are used to create
@@ -910,7 +919,7 @@ int ds3IsoMake(DS3IsoSurface *_this,DataSet3D *_ds3,double _v,int _d)
                                 if (!daSetSize(&_this->verts,_this->verts.size+1))
                                 {
                                     free(edges);
-                                    ds3IsoDstr(_this);
+                                    _this->clear();
                                     return 0;
                                 }
                                 for (vf=vt=l,i=0; i<3; i++)
@@ -973,7 +982,7 @@ int ds3IsoMake(DS3IsoSurface *_this,DataSet3D *_ds3,double _v,int _d)
                     if (tris[0]>=0&&!ds3IsoAddTris(_this,x[0],cv,tris))
                     {
                         free(edges);
-                        ds3IsoDstr(_this);
+                        _this->clear();
                         return 0;
                     }
                     l+=dx[0];
