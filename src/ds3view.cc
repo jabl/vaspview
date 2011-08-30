@@ -19,13 +19,6 @@
 #include "ds3.hh"
 #include "ds3view.hh"
 
-typedef struct DS3ViewParams
-{
-    double box[2][3];
-    Vect3d cntr;
-    double zoom;
-} DS3ViewParams;
-
 static int  ds3ViewGetClipBox(DS3View *_this,int _x0,int _y0,int _x1,int _y1,
                               Vect3d _box[2]);
 static int  ds3ViewGetRayLineISect(DS3View *_this,Vect3d _p,double *_t,
@@ -1108,12 +1101,12 @@ static int ds3ViewPeerMouse(DS3View *_this,const GLWCallbacks *_cb,
                             box[0][Z]!=_this->box[0][Z]||
                             box[1][X]!=_this->box[1][X]||
                             box[1][Y]!=_this->box[1][Y]||
-                            box[1][Z]!=_this->box[1][Z])&&
-                            daInsTail(&_this->view_stack,&view))
+			 box[1][Z]!=_this->box[1][Z]))
                     {
                         Vect3d p,q,c;
                         double d,e;
                         int    i,j;
+			_this->view_stack.push_back(view);
                         vectSub3d(q,_this->box[1],_this->box[0]);
                         ds3ViewSetBox(_this,box[0][X],box[0][Y],box[0][Z],
                                       box[1][X],box[1][Y],box[1][Z]);
@@ -1137,15 +1130,15 @@ static int ds3ViewPeerMouse(DS3View *_this,const GLWCallbacks *_cb,
         }
         else if (_b==GLUT_RIGHT_BUTTON&&_s)
         {
-            if (_this->view_stack.size>0)
+		if (_this->view_stack.size() > 0)
             {
-                DS3ViewParams *p;
-                p=_DAGetAt(&_this->view_stack,_this->view_stack.size-1,DS3ViewParams);
-                ds3ViewSetBox(_this,p->box[0][X],p->box[0][Y],p->box[0][Z],
-                              p->box[1][X],p->box[1][Y],p->box[1][Z]);
-                ds3ViewSetCenter(_this,p->cntr[X],p->cntr[Y],p->cntr[Z]);
-                ds3ViewSetZoom(_this,p->zoom);
-                daDelTail(&_this->view_stack);
+		    const DS3ViewParams& p 
+			    = _this->view_stack[_this->view_stack.size() - 1];
+		    ds3ViewSetBox(_this, p.box[0][X], p.box[0][Y], p.box[0][Z],
+				  p.box[1][X], p.box[1][Y], p.box[1][Z]);
+		    ds3ViewSetCenter(_this, p.cntr[X], p.cntr[Y], p.cntr[Z]);
+		    ds3ViewSetZoom(_this, p.zoom);
+		    _this->view_stack.resize(_this->view_stack.size() - 1);
             }
             else
             {
@@ -1195,7 +1188,6 @@ static void ds3ViewPeerDispose(DS3View *_this,const GLWCallbacks *_cb)
 # endif
     ds3SliceDstr(&_this->slice,_this);
     ds3IsoDstr(&_this->iso);
-    daDstr(&_this->view_stack);
 }
 
 
@@ -1287,7 +1279,6 @@ DS3View::DS3View() : cm_axes(new DS3ViewComp(this)),
             ds3BondsInit(&this->bonds);
 	    this->track_mbf = 0;
 # endif
-            _DAInit(&this->view_stack,0,DS3ViewParams);
             this->zoom=0;
             this->yaw=1;
 	    this->cntr[0] = this->cntr[1] = this->cntr[2] = 0.;
@@ -1558,7 +1549,7 @@ int ds3ViewSetDataSet(DS3View *_this,DataSet3D *_ds3)
 # if defined(__DS3_ADD_BONDS__)
     ds3ViewSetSelectedBond(_this,-1,-1);
 # endif
-    daSetSize(&_this->view_stack,0);
+    _this->view_stack.clear();
     glwCompSetFocusable(&_this->cm_axes->super,_ds3!=NULL);
     glwCompSetFocusable(&_this->cm_box->super,_ds3!=NULL);
     glwCompSetFocusable(&_this->cm_pts->super,_ds3!=NULL&&_ds3->npoints>0);

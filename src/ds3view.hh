@@ -52,7 +52,12 @@ struct DS3ViewComp
     DS3View      *ds3view;
 };
 
-
+struct DS3ViewParams
+{
+    double box[2][3];
+    Vect3d cntr;
+    double zoom;
+};
 
 struct DS3View
 {
@@ -103,7 +108,7 @@ struct DS3View
     double         basis[16];                   /*GL-formatted basis matrix*/
     double         basinv[3][3];                    /*Inverted basis matrix*/
     double         strans[3][4];              /*Slice transformation matrix*/
-    CDynArray      view_stack;                           /*Saved clip boxes*/
+	std::vector<DS3ViewParams>  view_stack;  /*Saved clip boxes*/
     /*Viewing parameters*/
     double         point_r;                                  /*Point radius*/
     double         slice_t;                         /*Slice angles/distance*/
