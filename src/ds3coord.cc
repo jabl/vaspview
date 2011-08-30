@@ -33,7 +33,7 @@ static void ds3ViewAxesPeerDisplay(DS3ViewComp *_this,
     int       k;
     GLWcolor  c;
     GLWcolor  nc;
-    GLWcolor  fc;
+    GLWcolor  fc = GLW_COLOR_RED;
     view=_this->ds3view;
     for (i=0; i<3; i++)b[0][i]=view->box[0][i]<0?view->box[0][i]:0;
     for (i=0; i<3; i++)b[1][i]=view->box[1][i]>1?view->box[1][i]:1;

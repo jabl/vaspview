@@ -296,7 +296,7 @@ void dsMatrix3x3PInv(const double _m[3][3],double _i[3][3])
     for (h=k=0; k<3; k++)
     {
         double v;
-        int l;
+        int l = 0;
         v=0;
         for (i=h; i<3; i++)
         {
@@ -305,7 +305,7 @@ void dsMatrix3x3PInv(const double _m[3][3],double _i[3][3])
             if (aluik>v)
             {
                 v=aluik;
-                l=i;
+		l=i;
             }
         }
         if (v>1E-8)
