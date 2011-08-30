@@ -362,6 +362,11 @@ static int glwTextFieldPeerKeyboard(GLWTextField *_this,
 				_this->text.erase(_this->carp, 1);
 			}
                 }
+		else
+		{
+			_this->text.insert(_this->carp, 1, _k);
+			_this->carp++;
+		}
                 glwTextFieldFixOffset(_this);
                 glwTextFieldResetBlink(_this);
                 if (_this->changed!=NULL)_this->changed(_this->changed_ctx,&_this->super);
