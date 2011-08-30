@@ -28,7 +28,6 @@
 #include <string.h>
 #include <unordered_map>
 #include <string>
-#include "DynArray.hh"
 #include <vector>
 
 /*This is a small, portable component library that is dependent only on OpenGL
