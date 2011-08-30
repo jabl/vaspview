@@ -443,7 +443,7 @@ struct GLWTextField
     void          *action_ctx;                     /*Extra parameter for callback*/
     GLWActionFunc  changed;                      /*Text changed callback function*/
     void          *changed_ctx;                    /*Extra parameter for callback*/
-    CDynArray      text;                                           /*Current text*/
+	std::string      text;        /*Current text*/
 	std::string      seld;        /*Currently selected text buffer*/
     int            sels;                                        /*Selection start*/
     int            sele;                                          /*Selection end*/
@@ -462,11 +462,11 @@ extern const GLWCallbacks GLW_TEXT_FIELD_CALLBACKS;
 
 int            glwTextFieldIsEditable(GLWTextField *_this);
 void           glwTextFieldSetEditable(GLWTextField *_this,int _b);
-const char          *glwTextFieldGetText(GLWTextField *_this);
+const char*      glwTextFieldGetText(GLWTextField *_this);
 int            glwTextFieldSetText(GLWTextField *_this,
-                                   const char *_text);
+                                   const std::string&);
 int            glwTextFieldAddText(GLWTextField *_this,
-                                   const char *_text);
+                                   const std::string&);
 const char          *glwTextFieldGetSelectedText(GLWTextField *_this);
 int            glwTextFieldGetCaretPos(GLWTextField *_this);
 void           glwTextFieldSetCaretPos(GLWTextField *_this,int _carp);

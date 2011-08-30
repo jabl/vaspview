@@ -288,10 +288,9 @@ static void ds3ViewerLoadBonds(DS3Viewer *_this)
 
 static void ds3ViewerFileTextChanged(DS3Viewer *_this,GLWComponent *_c)
 {
-    const char *text;
     glwCompSetForeColor(_c,_c->parent==NULL?GLW_COLOR_BLACK:_c->parent->forec);
-    text=glwTextFieldGetText(_this->tf_file);
-    glwCompEnable(&_this->bn_open->super,text!=NULL&&text[0]!='\0');
+    const std::string& text = glwTextFieldGetText(_this->tf_file);
+    glwCompEnable(&_this->bn_open->super, !text.empty());
 }
 
 static void ds3ViewerDrawSliceChanged(DS3Viewer *_this,GLWComponent *_c)
@@ -317,17 +316,20 @@ static void ds3ViewerSliceTextChanged(DS3Viewer *_this,GLWComponent *_c)
     int     i;
     i=0;
     ds3ViewerTextSet(_this,&_this->tf_slice_t->super);
-    text=glwTextFieldGetText(_this->tf_slice_t);
+    const std::string& textf = glwTextFieldGetText(_this->tf_slice_t);
+    text = textf.c_str();
     t=strtod(text,&e);
     if (e==text||e[0]!='\0')t=_this->ds3view->slice_t;
     else i=1;
     ds3ViewerTextSet(_this,&_this->tf_slice_p->super);
-    text=glwTextFieldGetText(_this->tf_slice_p);
+    const std::string& textf2 = glwTextFieldGetText(_this->tf_slice_p);
+    text = textf2.c_str();
     p=strtod(text,&e);
     if (e==text||e[0]!='\0')p=_this->ds3view->slice_p;
     else i=1;
     ds3ViewerTextSet(_this,&_this->tf_slice_d->super);
-    text=glwTextFieldGetText(_this->tf_slice_d);
+    const std::string& textf3 = glwTextFieldGetText(_this->tf_slice_d);
+    text = textf3.c_str();
     d=strtod(text,&e);
     if (e==text||e[0]!='\0')d=_this->ds3view->slice_d;
     else i=1;
@@ -373,7 +375,8 @@ static void ds3ViewerIsoVTextChanged(DS3Viewer *_this,GLWComponent *_c)
     char   *e;
     double  v;
     ds3ViewerTextSet(_this,_c);
-    text=glwTextFieldGetText(_this->tf_iso_v);
+    const std::string& textf = glwTextFieldGetText(_this->tf_iso_v);
+    text = textf.c_str();
     v=strtod(text,&e);
     if (e!=text&&e[0]=='\0')
     {
@@ -441,7 +444,8 @@ static void ds3ViewerPointRTextChanged(DS3Viewer *_this,GLWComponent *_c)
     char   *e;
     double  r;
     ds3ViewerTextSet(_this,_c);
-    text=glwTextFieldGetText(_this->tf_point_r);
+    const std::string& textf = glwTextFieldGetText(_this->tf_point_r);
+    text = textf.c_str();
     r=strtod(text,&e);
     if (e!=text&&e[0]=='\0')ds3ViewerSetPointR(_this,r);
 }
