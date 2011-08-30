@@ -46,7 +46,7 @@ static void ds3IsoReset(DS3IsoSurface *_this,long _d)
 {
 	_this->verts.clear();
 	_this->nodes.clear();
-    daSetSize(&_this->leafs,0);
+	_this->leafs.clear();
     while (_this->dim<=_d)_this->dim<<=1;
     _this->stp=_d;
 }
@@ -73,15 +73,11 @@ static long ds3IsoAddLeaf(DS3IsoSurface *_this,long _cv[12],
     long ret;
     int  i;
     for (i=0; _tris[i]>=0; i++);
-    ret=(long)_this->leafs.size;
-    if (daSetSize(&_this->leafs,_this->leafs.size+i+1))
-    {
-        DS3IsoOctLeaf *leaf;
-        leaf=(DS3IsoOctLeaf *)_DAGetAt(&_this->leafs,ret,GLint);
-        leaf->nverts=i;
-        while (i-->0)leaf->verts[i]=(GLint)_cv[_tris[i]];
-    }
-    else ret=DS3V_NO_CHILD;
+    ret = (long)_this->leafs.size();
+    _this->leafs.resize(_this->leafs.size() + i + 1);
+    DS3IsoOctLeaf& leaf = _this->leafs[ret];
+    leaf.nverts=i;
+    while (i-- > 0) leaf.verts[i] = (GLint)_cv[_tris[i]];
     return ret;
 }
 
@@ -170,7 +166,7 @@ static void ds3ViewIsoDrawLeaf(DS3IsoDrawCtx *_this,long _leaf,long _offs)
         if (_this->cntr[i]+_offs<_this->box[0][i]||
                 _this->cntr[i]-_offs>_this->box[1][i])return;
     }
-    leaf=(DS3IsoOctLeaf *)_DAGetAt(&_this->iso->leafs,_leaf,GLint);
+    leaf = &_this->iso->leafs[_leaf];
     glDrawElements(GL_TRIANGLES,leaf->nverts,GL_UNSIGNED_INT,leaf->verts);
 }
 
@@ -449,7 +445,6 @@ const GLWCallbacks DS3_VIEW_ISO_CALLBACKS=
 void DS3IsoSurface::init(size_t _dens[3])
 {
     int i;
-    _DAInit(&this->leafs,0,GLint);
     this->dim=2;
     if (_dens!=NULL)for (i=0; i<3; i++)
         {
@@ -472,7 +467,7 @@ void DS3IsoSurface::clear()
 {
 	this->verts.clear();
 	this->nodes.clear();
-	daDstr(&this->leafs);
+	this->leafs.clear();
 }
 
 /*Creates an iso-surface for the given data set using the given data value
