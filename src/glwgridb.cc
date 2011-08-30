@@ -56,14 +56,12 @@ static int glwGBLCalcLayout(GLWGridBagLayout *_this,GLWComponent *_comp)
         size_t         i;
         int            cur_r;
         int            cur_c;
-        CDynArray      x_max;
-        CDynArray      y_max;
+	std::vector<int>      x_max;
+	std::vector<int>      y_max;
         int           *xs_w;
         int           *xs_h;
         int            next;
         _this->validating=1;
-        _DAInit(&x_max,0,int);
-        _DAInit(&y_max,0,int);
         _this->cache=(GLWGBLCInfo *)malloc(_comp->comps.size*sizeof(GLWGBLCInfo));
         if (_this->cache==NULL)goto fail;
         comps=(GLWComponent **)_DAGetAt(&_comp->comps,0,GLWComponent *);
@@ -94,9 +92,10 @@ static int glwGBLCalcLayout(GLWGridBagLayout *_this,GLWComponent *_comp)
                 if (cur_x<0)
                 {
                     px=0;
-                    for (j=cur_y; j<cur_y+cur_h&&(size_t)j<x_max.size; j++)
+                    for (j = cur_y; j < cur_y + cur_h 
+				 && (size_t)j < x_max.size(); j++)
                     {
-                        if (*_DAGetAt(&x_max,j,int)>px)px=*_DAGetAt(&x_max,j,int);
+                        if (x_max[j] > px) px = x_max[j];
                     }
                     cur_x=px-cur_x-1;
                     if (cur_x<0)cur_x=0;
@@ -104,21 +103,22 @@ static int glwGBLCalcLayout(GLWGridBagLayout *_this,GLWComponent *_comp)
                 else if (cur_y<0)
                 {
                     py=0;
-                    for (j=cur_x; j<cur_x+cur_w&&(size_t)j<y_max.size; j++)
+                    for (j = cur_x; j < cur_x + cur_w 
+				 && (size_t)j < y_max.size(); j++)
                     {
-                        if (*_DAGetAt(&y_max,j,int)>py)py=*_DAGetAt(&y_max,j,int);
+                        if (y_max[j] > py) py = y_max[j];
                     }
                     cur_y=py-cur_y-1;
                     if (cur_y<0)cur_y=0;
                 }
                 px=0;
-                while (x_max.size<(size_t)cur_x)
+                while (x_max.size() < (size_t)cur_x)
                 {
-                    if (!daInsTail(&x_max,&px))goto fail;
+			x_max.push_back(px);
                 }
-                while (y_max.size<(size_t)cur_y)
+                while (y_max.size() < (size_t)cur_y)
                 {
-                    if (!daInsTail(&y_max,&px))goto fail;
+			y_max.push_back(px);
                 }
                 px=cur_x+cur_w;
                 if (_this->w<px)_this->w=px;
@@ -126,13 +126,13 @@ static int glwGBLCalcLayout(GLWGridBagLayout *_this,GLWComponent *_comp)
                 if (_this->h<py)_this->h=py;
                 for (j=cur_y; j<py; j++)
                 {
-                    if ((size_t)j<x_max.size)daSetAt(&x_max,j,&px);
-                    else if (!daInsTail(&x_max,&px))goto fail;
+			if ((size_t)j < x_max.size()) x_max[j] = px;
+			else x_max.push_back(px);
                 }
                 for (j=cur_x; j<px; j++)
                 {
-                    if ((size_t)j<y_max.size)daSetAt(&y_max,j,&py);
-                    else if (!daInsTail(&y_max,&py))goto fail;
+			if ((size_t)j < y_max.size()) y_max[j] = py;
+			else y_max.push_back(py);
                 }
                 /*Cache minimum sizes while we're here*/
                 glwCompGetMinSize(comps[i],&_this->cache[i].min_w,&_this->cache[i].min_h);
@@ -158,8 +158,8 @@ static int glwGBLCalcLayout(GLWGridBagLayout *_this,GLWComponent *_comp)
             }
         /*Pass 2: Position relative components*/
         cur_r=cur_c=-1;
-        daSetSize(&x_max,0);
-        daSetSize(&y_max,0);
+        x_max.clear();
+        y_max.clear();
         for (i=0; (size_t)i<_comp->comps.size; i++)if (glwCompIsVisible(comps[i]))
             {
                 int cur_x;
@@ -187,9 +187,10 @@ static int glwGBLCalcLayout(GLWGridBagLayout *_this,GLWComponent *_comp)
                         if (cur_h<1)cur_h=1;
                     }
                     px=0;
-                    for (j=cur_y; j<cur_y+cur_h&&(size_t)j<x_max.size; j++)
+                    for (j = cur_y; j < cur_y + cur_h 
+				 && (size_t)j < x_max.size(); j++)
                     {
-                        if (px<*_DAGetAt(&x_max,j,int))px=*_DAGetAt(&x_max,j,int);
+                        if (px < x_max[j]) px = x_max[j];
                     }
                     cur_x=px-cur_x-1;
                     if (cur_x<0)cur_x=0;
@@ -202,9 +203,10 @@ static int glwGBLCalcLayout(GLWGridBagLayout *_this,GLWComponent *_comp)
                         if (cur_w<1)cur_w=1;
                     }
                     py=0;
-                    for (j=cur_x; j<cur_x+cur_w&&(size_t)j<y_max.size; j++)
+                    for (j = cur_x; j < cur_x + cur_w
+				 && (size_t)j < y_max.size(); j++)
                     {
-                        if (py<*_DAGetAt(&y_max,j,int))py=*_DAGetAt(&y_max,j,int);
+                        if (py < y_max[j]) py = y_max[j];
                     }
                     cur_y=py-cur_y-1;
                     if (cur_y<0)cur_y=0;
@@ -220,25 +222,25 @@ static int glwGBLCalcLayout(GLWGridBagLayout *_this,GLWComponent *_comp)
                     if (cur_h<1)cur_h=1;
                 }
                 px=0;
-                while (x_max.size<(size_t)cur_x)
+                while (x_max.size() < (size_t)cur_x)
                 {
-                    if (!daInsTail(&x_max,&px))goto fail;
+			x_max.push_back(px);
                 }
-                while (y_max.size<(size_t)cur_y)
+                while (y_max.size() < (size_t)cur_y)
                 {
-                    if (!daInsTail(&y_max,&px))goto fail;
+			y_max.push_back(px);
                 }
                 px=cur_x+cur_w;
                 py=cur_y+cur_h;
                 for (j=cur_y; j<py; j++)
                 {
-                    if ((size_t)j<x_max.size)daSetAt(&x_max,j,&px);
-                    else if (!daInsTail(&x_max,&px))goto fail;
+			if ((size_t)j < x_max.size()) x_max[j] = px;
+			else x_max.push_back(px);
                 }
                 for (j=cur_x; j<px; j++)
                 {
-                    if ((size_t)j<y_max.size)daSetAt(&y_max,j,&py);
-                    else if (!daInsTail(&y_max,&py))goto fail;
+			if ((size_t)j < y_max.size()) y_max[j] = py;
+			else y_max.push_back(py);
                 }
                 if (comps[i]->constraints.gridw<=0&&comps[i]->constraints.gridh<=0)
                 {
@@ -438,8 +440,8 @@ static int glwGBLCalcLayout(GLWGridBagLayout *_this,GLWComponent *_comp)
                 }
         }
         /*Pass 5: compress minimum widths and heights*/
-        xs_w=_DAGetAt(&y_max,0,int);
-        xs_h=_DAGetAt(&x_max,0,int);
+        xs_w = &y_max[0];
+        xs_h = &x_max[0];
         for (;;)
         {
             size_t j;
@@ -540,8 +542,6 @@ static int glwGBLCalcLayout(GLWGridBagLayout *_this,GLWComponent *_comp)
                 }
             if (k==_this->h)break;
         }
-        daDstr(&x_max);
-        daDstr(&y_max);
         _this->validating=0;
         _this->valid=1;
         return 1;
@@ -560,8 +560,6 @@ fail:
         _this->weight_x=NULL;
         free(_this->weight_y);
         _this->weight_y=NULL;
-        daDstr(&x_max);
-        daDstr(&y_max);
         _this->validating=0;
         return 0;
     }
