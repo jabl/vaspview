@@ -21,6 +21,8 @@
 #include "ds3legnd.hh"
 #include "ds3view.hh"
 #include "ds3viewr.hh"
+#include "file.hh"
+#include "strutil.hh"
 
 static void ds3ViewerTextChanged(DS3Viewer *_this,GLWComponent *_c);
 static void ds3ViewerTextSet(DS3Viewer *_this,GLWComponent *_c);
@@ -234,25 +236,23 @@ static void ds3ViewerLoadBonds(DS3Viewer *_this)
 {
     if (_this->bond_name!=NULL)
     {
-        FILE *file;
+	    File file(_this->bond_name, "r");
         int   err;
         err=1;
-        file=fopen(_this->bond_name,"r");
-        if (file!=NULL)
+        if (file.f != NULL)
         {
-            CDynArray line;
-            _DAInit(&line,0,char);
+		std::string line;
             ds3ViewSetBondsChangedFunc(_this->ds3view,NULL);
-            while (!feof(file))
+            while (!feof(file.f))
             {
                 char *p;
-                if (!daFGetS(&line,file))
+                if (!file.fgets(line))
                 {
-                    if (!ferror(file))errno=ENOMEM;
+                    if (!ferror(file.f))errno=ENOMEM;
                     break;
                 }
-                daTrimWS(&line);
-                p=_DAGetAt(&line,0,char);
+                trimlr(line);
+                p = &line[0];
                 if (p[0]!='#'&&p[0]!='\0')
                 {
                     long   bf;
@@ -266,11 +266,9 @@ static void ds3ViewerLoadBonds(DS3Viewer *_this)
                     ds3ViewSetBond(_this->ds3view,bf,bt,s*0.1);
                 }
             }
-            if (feof(file))err=0;
+            if (feof(file.f))err=0;
             ds3ViewSetBondsChangedFunc(_this->ds3view,
                                        (GLWActionFunc)ds3ViewerSaveBonds);
-            daDstr(&line);
-            fclose(file);
         }
         else if (errno==ENOENT)err=0;
         if (err)
