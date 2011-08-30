@@ -163,7 +163,6 @@ static void glwTextFieldPeerDisplay(GLWTextField *_this,GLWCallbacks *_cb)
     GLWcolor  bc;
     GLWcolor  fc;
 
-    fprintf(stderr,  "called glwTextFieldPeerDisplay\n");
     glwCompSuperDisplay(&_this->super,_cb);
     /*Calculate text position and dimensions*/
     std::string text;
@@ -210,7 +209,6 @@ static void glwTextFieldPeerDisplay(GLWTextField *_this,GLWCallbacks *_cb)
    
     else 
     {
-	    printf("about to draw %s\n", text.c_str());
 	    glwFontDrawString(_this->super.font, text.c_str(), 
 			   GLW_TEXT_FIELD_INSET, yb);
     }
@@ -594,22 +592,23 @@ const GLWCallbacks GLW_TEXT_FIELD_CALLBACKS=
 
 GLWTextField::GLWTextField(const char* _text, int _cols)
 {
-    this->changed=NULL;
-    this->changed_ctx=NULL;
-    this->action=NULL;
-    this->action_ctx=NULL;
-    this->blink_timer=0;
-    if (_text != NULL && glwTextFieldSetText(this,_text))
-    {
-        this->super.callbacks=&GLW_TEXT_FIELD_CALLBACKS;
-        glwCompSetFont(&this->super,glwFontGet(GLW_FONT_FIXED,0));
-        glwCompSetCursor(&this->super,GLUT_CURSOR_TEXT);
-        glwCompSetLayout(&this->super,&glw_text_field_layout);
+	this->changed=NULL;
+	this->changed_ctx=NULL;
+	this->action=NULL;
+	this->action_ctx=NULL;
+	this->blink_timer=0;
+	this->offs = this->carp = 0;
+	this->mark = this->sels = this->sele = -1;
+	if (_text != NULL)
+		glwTextFieldSetText(this,_text);
+	this->super.callbacks=&GLW_TEXT_FIELD_CALLBACKS;
+	glwCompSetFont(&this->super,glwFontGet(GLW_FONT_FIXED,0));
+	glwCompSetCursor(&this->super,GLUT_CURSOR_TEXT);
+	glwCompSetLayout(&this->super,&glw_text_field_layout);
         glwCompSetFocusable(&this->super,1);
         this->cols=_cols;
         this->echo=0;
         this->editable=1;
-    }
 }
 
 int glwTextFieldIsEditable(GLWTextField *_this)
