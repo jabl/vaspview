@@ -19,6 +19,7 @@
 #ifndef DS3_HH
 #define DS3_HH
 
+#include "glinc.hh"
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -27,8 +28,6 @@
 #include <limits.h>
 #include <math.h>
 #include <string.h>
-#include <GL/glew.h>
-#include <GL/glut.h>
 #include "glw.hh"
 #include "vect.hh"
 #include <string>
