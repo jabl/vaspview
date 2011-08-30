@@ -52,7 +52,6 @@ struct DS3IsoSurface
 {
 	DS3IsoSurface() = delete;
 	DS3IsoSurface(size_t[3]);
-	~DS3IsoSurface();
 	DS3IsoSurface(const DS3IsoSurface&) = delete;
 	DS3IsoSurface& operator=(const DS3IsoSurface&) = delete;
 	void clear();

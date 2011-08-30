@@ -457,12 +457,8 @@ DS3IsoSurface::DS3IsoSurface(size_t dens[3])
 	this->init(dens);
 }
 
-/*Frees the memory used by the iso-surface structure*/
-DS3IsoSurface::~DS3IsoSurface()
-{
-	this->clear();
-}
 
+/*Frees the memory used by the iso-surface structure*/
 void DS3IsoSurface::clear()
 {
 	this->verts.clear();
