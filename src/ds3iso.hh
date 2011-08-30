@@ -63,7 +63,7 @@ struct DS3IsoSurface
 	DS3IsoSurface& operator=(const DS3IsoSurface&) = delete;
 	void clear();
 	void init(size_t[3]);
-    CDynArray verts;
+	std::vector<DS3IsoVertex> verts;
     CDynArray nodes;
     CDynArray leafs;
     long      dim;

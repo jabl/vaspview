@@ -44,7 +44,7 @@
   d: The new detail level*/
 static void ds3IsoReset(DS3IsoSurface *_this,long _d)
 {
-    daSetSize(&_this->verts,0);
+	_this->verts.clear();
     daSetSize(&_this->nodes,0);
     daSetSize(&_this->leafs,0);
     while (_this->dim<=_d)_this->dim<<=1;
@@ -137,20 +137,18 @@ static int ds3IsoAddTris(DS3IsoSurface *_this,long _x[3],
   successive frames*/
 static void ds3IsoXForm(DS3IsoSurface *_this,DataSet3D *_ds3)
 {
-    DS3IsoVertex *verts;
-    long          i;
-    verts=_DAGetAt(&_this->verts,0,DS3IsoVertex);
-    for (i=(long)_this->verts.size; i-->0;)
+    for (auto it = _this->verts.begin(); it != _this->verts.end(); ++it)
     {
         Vect3d p;
         double m;
         int    j;
-        for (j=0; j<3; j++)p[j]=vectDot3d(_ds3->basis[j],verts[i].vert);
-        vectSet3dv(verts[i].vert,p);
-        for (j=0; j<3; j++)p[j]=vectDot3d(_ds3->basis[j],verts[i].norm);
+	DS3IsoVertex& vert = *it;
+        for (j = 0; j < 3; j++) p[j] = vectDot3d(_ds3->basis[j], vert.vert);
+        vectSet3dv(vert.vert,p);
+        for (j = 0; j < 3; j++) p[j] = vectDot3d(_ds3->basis[j], vert.norm);
         m=vectMag2_3d(p);
-        if (m<1E-100)vectSet3d(verts[i].norm,0,0,1);
-        else vectMul3d(verts[i].norm,p,1/sqrt(m));
+        if (m < 1E-100) vectSet3d(vert.norm, 0, 0, 1);
+        else vectMul3d(vert.norm, p, 1/sqrt(m));
     }
 }
 
@@ -357,7 +355,6 @@ static void ds3ViewIsoPeerDisplay(DS3ViewComp *_this,const GLWCallbacks *_cb)
 {
     static const GLfloat COLOR[4]={1.F,1.F,1.F,.75F};
     DS3View       *view;
-    DS3IsoVertex  *verts;
     DS3IsoDrawCtx  ctx;
     Vect3d         p;
     int            i;
@@ -408,7 +405,7 @@ static void ds3ViewIsoPeerDisplay(DS3ViewComp *_this,const GLWCallbacks *_cb)
         box[1][i]=(int)ceil(ctx.box[1][i]/view->ds3->density[i]);
     }
     /*Set up OpenGL parameters*/
-    verts=_DAGetAt(&view->iso.verts,0,DS3IsoVertex);
+    DS3IsoVertex& vert = view->iso.verts[0];
     glPushAttrib(GL_COLOR_BUFFER_BIT|GL_CURRENT_BIT|
                  GL_ENABLE_BIT|GL_LIGHTING_BIT);
     glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
@@ -422,8 +419,8 @@ static void ds3ViewIsoPeerDisplay(DS3ViewComp *_this,const GLWCallbacks *_cb)
     glEnable(GL_LIGHTING);
     glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
-    glVertexPointer(3,GL_DOUBLE,sizeof(DS3IsoVertex),verts[0].vert);
-    glNormalPointer(GL_DOUBLE,sizeof(DS3IsoVertex),verts[0].norm);
+    glVertexPointer(3,GL_DOUBLE, sizeof(DS3IsoVertex), vert.vert);
+    glNormalPointer(GL_DOUBLE, sizeof(DS3IsoVertex), vert.norm);
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
     ds3ViewIsoDrawTree(view,&ctx,box);
@@ -458,7 +455,6 @@ const GLWCallbacks DS3_VIEW_ISO_CALLBACKS=
 void DS3IsoSurface::init(size_t _dens[3])
 {
     int i;
-    _DAInit(&this->verts,0,DS3IsoVertex);
     _DAInit(&this->nodes,0,DS3IsoOctNode);
     _DAInit(&this->leafs,0,GLint);
     this->dim=2;
@@ -481,7 +477,7 @@ DS3IsoSurface::~DS3IsoSurface()
 
 void DS3IsoSurface::clear()
 {
-	daDstr(&this->verts);
+	this->verts.clear();
 	daDstr(&this->nodes);
 	daDstr(&this->leafs);
 }
@@ -914,14 +910,8 @@ int ds3IsoMake(DS3IsoSurface *_this,DataSet3D *_ds3,double _v,int _d)
                                 long          vf;
                                 long          vt;
                                 long          fx[3];
-                                DS3IsoVertex *vert;
                                 double        d;
-                                if (!daSetSize(&_this->verts,_this->verts.size+1))
-                                {
-                                    free(edges);
-                                    _this->clear();
-                                    return 0;
-                                }
+				_this->verts.resize(_this->verts.size() + 1);
                                 for (vf=vt=l,i=0; i<3; i++)
                                 {
                                     if (F[i][b])
@@ -935,25 +925,27 @@ int ds3IsoMake(DS3IsoSurface *_this,DataSet3D *_ds3,double _v,int _d)
                                 d=(data[vf]-_v)/(data[vf]-data[vt]);
                                 if (d<0)d=0;
                                 else if (d>1)d=1;
-                                vert=_DAGetAt(&_this->verts,_this->verts.size-1,DS3IsoVertex);
+                                DS3IsoVertex& vert = 
+					_this->verts[_this->verts.size() - 1];
                                 for (i=0; i<3; i++)
                                 {
                                     double nf;
                                     double nt;
-                                    vert->vert[i]=fx[i];
+                                    vert.vert[i]=fx[i];
                                     if (F[i][b]!=T[i][b])
                                     {
-                                        vert->vert[i]+=d*((T[i][b]?(x[1][i]?x[1][i]:dim[i]):x[0][i])-
+                                        vert.vert[i]+=d*((T[i][b]?(x[1][i]?x[1][i]:dim[i]):x[0][i])-
                                                                   fx[i]);
                                     }
-                                    vert->vert[i]/=dim[i];
+                                    vert.vert[i]/=dim[i];
                                     nf=0.5*(data[vf+(x[F[i][b]][i]+_d<dim[i]?dx[i]:-x[F[i][b]][i]*off[i])]-
                                             data[vf+(x[F[i][b]][i]>=_d?-dx[i]:(step[i]-1)*dx[i])]);
                                     nt=0.5*(data[vt+(x[T[i][b]][i]+_d<dim[i]?dx[i]:-x[T[i][b]][i]*off[i])]-
                                             data[vt+(x[T[i][b]][i]>=_d?-dx[i]:(step[i]-1)*dx[i])]);
-                                    vert->norm[i]=(nf+d*(nt-nf))/dim[i];
+                                    vert.norm[i]=(nf+d*(nt-nf))/dim[i];
                                 }
-                                edges[e+b]=cv[b]=(long)(_this->verts.size-1);
+                                edges[e+b] = cv[b] 
+					= (long)(_this->verts.size() - 1);
                             }
                             else cv[b]=edges[e+b];
                         }                  /*Reuse old edge intersections*/
