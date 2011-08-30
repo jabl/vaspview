@@ -304,7 +304,8 @@ static int glwCheckBoxPeerSpecial(GLWCheckBox *_this,const GLWCallbacks *_cb,
         if (_this->group!=NULL)
         {
             int           i;
-	    for (auto it = _this->group->cbs.begin(), i = 0; 
+	    auto it = _this->group->cbs.begin();
+	    for (i = 0; 
 		 it != _this->group->cbs.end(); ++it, ++i)
 		    if (*it == _this) break;
             switch (_k)
@@ -493,7 +494,8 @@ void glwCheckBoxSetState(GLWCheckBox *_this,int _state)
                 if (_this->group->seld<0)              /*If nothing is selected, select us*/
                 {
 			int ii;
-			for (auto it = _this->group->cbs.begin(), ii = 0;
+			auto it = _this->group->cbs.begin();
+			for (ii = 0;
 			     it != _this->group->cbs.end(); ++it, ++ii)
 				if (*it == _this)
 				{

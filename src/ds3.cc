@@ -18,6 +18,8 @@
 #include "ds3.hh"
 #include "ds3viewr.hh"
 
+bool use_texture3D;
+
 /*Initializes the data set to default values*/
 DataSet3D::DataSet3D()
 {
@@ -420,8 +422,20 @@ int main(int _argc,char **_argv)
     fprintf(stdout, "Status: Using GLEW %s\n", glewGetString(GLEW_VERSION));
     if (GLEW_EXT_paletted_texture)
 	    printf("EXT_paletted_texture available.\n");
+
     if (GLEW_EXT_texture3D)
+    {
 	    printf("EXT_texture3D available.\n");
+	    std::string rr = (const char*) glGetString(GL_RENDERER);
+	    if (rr.find("Mesa") != std::string::npos &&
+		rr.find("Intel") != std::string::npos)
+	    {
+		    printf("Disabling EXT_texture3D on renderer: %s\n", 
+			   rr.c_str());
+	    }
+	    else
+		    use_texture3D = true;
+    }
     if (_argc>1)ds3ViewerOpenFile(&ds3v,_argv[1]);
     glutMainLoop();
 }

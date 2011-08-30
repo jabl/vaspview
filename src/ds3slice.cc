@@ -19,6 +19,7 @@
 #include "ds3view.hh"
 #include "ds3slice.hh"
 
+extern bool use_texture3D;
 
 /*NOTE: The 2D slice extraction is the only operation that prevents the
   data set from being repeated an arbitrary amount in each direction. If we
@@ -782,8 +783,7 @@ static void ds3ViewSlicePeerDisplay(DS3ViewComp *_this,
     DS3View       *view;
     view=_this->ds3view;
     /*If we can, use a 3D texture for the slice*/
-    if (GLEW_EXT_texture3D)
-//    if (0) // EXT_texture3D crashed on i915?!
+    if (use_texture3D)
         {if (view->t_valid||ds3SliceTexture3D(&view->slice,view))
         {
             DS3SliceVertex slice[16];
