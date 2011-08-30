@@ -257,7 +257,7 @@ GLWButton::GLWButton(const char* label)
 	this->super.callbacks=&GLW_BUTTON_CALLBACKS;
         glwCompSetLayout(&this->super,&glw_button_layout);
         glwCompSetFocusable(&this->super,1);
-        this->down=0;
+        this->down = this->release = 0;
 }
 
 const char *glwButtonGetLabel(GLWButton *_this)
