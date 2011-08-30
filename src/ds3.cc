@@ -17,6 +17,7 @@
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA*/
 #include "ds3.hh"
 #include "ds3viewr.hh"
+#include <cassert>
 
 bool use_texture3D;
 
@@ -94,8 +95,13 @@ static GLWcolor dsRainbowScale(const DSColorScale *_this,double _c)
     double red,grn,blu;
     /*double lum,tgt_lum;*/
     hue=(DS_RAINBOW_MIN_HUE+(DS_RAINBOW_MAX_HUE-DS_RAINBOW_MIN_HUE)*_c)*(1.0/60);
-    h=(int)floor(hue);
-    flr=hue-h;
+    assert(hue >= 0. && hue <= INT_MAX);
+    // Should be flr = hue - floor(hue), and h = (int) floor(hue)
+    // Avoiding the floor function improves performance and is ok as
+    // long as hue > 0.
+    //flr = floor(hue);
+    h = static_cast<int>(hue);
+    flr = hue - h;
     switch ((h&INT_MAX)%6)
     {
     case 0 :
