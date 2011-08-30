@@ -73,7 +73,6 @@ static int glwTabbedPaneCalcTabAreaWidth(GLWTabbedPane *_this,int _rows)
 static void glwTabbedPaneLayout(GLWLayoutManager *_this,
                                 GLWTabbedPane *_tabpn)
 {
-    GLWComponent **children;
     GLWComponent  *selc;
     GLWTabPage    *tabs;
     GLWRect       *tabr;
@@ -352,10 +351,10 @@ static void glwTabbedPaneLayout(GLWLayoutManager *_this,
                        glwTabbedPaneCalcTabAreaHeight(_tabpn,-1);
     }
     }
-    children=_DAGetAt(&_tabpn->super.comps,0,GLWComponent *);
+    GLWComponent** children = &_tabpn->super.comps[0];
     if (_tabpn->seld>=0)selc=tabs[_tabpn->seld].comp;
     else selc=NULL;
-    for (i=(int)_tabpn->super.comps.size; i-->0;)
+    for (i = (int)_tabpn->super.comps.size(); i-- > 0;)
     {
         GLWConstraints *c;
         int             x;

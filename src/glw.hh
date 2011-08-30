@@ -240,7 +240,7 @@ public:
     GLWcolor          backc;
     GLWfont           font;
     GLWcursor         cursor;
-    CDynArray         comps;
+	std::vector<GLWComponent*>         comps;
 	std::vector<int>         timers;
 	std::vector<int>         idlers;
     GLWLayoutManager *layout;

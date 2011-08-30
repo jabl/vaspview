@@ -111,17 +111,17 @@ static void glwCompPeerDisplay(GLWComponent *_this,const GLWCallbacks *_cb)
 static void glwCompPeerDisplayChildren(GLWComponent *_this,
                                        const GLWCallbacks *_cb)
 {
-    if (_this->comps.size>0)
+	if (_this->comps.size() > 0)
     {
         GLWComponent *p;
         int           dx,dy;
         size_t        i;
         for (dx=0,p=_this; p!=NULL; p=p->parent)dx+=p->bounds.x;
         for (dy=0,p=_this; p!=NULL; p=p->parent)dy+=p->bounds.y;
-        for (i=_this->comps.size; i-->0;)
+        for (i = _this->comps.size(); i-->0;)
         {
             GLWComponent *comp;
-            comp=*_DAGetAt(&_this->comps,i,GLWComponent *);
+            comp = _this->comps[i];
             if (glwCompIsVisible(comp))
             {
                 glwCompValidate(comp);
@@ -283,7 +283,6 @@ GLWComponent::GLWComponent()
     this->backc=GLW_COLOR_LIGHT_GREY;
     this->font=glwFontGet(GLW_FONT_SERIF,0);
     this->cursor=GLUT_CURSOR_INHERIT;
-    _DAInit(&this->comps,0,GLWComponent *);
     this->layout=NULL;
     this->focus=NULL;
     this->capture=NULL;
@@ -300,13 +299,12 @@ GLWComponent::GLWComponent()
 GLWComponent::~GLWComponent()
 {
 	delete this->parent;
-    for (; this->comps.size>0;)
-    {
-        delete *_DAGetAt(&this->comps,this->comps.size-1,GLWComponent *);
-    }
+	for (auto it = this->comps.begin(); it != this->comps.end(); ++it)
+	{
+		delete *it;
+	}
     glwCompSetLayout(this,NULL);
     glwCompDispose(this);
-    daDstr(&this->comps);
 }
 
 int glwCompIsVisible(GLWComponent *_this)
@@ -337,12 +335,11 @@ int glwCompIsFocusable(GLWComponent *_this)
 
 int glwCompIsFocusTraversable(GLWComponent *_this)
 {
-    GLWComponent **children;
-    size_t         i;
-    children=_DAGetAt(&_this->comps,0,GLWComponent *);
-    for (i=0; i<_this->comps.size; i++)
+    for (auto it = _this->comps.begin(); it != _this->comps.end(); ++it)
     {
-        if (children[i]->focusable||glwCompIsFocusTraversable(children[i]))return 1;
+	    GLWComponent* child = *it;
+	    if (child->focusable||glwCompIsFocusTraversable(child))
+		    return 1;
     }
     return 0;
 }
@@ -690,57 +687,58 @@ void glwCompRepaint(GLWComponent *_this,unsigned _millis)
 
 int glwCompAdd(GLWComponent *_this,GLWComponent *_comp,int _idx)
 {
-    if (_idx<=(int)_this->comps.size)
-    {
-        if (_idx<0)_idx=(int)_this->comps.size;
-        if (daInsBefore(&_this->comps,_idx,&_comp))
-        {
-            if (_comp->parent!=NULL)glwCompDel(_this,_comp);
-            else
-            {
-                glwCompClearFocus(_comp);
-                glwCompClearCapture(_comp);
-            }
-            _comp->parent=_this;
-            _comp->wid=_this->wid;
-            if (!glwCompIsVisible(_comp))glwCompVisibility(_comp,1);
-            glwCompInvalidate(_this);
-            return 1;
-        }
-    }
-    return 0;
+	if (_idx <= (int)_this->comps.size())
+	{
+		if (_idx < 0) _idx = (int)_this->comps.size();
+		_this->comps.insert(_this->comps.begin() + _idx, _comp);
+		if (_comp->parent!=NULL)glwCompDel(_this,_comp);
+		else
+		{
+			glwCompClearFocus(_comp);
+			glwCompClearCapture(_comp);
+		}
+		_comp->parent=_this;
+		_comp->wid=_this->wid;
+		if (!glwCompIsVisible(_comp))glwCompVisibility(_comp,1);
+		glwCompInvalidate(_this);
+		return 1;
+	}
+	return 0;
 }
 
 int glwCompDel(GLWComponent *_this,GLWComponent *_comp)
 {
-    size_t i;
-    for (i=_this->comps.size;;)
-    {
-        if (i--==0)return 0;
-        if (*_DAGetAt(&_this->comps,i,GLWComponent *)==_comp)break;
-    }
-    daDelAt(&_this->comps,i);
-    _comp->parent=NULL;
-    _comp->wid=0;
-    if (glwCompIsVisible(_comp))glwCompVisibility(_comp,0);
-    if (_this->focus==_comp||_this->focus==_comp->focus)glwCompClearFocus(_this);
-    glwCompInvalidate(_this);
-    return 1;
+	for (auto it = _this->comps.begin(); it != _this->comps.end(); ++it)
+	{
+		if (*it == _comp)
+		{
+			_this->comps.erase(it);
+			_comp->parent=NULL;
+			_comp->wid=0;
+			if (glwCompIsVisible(_comp)) 
+				glwCompVisibility(_comp, 0);
+			if (_this->focus == _comp
+			    || _this->focus == _comp->focus)
+				glwCompClearFocus(_this);
+			glwCompInvalidate(_this);
+			return 1;
+	    }
+	}
+	return 0;
 }
 
 void glwCompDelAll(GLWComponent *_this)
 {
-    for (; _this->comps.size>0;)
-    {
-        GLWComponent *comp;
-        comp=*_DAGetAt(&_this->comps,_this->comps.size-1,GLWComponent *);
-        daDelAt(&_this->comps,_this->comps.size-1);
-        comp->parent=NULL;
-        comp->wid=0;
-        if (glwCompIsVisible(comp))glwCompVisibility(comp,0);
-    }
-    if (_this->focus!=NULL)glwCompClearFocus(_this);
-    glwCompInvalidate(_this);
+	for (auto it = _this->comps.begin(); it != _this->comps.end(); ++it)
+	{
+		GLWComponent* comp = *it;
+		comp->parent=NULL;
+		comp->wid=0;
+		if (glwCompIsVisible(comp)) glwCompVisibility(comp, 0);
+	}
+	_this->comps.clear();
+	if (_this->focus != NULL) glwCompClearFocus(_this);
+	glwCompInvalidate(_this);
 }
 
 void glwCompSetLayout(GLWComponent *_this,GLWLayoutManager *_layout)
@@ -779,12 +777,12 @@ static int glwCompNextFocusTree(GLWComponent *_this)
         for (i=0;; i++)
         {
             GLWComponent *comp;
-            if (i==_this->comps.size)                       /*This should never happen!*/
+            if (i == _this->comps.size())  /*This should never happen!*/
             {
                 _this->focus=NULL;
                 return 0;
             }
-            comp=*_DAGetAt(&_this->comps,i,GLWComponent *);
+            comp = _this->comps[i];
             /*Foud the currently focused component. If it has no children, we get to
               transfer, otherwise let it try to transfer to one of its children first*/
             if (comp==_this->focus)
@@ -812,15 +810,15 @@ static int glwCompNextFocusTree(GLWComponent *_this)
     {
         GLWComponent *comp;
         j++;
-        if (j>=_this->comps.size)
+        if (j >= _this->comps.size())
         {
             /*There were no more focusable components in our tree, let our parent
               try transferring focus to one of its descendants now*/
             if (_this->parent!=NULL||glwCompIsFocusable(_this)||
-                    _this->comps.size==0)return 0;
+		_this->comps.size() == 0) return 0;
             j=0;
         }
-        comp=*_DAGetAt(&_this->comps,j,GLWComponent *);
+        comp = _this->comps[j];
         if (glwCompIsVisible(comp)&&glwCompIsEnabled(comp))
         {
             /*Found a focusable component: propogate it up the tree*/
@@ -846,19 +844,19 @@ static int glwCompPrevFocusTree(GLWComponent *_this)
     if (_this->focus==NULL)
     {
         i=0;
-        j=_this->comps.size;
+        j = _this->comps.size();
     }
     else                /*Find the currently focused component (or it's ancestor)*/
     {
         for (i=0;; i++)
         {
             GLWComponent *comp;
-            if (i==_this->comps.size)                       /*This should never happen!*/
+            if (i == _this->comps.size())    /*This should never happen!*/
             {
                 _this->focus=NULL;
                 return 0;
             }
-            comp=*_DAGetAt(&_this->comps,i,GLWComponent *);
+            comp = _this->comps[i];
             /*Foud the currently focused component: we get to transfer*/
             if (comp==_this->focus)break;
             /*We've found an ancestor of the currently focused component: let it
@@ -886,15 +884,15 @@ static int glwCompPrevFocusTree(GLWComponent *_this)
     {
         GLWComponent *comp;
         j--;
-        if (j>=_this->comps.size)
+        if (j >= _this->comps.size())
         {
             /*There were no more focusable components in our tree, let our parent
               try transferring focus to one of its descendants now*/
             if (_this->parent!=NULL||glwCompIsFocusable(_this)||
-                    _this->comps.size==0)return 0;
-            j=_this->comps.size-1;
+		_this->comps.size() == 0) return 0;
+            j = _this->comps.size() - 1;
         }
-        comp=*_DAGetAt(&_this->comps,j,GLWComponent *);
+        comp = _this->comps[j];
         if (glwCompIsVisible(comp)&&glwCompIsEnabled(comp))
         {
             /*Found an ancestor of a focusable component: let it transfer focus*/
@@ -949,10 +947,10 @@ void glwCompClearFocus(GLWComponent *_this)
     if (_this->focus!=NULL)
     {
         size_t i;
-        for (i=0; i<_this->comps.size; i++)
+        for (i = 0; i < _this->comps.size(); i++)
         {
             GLWComponent *comp;
-            comp=*_DAGetAt(&_this->comps,i,GLWComponent *);
+            comp = _this->comps[i];
             if (_this->focus==comp||comp->focus!=NULL)glwCompClearFocus(comp);
         }
     }
@@ -993,9 +991,9 @@ void glwCompTransferCapture(GLWComponent *_this,int _x,int _y)
 void glwCompClearCapture(GLWComponent *_this)
 {
     size_t i;
-    for (i=0; i<_this->comps.size; i++)
+    for (i = 0; i < _this->comps.size(); i++)
     {
-        glwCompClearCapture(*_DAGetAt(&_this->comps,i,GLWComponent *));
+        glwCompClearCapture(_this->comps[i]);
     }
     if (_this->capture!=NULL)
     {
@@ -1021,16 +1019,13 @@ void glwCompRequestCapture(GLWComponent *_this,GLWComponent *_that)
 
 GLWComponent *glwCompGetComponentAt(GLWComponent *_this,int _x,int _y)
 {
-    size_t i;
-    GLWComponent **children;
     /*Children do not extend beyond their parent's client rectangle*/
     if (_x<0||_x>=_this->bounds.w||_y<0||_y>=_this->bounds.h)return NULL;
     /*Check each child, in order. The first one hit that contains the point is
       returned (assumes higher components come first)*/
-    children=_DAGetAt(&_this->comps,0,GLWComponent *);
-    for (i=0; i<_this->comps.size; i++)
+    for (auto it = _this->comps.begin(); it != _this->comps.end(); ++it)
     {
-        GLWComponent *child=children[i];
+        GLWComponent* child = *it;
         if (child!=NULL&&glwCompIsVisible(child)&&
                 child->bounds.x<=_x&&
                 child->bounds.x+child->bounds.w>_x&&
@@ -1046,17 +1041,14 @@ GLWComponent *glwCompGetComponentAt(GLWComponent *_this,int _x,int _y)
 
 GLWComponent *glwCompFindComponentAt(GLWComponent *_this,int _x,int _y)
 {
-    size_t i;
-    GLWComponent **children;
     /*Children do not extend beyond their parent's client rectangle*/
     if (_x<0||_x>=_this->bounds.w||_y<0||_y>=_this->bounds.h)return _this;
     /*Check each child, in order. The first one hit that contains the point is
       returned (assumes higher components come first)*/
-    children=_DAGetAt(&_this->comps,0,GLWComponent *);
-    for (i=0; i<_this->comps.size; i++)
+    for (auto it = _this->comps.begin(); it != _this->comps.end(); ++it)
     {
-        GLWComponent *child=children[i];
-        if (child!=NULL&&glwCompIsVisible(child)&&
+        GLWComponent* child = *it;
+	if (child!=NULL&&glwCompIsVisible(child)&&
                 child->bounds.x<=_x&&
                 child->bounds.x+child->bounds.w>_x&&
                 child->bounds.y<=_y&&
@@ -1212,15 +1204,14 @@ void glwCompDisplayChildren(GLWComponent *_this)
 
 void glwCompValidate(GLWComponent *_this)
 {
-    size_t i;
     if (!_this->valid)
     {
         const GLWCallbacks *cb;
         for (cb=_this->callbacks; cb!=NULL&&cb->validate==NULL; cb=cb->super);
         if (cb!=NULL)cb->validate(_this,cb);
-        for (i=0; i<_this->comps.size; i++)
+        for (auto it = _this->comps.begin(); it != _this->comps.end(); ++it)
         {
-            glwCompValidate(*_DAGetAt(&_this->comps,i,GLWComponent *));
+            glwCompValidate(*it);
         }
         _this->valid=1;
     }
