@@ -64,7 +64,7 @@ struct DS3IsoSurface
 	void clear();
 	void init(size_t[3]);
 	std::vector<DS3IsoVertex> verts;
-    CDynArray nodes;
+	std::vector<DS3IsoOctNode> nodes;
     CDynArray leafs;
     long      dim;
     long      stp;

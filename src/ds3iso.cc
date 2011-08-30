@@ -45,7 +45,7 @@
 static void ds3IsoReset(DS3IsoSurface *_this,long _d)
 {
 	_this->verts.clear();
-    daSetSize(&_this->nodes,0);
+	_this->nodes.clear();
     daSetSize(&_this->leafs,0);
     while (_this->dim<=_d)_this->dim<<=1;
     _this->stp=_d;
@@ -55,16 +55,10 @@ static void ds3IsoReset(DS3IsoSurface *_this,long _d)
   x,y,z: The index of the center of the node*/
 static long ds3IsoAddNode(DS3IsoSurface *_this)
 {
-    long ret;
-    if (daSetSize(&_this->nodes,_this->nodes.size+1))
-    {
-        DS3IsoOctNode *node;
-        int            i;
-        ret=(long)_this->nodes.size-1;
-        node=_DAGetAt(&_this->nodes,ret,DS3IsoOctNode);
-        for (i=0; i<8; i++)node->node[i]=DS3V_NO_CHILD;
-    }
-    else ret=DS3V_NO_CHILD;
+    _this->nodes.resize(_this->nodes.size() + 1);
+    long ret= (long)_this->nodes.size() - 1;
+    DS3IsoOctNode& node = _this->nodes[ret];
+    for (int i = 0; i<8; i++) node.node[i] = DS3V_NO_CHILD;
     return ret;
 }
 
@@ -104,8 +98,8 @@ static int ds3IsoAddTris(DS3IsoSurface *_this,long _x[3],
     int            idx;
     int            i;
     offs=_this->dim>>1;
-    if (_this->nodes.size==0&&ds3IsoAddNode(_this)<0)return 0;
-    nodes=_DAGetAt(&_this->nodes,0,DS3IsoOctNode);
+    if (_this->nodes.size() == 0 && ds3IsoAddNode(_this) < 0) return 0;
+    nodes = &_this->nodes[0];
     for (node=0; offs>_this->stp; offs>>=1)
     {
         for (i=idx=0; i<3; i++)if (_x[i]&offs)idx|=1<<i;
@@ -114,7 +108,7 @@ static int ds3IsoAddTris(DS3IsoSurface *_this,long _x[3],
             long n;
             n=ds3IsoAddNode(_this);
             if (n==DS3V_NO_CHILD)return 0;
-            nodes=_DAGetAt(&_this->nodes,0,DS3IsoOctNode);
+            nodes = &_this->nodes[0];
             nodes[node].node[idx]=n;
         }
         node=nodes[node].node[idx];
@@ -253,7 +247,7 @@ static void ds3ViewIsoDrawNode(DS3IsoDrawCtx *_this,long _node,long _offs)
         if (_this->cntr[i]+_offs<_this->box[0][i]+1E-4||
                 _this->cntr[i]-_offs>_this->box[1][i]-1E-4)return;
     }
-    node=_DAGetAt(&_this->iso->nodes,_node,DS3IsoOctNode);
+    node = &_this->iso->nodes[_node];
     for (idx=j=0; j<3; j++)if (_this->eye[j]<_this->cntr[j])idx|=1<<j;
     if (_offs>_this->iso->stp)
     {
@@ -370,7 +364,7 @@ static void ds3ViewIsoPeerDisplay(DS3ViewComp *_this,const GLWCallbacks *_cb)
         }
         view->s_valid=1;
     }
-    if (view->iso.nodes.size<=0)return;
+    if (view->iso.nodes.size() <= 0) return;
     ctx.iso=&view->iso;
     /*Scale the viewable box into data-set coordinates*/
     for (i=0; i<2; i++)for (j=0; j<3; j++)
@@ -455,7 +449,6 @@ const GLWCallbacks DS3_VIEW_ISO_CALLBACKS=
 void DS3IsoSurface::init(size_t _dens[3])
 {
     int i;
-    _DAInit(&this->nodes,0,DS3IsoOctNode);
     _DAInit(&this->leafs,0,GLint);
     this->dim=2;
     if (_dens!=NULL)for (i=0; i<3; i++)
@@ -478,7 +471,7 @@ DS3IsoSurface::~DS3IsoSurface()
 void DS3IsoSurface::clear()
 {
 	this->verts.clear();
-	daDstr(&this->nodes);
+	this->nodes.clear();
 	daDstr(&this->leafs);
 }
 
