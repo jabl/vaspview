@@ -645,7 +645,7 @@ public:
 	GLWTabbedPane();
     GLWComponent super;
 	std::vector<GLWTabPage>    tabs;
-    CDynArray    runs;
+	std::vector<int>    runs;
     GLWRect      area;
     int          tplc;
     int          seld;
