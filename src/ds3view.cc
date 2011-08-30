@@ -1290,7 +1290,6 @@ DS3View::DS3View() : cm_axes(new DS3ViewComp(this)),
 	    this->track_sp = this->track_sbf = this->track_sbt = 0;
 	    this->track_lbf = this->track_lbt = 0;
 	    this->point_r = 0;
-            _DAInit(&this->draw_point,0,int);
             this->draw_coords=1;
             this->draw_points=1;
             this->draw_slice=1;
@@ -1492,7 +1491,7 @@ int ds3ViewSetDataSet(DS3View *_this,DataSet3D *_ds3)
 # if defined(__DS3_ADD_BONDS__)
         if (!ds3BondsReset(&_this->bonds,_ds3))return 0;
 # endif
-        if (!daSetSize(&_this->draw_point,_ds3->npoints))return 0;
+	_this->draw_point.resize(_ds3->npoints);
     }
     /*Set up parameters for new data set*/
     _this->ds3=_ds3;
@@ -1522,14 +1521,14 @@ int ds3ViewSetDataSet(DS3View *_this,DataSet3D *_ds3)
         }
         _this->basis[15]=1;
         i=1;
-        for (k=0; k<_ds3->npoints; k++)_DASetAt(&_this->draw_point,k,&i,int);
+        for (k = 0; k < _ds3->npoints; k++) _this->draw_point[k] = i;
         ds3ViewSetCenter(_this,_ds3->center[X],_ds3->center[Y],_ds3->center[Z]);
     }
     else
     {
         _this->offs=1;
         for (i=0; i<4; i++)for (j=0; j<4; j++)_this->basis[(i<<2)+j]=i==j;
-        daSetSize(&_this->draw_point,0);
+        _this->draw_point.clear();
         ds3ViewSetCenter(_this,0.5,0.5,0.5);
     }
     ds3ViewSetZoom(_this,_this->offs);
@@ -1878,9 +1877,9 @@ void ds3ViewSetPointVisible(DS3View *_this,long _pt,int _v)
 {
     _v=_v?1:0;
     if (_pt>=0&&_this->ds3!=NULL&&(size_t)_pt<_this->ds3->npoints&&
-            *_DAGetAt(&_this->draw_point,_pt,int)!=_v)
+            _this->draw_point[_pt] != _v)
     {
-        _DASetAt(&_this->draw_point,_pt,&_v,int);
+	    _this->draw_point[_pt] = _v;
         if (_this->draw_points)glwCompRepaint(&_this->super,0);
         if (_this->track_sp==_pt&&_this->point_changed_func!=NULL)
         {
@@ -1997,7 +1996,7 @@ int ds3ViewGetPointVisible(DS3View *_this,long _pt)
 {
     if (_pt>=0&&_this->ds3!=NULL&&(size_t)_pt<_this->ds3->npoints)
     {
-        return *_DAGetAt(&_this->draw_point,_pt,int);
+        return _this->draw_point[_pt];
     }
     return 0;
 }

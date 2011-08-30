@@ -158,7 +158,7 @@ struct DS3View
     long           track_dy;
     long           track_dz;
     /*Which items to draw*/
-    CDynArray      draw_point;                 /*Whether to draw each point*/
+	std::vector<int>      draw_point;      /*Whether to draw each point*/
     unsigned       draw_coords:1;   /*Whether to draw the coordinate system*/
     unsigned       draw_points:1;       /*Whether or not to draw any points*/
     unsigned       draw_slice:1;         /*Whether or not to draw the slice*/
