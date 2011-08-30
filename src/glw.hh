@@ -29,6 +29,7 @@
 #include <unordered_map>
 #include <string>
 #include <vector>
+#include <cstdint>
 
 /*This is a small, portable component library that is dependent only on OpenGL
   and GLUT. It is not very general purpose, and in order to be made so
@@ -56,7 +57,10 @@
 # define GLW_FONT_SERIF      (1)
 # define GLW_FONT_SANS_SERIF (2)
 
-typedef        unsigned long         GLWcolor;
+// We use GL_RBGA8 for colors, that is 8 bits each for red, green,
+// blue + 8 bits for alpha. Thus GLWColor should be an unsigned 32-bit
+// integer.
+typedef        std::uint32_t         GLWcolor;
 typedef        void                 *GLWfont;
 typedef        int                   GLWcursor;
 
