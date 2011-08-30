@@ -158,14 +158,7 @@ int glwFontGetWidth(GLWfont _font,int _c)
 
 int glwFontGetStringWidth(GLWfont _font,const char *_s)
 {
-    size_t i;
-    int    ret;
-    ret=0;
-    if (_s!=NULL)
-    {
-        for (i=0; _s[i]; i++)ret+=glutBitmapWidth(_font,(unsigned char)_s[i]);
-    }
-    return ret;
+	return glutBitmapLength(_font, (const unsigned char*)_s);
 }
 
 int glwFontDrawString(GLWfont _font,const char *_s,double _x,double _y)
@@ -179,9 +172,9 @@ int glwFontDrawString(GLWfont _font,const char *_s,double _x,double _y)
         glRasterPos2d(_x,_y);
         for (i=0; _s[i]; i++)
         {
-            glutBitmapCharacter(_font,(unsigned char)_s[i]);
-            ret+=glutBitmapWidth(_font,(unsigned char)_s[i]);
-        }
+	    glutBitmapCharacter(_font,(unsigned char)_s[i]);
+	}
+	ret = glutBitmapLength(_font, (const unsigned char*) _s);
         glPopAttrib();
     }
     return ret;
