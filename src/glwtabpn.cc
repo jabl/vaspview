@@ -235,7 +235,7 @@ static void glwTabbedPaneLayout(GLWLayoutManager *_this,
         int start;
         int end;
         start = _tabpn->runs[i];
-        end = _tabpn->runs[i + 1 < _tabpn->runs.size() ? i + 1 : 0];
+        end = _tabpn->runs[(size_t) i + 1 < _tabpn->runs.size() ? i + 1 : 0];
         if (!end)end=_tabpn->tabs.size();
         if (vert)
         {
