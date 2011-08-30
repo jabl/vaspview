@@ -351,7 +351,7 @@ static int glwTextFieldPeerKeyboard(GLWTextField *_this,
 			    && (size_t)_this->carp <= _this->text.size())
 			{
 				size_t pos = --_this->carp;
-				_this->text.erase(pos, pos + 1);
+				_this->text.erase(pos, 1);
 			}
                 }
                 else if (_k==0x7F)                                                /*Delete*/
@@ -359,12 +359,9 @@ static int glwTextFieldPeerKeyboard(GLWTextField *_this,
 			if (ss >= se && _this->carp >= 0 
 			    && (size_t)_this->carp < _this->text.size())
 			{
-				_this->text.erase(_this->carp, 
-						  _this->carp + 1);
+				_this->text.erase(_this->carp, 1);
 			}
                 }
-                _this->text.insert(_this->carp, 1, _k);
-		_this->carp++;
                 glwTextFieldFixOffset(_this);
                 glwTextFieldResetBlink(_this);
                 if (_this->changed!=NULL)_this->changed(_this->changed_ctx,&_this->super);
