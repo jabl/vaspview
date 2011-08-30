@@ -477,6 +477,9 @@ static int ds3SliceTexture3D(DS3Slice *_this,DS3View *_view)
 {
     GLint m;
     glGetIntegerv(GL_MAX_3D_TEXTURE_SIZE,&m);
+#ifndef NDEBUG
+    printf("Max 3D texture size: %d\n", m);
+#endif
     if (m>1)m>>=1;
     if (_view->ds3!=NULL)
     {
@@ -503,6 +506,9 @@ static int ds3SliceTexture3D(DS3Slice *_this,DS3View *_view)
             for (w[i]=1,ws[i]=0; w[i]<d[i]&&w[i]<(GLsizei)m; w[i]<<=1,ws[i]++);
             dx[i]=d[i]/(double)w[i];
         }
+#ifndef NDEBUG
+	printf("calculated texture size: x=%d, y=%d, z=%d\n", w[X], w[Y], w[Z]);
+#endif
         if (GLEW_EXT_paletted_texture)
         {
             txtr=(GLubyte *)malloc(sizeof(GLubyte)*w[X]*w[Y]*w[Z]);

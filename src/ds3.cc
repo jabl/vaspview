@@ -418,6 +418,8 @@ int main(int _argc,char **_argv)
     DS3Viewer ds3v;
     /*At this point, we've created a window, and so should have a current
       rendering context: test for GL extensions*/
+    //glewExperimental = GL_TRUE; // Enabled paletted textures on R300
+                                  // but it doesn't actually work..
     GLenum err = glewInit();
     if (GLEW_OK != err)
     {
