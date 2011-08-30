@@ -85,22 +85,12 @@ int dsColorLegendSetDataSet(DSColorLegend *_this,DataSet3D *_ds3)
     {
         if (_ds3->units[3]!=NULL&&_ds3->units[3][0]!='\0')
         {
-            CDynArray label;
-            char      sp=' ';
-            char      lp='(';
-            char      rp=')';
-            int       ret;
-            _DAInit(&label,64,char);
-            if (daInsArrayTail(&label,_ds3->label[3],strlen(_ds3->label[3]))&&
-                    daInsTail(&label,&sp)&&daInsTail(&label,&lp)&&
-                    daInsArrayTail(&label,_ds3->units[3],strlen(_ds3->units[3])+1)&&
-                    daInsTail(&label,&rp))
-            {
-                ret=dsColorLegendSetLabel(_this,_DAGetAt(&label,0,char));
-            }
-            else ret=0;
-            daDstr(&label);
-            return ret;
+	    std::string label;
+	    label += _ds3->label[3];
+	    label += " (";
+	    label += _ds3->units[3];
+	    label += ")";
+	    return dsColorLegendSetLabel(_this, label.c_str());
         }
         else return dsColorLegendSetLabel(_this,_ds3->label[3]);
     }
