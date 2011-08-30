@@ -110,15 +110,15 @@ static int glwTextFieldGetPosAt(GLWTextField *_this,int _x)
     while (_x+w>=x)
     {
         ret++;
-        if ((size_t)ret + 1 >= _this->text.size()) break;
+        if ((size_t)ret > _this->text.size()) break;
         w = glwFontGetWidth(_this->super.font, _this->echo ? _this->echo 
 			    :_this->text[ret]);
         x+=w;
         w>>=1;
         if (x>_this->super.bounds.w-GLW_TEXT_FIELD_INSET)break;
     }
-    if ((size_t)ret + 1 >= _this->text.size()) 
-	    ret = (int)_this->text.size() - 1;
+    if ((size_t)ret > _this->text.size()) 
+	    ret = (int)_this->text.size();
     if (ret<0)ret=0;
     return ret;
 }
@@ -200,7 +200,7 @@ static void glwTextFieldPeerDisplay(GLWTextField *_this,GLWCallbacks *_cb)
         int i;
         int x;
         for (x=GLW_TEXT_FIELD_INSET,i=0;
-	     (size_t)i + 1 < _this->text.size() && x < _this->super.bounds.w; 
+	     (size_t)i < _this->text.size() && x < _this->super.bounds.w; 
 	     i++)
         {
             x+=glwFontDrawChar(_this->super.font,_this->echo,x,yb);
@@ -257,7 +257,7 @@ static void glwTextFieldPeerDisplay(GLWTextField *_this,GLWCallbacks *_cb)
         {
             int       carp;
             carp=_this->carp;
-            if ((size_t)_this->carp < _this->text.size())
+            if ((size_t)_this->carp <= _this->text.size())
             {
                 if (_this->offs>0)carp-=_this->offs;
                 if (carp>=0)
@@ -335,7 +335,7 @@ static int glwTextFieldPeerKeyboard(GLWTextField *_this,
             ss=glwTextFieldGetSelectionStart(_this);
             se=glwTextFieldGetSelectionEnd(_this);
             if (ss < 0 || se < 0 || ss >= se 
-		|| (size_t)se >= _this->text.size())
+		|| (size_t)se > _this->text.size())
 		    ss=se=0;
             if (se - ss != 1 || _this->text[ss] != (char)_k)        /*If there will be a net change...*/
             {
@@ -430,16 +430,16 @@ static int glwTextFieldPeerSpecial(GLWTextField *_this,
             break;
             case GLUT_KEY_RIGHT:
             {
-		if ((size_t)_this->carp + 1 < _this->text.size()) 
+		if ((size_t)_this->carp < _this->text.size()) 
 			_this->carp++;
                 if ((mods&GLUT_ACTIVE_CTRL)&&_this->carp>0&&
-		    (size_t)_this->carp + 1 < _this->text.size() 
+		    (size_t)_this->carp < _this->text.size() 
 		    && !_this->echo)
                 {
 			std::string& text = _this->text;
                     if (isalnum(text[_this->carp-1])||text[_this->carp-1]=='_')
                     {
-			    while ((size_t)_this->carp + 1 < _this->text.size()
+			    while ((size_t)_this->carp < _this->text.size()
 				   &&
 				   (isalnum(text[_this->carp]) 
 				    || text[_this->carp] == '_'))
@@ -447,7 +447,7 @@ static int glwTextFieldPeerSpecial(GLWTextField *_this,
 				    _this->carp++;
 			    }
                     }
-                    else while ((size_t)_this->carp + 1 < _this->text.size() 
+                    else while ((size_t)_this->carp < _this->text.size() 
 				&&
 				!isalnum(text[_this->carp]) 
 				&& text[_this->carp]!='_')
@@ -462,7 +462,7 @@ static int glwTextFieldPeerSpecial(GLWTextField *_this,
                 _this->carp=0;
                 if ((mods&GLUT_ACTIVE_CTRL)&&!_this->echo)
                 {
-			while ((size_t)_this->carp + 1 < _this->text.size() 
+			while ((size_t)_this->carp < _this->text.size() 
 			       && isspace(_this->text[_this->carp]))
 				_this->carp++;
                 }
@@ -470,7 +470,7 @@ static int glwTextFieldPeerSpecial(GLWTextField *_this,
             break;
             case GLUT_KEY_END :
             {
-		    _this->carp = (int)_this->text.size() - 1;
+		    _this->carp = (int)_this->text.size();
                 if (_this->carp<0)_this->carp=0;
                 if ((mods&GLUT_ACTIVE_CTRL)&&!_this->echo)
                 {
@@ -676,8 +676,8 @@ int glwTextFieldGetCaretPos(GLWTextField *_this)
 
 void glwTextFieldSetCaretPos(GLWTextField *_this,int _carp)
 {
-	if ((size_t)_carp + 1 >= _this->text.size())
-		_carp = (int)_this->text.size() - 1;
+	if ((size_t)_carp > _this->text.size())
+		_carp = (int)_this->text.size();
     if (_carp<0)_carp=0;
     if (_carp!=_this->carp)
     {
@@ -694,8 +694,8 @@ int glwTextFieldGetSelectionStart(GLWTextField *_this)
 
 void glwTextFieldSetSelectionStart(GLWTextField *_this,int _sels)
 {
-	if ((size_t)_sels + 1 >= _this->text.size())
-		_sels = (int)_this->text.size() - 1;
+	if ((size_t)_sels > _this->text.size())
+		_sels = (int)_this->text.size();
     if (_sels<0)_sels=0;
     if (_sels!=_this->sels)
     {
@@ -711,8 +711,8 @@ int glwTextFieldGetSelectionEnd(GLWTextField *_this)
 
 void glwTextFieldSetSelectionEnd(GLWTextField *_this,int _sele)
 {
-	if ((size_t)_sele + 1 >= _this->text.size())
-		_sele = (int)_this->text.size() - 1;
+	if ((size_t)_sele > _this->text.size())
+		_sele = (int)_this->text.size();
     if (_sele<0)_sele=0;
     if (_sele!=_this->sele)
     {
@@ -723,11 +723,11 @@ void glwTextFieldSetSelectionEnd(GLWTextField *_this,int _sele)
 
 void glwTextFieldSelect(GLWTextField *_this,int _sels,int _sele)
 {
-	if ((size_t)_sels+1 >= _this->text.size())
-		_sels = (int)_this->text.size() - 1;
+	if ((size_t)_sels > _this->text.size())
+		_sels = (int)_this->text.size();
     if (_sels<0)_sels=0;
-    if ((size_t)_sele + 1 >= _this->text.size())
-	    _sele = (int)_this->text.size() - 1;
+    if ((size_t)_sele > _this->text.size())
+	    _sele = (int)_this->text.size();
     if (_sele<0)_sele=0;
     if (_sels!=_this->sels||_sele!=_this->sele)
     {
