@@ -28,7 +28,7 @@ static void glwButtonLayoutMinSize(GLWLayoutManager *_this,GLWButton *_button,
     if (_w!=NULL)
     {
         *_w=glwFontGetStringWidth(_button->super.font,
-                                  _button->label.c_str()) + 8;
+                                  _button->label) + 8;
     }
     if (_h!=NULL)*_h=glwFontGetHeight(_button->super.font)+8;
 }
@@ -52,7 +52,7 @@ static void glwButtonPeerDisplay(GLWButton *_this,GLWCallbacks *_cb)
     int     c2;
     glwCompSuperDisplay(&_this->super,_cb);
     /*Calculate text position and dimensions*/
-    w=glwFontGetStringWidth(_this->super.font, _this->label.c_str());
+    w=glwFontGetStringWidth(_this->super.font, _this->label);
     h=glwFontGetHeight(_this->super.font);
     x=(_this->super.bounds.w-w)*0.5;
     y=(_this->super.bounds.h-h)*0.5;

@@ -251,8 +251,8 @@ static void glwSliderLayout(GLWLayoutManager *_this,GLWSlider *_slider)
 	for (auto it = _slider->labels.begin(); 
 	     it != _slider->labels.end(); ++it)
         {
-		std::string& lblp = (*it).second;
-		int w = glwFontGetStringWidth(_slider->super.font, lblp.c_str());
+		std::string& lblp = it->second;
+		int w = glwFontGetStringWidth(_slider->super.font, lblp);
 	    if (w>_slider->label_rect.w)_slider->label_rect.w=w;
         }
         _slider->label_rect.h=_slider->tick_rect.h+
@@ -263,7 +263,7 @@ static void glwSliderLayout(GLWLayoutManager *_this,GLWSlider *_slider)
     }
     else
     {
-        int w;
+        int w = 0;
         _slider->thumb_rect.w=GLW_SLIDER_THUMB_WIDTH;
         _slider->thumb_rect.h=GLW_SLIDER_THUMB_HEIGHT;
         if (!_slider->labels.empty() && _slider->center_labels)
@@ -271,15 +271,19 @@ static void glwSliderLayout(GLWLayoutManager *_this,GLWSlider *_slider)
 		auto it = _slider->labels.find(_slider->label_lo);
 		if (it != _slider->labels.end())
 		{
-			std::string& lblp = (*it).second;
-			_slider->track_offs=(glwFontGetStringWidth(_slider->super.font,lblp.c_str())>>1)+
-                                    GLW_SLIDER_INSET;
+			std::string& lblp = it->second;
+			_slider->track_offs = (glwFontGetStringWidth(
+						       _slider->super.font,
+						       lblp) >> 1)
+				+ GLW_SLIDER_INSET;
 		}
 		it = _slider->labels.find(_slider->label_hi);
 		if (it != _slider->labels.end())
 		{
-			std::string& lblp= (*it).second;
-			w=(glwFontGetStringWidth(_slider->super.font,lblp.c_str())>>1)+GLW_SLIDER_INSET;
+			std::string& lblp= it->second;
+			w = (glwFontGetStringWidth(_slider->super.font,
+						   lblp) >> 1)
+				+ GLW_SLIDER_INSET;
 		}
             if (w>_slider->track_offs)_slider->track_offs=w;
         }
@@ -586,10 +590,10 @@ void glwSliderPeerDisplay(GLWSlider *_this,GLWCallbacks *_cb)
 		 it != _this->labels.end(); ++it)
             {
 		    int vp= (*it).first;
-		    std::string& lblp = (*it).second;
+		    std::string& lblp = it->second;
                     double cx;
                     double cw;
-                    cw=glwFontGetStringWidth(_this->super.font,lblp.c_str());
+                    cw = glwFontGetStringWidth(_this->super.font,lblp);
                     cx=glwSliderGetXPos(_this,vp)-0.5*cw;
                     if (cx+cw>_this->label_rect.x+_this->label_rect.w)
                     {

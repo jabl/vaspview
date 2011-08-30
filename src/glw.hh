@@ -703,7 +703,7 @@ int     glwFontGetHeight(GLWfont _font);
 int     glwFontGetAscent(GLWfont _font);
 int     glwFontGetDescent(GLWfont _font);
 int     glwFontGetWidth(GLWfont _font,int _c);
-int     glwFontGetStringWidth(GLWfont _font,const char *_s);
+int     glwFontGetStringWidth(GLWfont _font, const std::string&);
 int     glwFontDrawString(GLWfont _font,const char *_s,double _x,double _y);
 int     glwFontDrawChar(GLWfont _font,int _c,double _x,double _y);
 

@@ -130,7 +130,7 @@ static void glwCheckBoxLayoutMinSize(GLWLayoutManager *_this,GLWCheckBox *_cb,
     h=glwFontGetHeight(_cb->super.font);
     if (_w!=NULL)
     {
-	    *_w = glwFontGetStringWidth(_cb->super.font, _cb->label.c_str())
+	    *_w = glwFontGetStringWidth(_cb->super.font, _cb->label)
 		    + h + (GLW_CHECK_BOX_INSET<<2);
     }
     if (_h!=NULL)*_h=h+(GLW_CHECK_BOX_INSET<<1);
@@ -154,7 +154,7 @@ static void glwCheckBoxPeerDisplay(GLWCheckBox *_this,GLWCallbacks *_cb)
     int     bc;
     glwCompSuperDisplay(&_this->super,_cb);
     /*Calculate text position and dimensions*/
-    w = glwFontGetStringWidth(_this->super.font, _this->label.c_str());
+    w = glwFontGetStringWidth(_this->super.font, _this->label);
     h=glwFontGetHeight(_this->super.font);
     y=(_this->super.bounds.h-h)*0.5;
     if (glwCompIsEnabled(&_this->super))

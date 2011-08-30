@@ -156,9 +156,9 @@ int glwFontGetWidth(GLWfont _font,int _c)
     return glutBitmapWidth(_font,_c);
 }
 
-int glwFontGetStringWidth(GLWfont _font,const char *_s)
+int glwFontGetStringWidth(GLWfont _font, const std::string& s)
 {
-	return glutBitmapLength(_font, (const unsigned char*)_s);
+	return glutBitmapLength(_font, (const unsigned char*) s.c_str());
 }
 
 int glwFontDrawString(GLWfont _font,const char *_s,double _x,double _y)

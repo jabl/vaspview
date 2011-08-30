@@ -52,7 +52,7 @@ static int glwTabbedPaneCalcMaxTabWidth(GLWTabbedPane *_this)
 	{
 		GLWTabPage& tp = *it;
 		int tw = glwFontGetStringWidth(_this->super.font, 
-					       tp.title.c_str());
+					       tp.title);
 		if (tw > w) w = tw;
 	}
 	w += GLW_TABBED_PANE_INSET<<1;
@@ -148,7 +148,7 @@ static void glwTabbedPaneLayout(GLWLayoutManager *_this,
         else
         {
             tabr->w=glwFontGetStringWidth(_tabpn->super.font,
-                                          tabs[i].title.c_str())
+                                          tabs[i].title)
                     + (GLW_TABBED_PANE_INSET<<1);
             tabr->h=_tabpn->max_tab_h;
             if (i>0)
@@ -482,7 +482,7 @@ static void glwTabbedPaneLayoutSize(GLWLayoutManager *_this,
             {
                 int tw;
                 tw=glwFontGetStringWidth(_tabpn->super.font,
-                                         tabs[i].title.c_str()) +
+                                         tabs[i].title) +
                    (GLW_TABBED_PANE_INSET<<1);
                 if (tw>w)w=tw;
                 if (x+tw>w)
@@ -834,7 +834,7 @@ static void glwTabbedPaneDisplayTab(GLWTabbedPane *_this,int _i)
     }
     break;
     }
-    w=glwFontGetStringWidth(_this->super.font, tab->title.c_str());
+    w=glwFontGetStringWidth(_this->super.font, tab->title);
     h=glwFontGetHeight(_this->super.font);
     tx=x+0.5*(tab->bounds.w-w);
     ty=y+0.5*(tab->bounds.h-h);

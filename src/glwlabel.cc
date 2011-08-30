@@ -57,7 +57,7 @@ static void glwLabelPeerDisplay(GLWLabel *_this,GLWCallbacks *_cb)
     glwCompSuperDisplay(&_this->super,_cb);
     if (glwCompIsEnabled(&_this->super))fc=_this->super.forec;
     else fc=glwColorBlend(_this->super.forec,_this->super.backc);
-    w=glwFontGetStringWidth(_this->super.font, _this->label.c_str());
+    w=glwFontGetStringWidth(_this->super.font, _this->label);
     h=glwFontGetHeight(_this->super.font);
     x=_this->super.bounds.w-w-(GLW_LABEL_INSET<<1);
     y=_this->super.bounds.h-h-(GLW_LABEL_INSET<<1);
