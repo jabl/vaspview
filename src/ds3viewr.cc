@@ -123,7 +123,7 @@ static void ds3ViewerViewDataChanged(DS3Viewer *_this,DS3View *_view)
         sprintf(text,"Z: %li",z);
         glwLabelSetLabel(_this->lb_dataz,text);
         v=_this->ds3->data[_DS3Index(_this->ds3,x,y,z)];
-        sprintf(text,"Value: %0.6lg",v);
+        sprintf(text,"Value: %0.6g",v);
         glwLabelSetLabel(_this->lb_datav,text);
     }
     else
@@ -210,7 +210,7 @@ static void ds3ViewerSaveBonds(DS3Viewer *_this)
                     {
                         double s;
                         s=ds3ViewGetBond(_this->ds3view,bf,bt);
-                        if (s>0&&fprintf(file,"%li %li %0.9lg\n",bf,bt,s*10)<0)break;
+                        if (s>0&&fprintf(file,"%li %li %0.9g\n",bf,bt,s*10)<0)break;
                     }
                 }
                 if ((size_t)bf+1==_this->ds3->npoints&&
@@ -2146,7 +2146,7 @@ void ds3ViewerUpdatePointRLabels(DS3Viewer *_this)
     for (i=0; i<=100; i+=50)
     {
         char text[32];
-        sprintf(text,"%0.3lg",i*0.001*_this->ds3view->offs);
+        sprintf(text,"%0.3g",i*0.001*_this->ds3view->offs);
         glwSliderAddLabel(_this->sl_point_r,i,text);
     }
 }
@@ -2154,12 +2154,12 @@ void ds3ViewerUpdatePointRLabels(DS3Viewer *_this)
 void ds3ViewerUpdateIsoVLabels(DS3Viewer *_this)
 {
     char text[32];
-    sprintf(text,"%0.4lg", _this->ds3->min);
+    sprintf(text,"%0.4g", _this->ds3->min);
     glwSliderAddLabel(_this->sl_iso_v,0,text);
-    sprintf(text,"%0.4lg",dsUnscale(_this->ds3view->ds,
+    sprintf(text,"%0.4g",dsUnscale(_this->ds3view->ds,
                                     (DS3V_ISO_V_RES>>1)*(1.0/DS3V_ISO_V_RES)));
     glwSliderAddLabel(_this->sl_iso_v,DS3V_ISO_V_RES>>1,text);
-    sprintf(text,"%0.4lg", _this->ds3->max);
+    sprintf(text,"%0.4g", _this->ds3->max);
     glwSliderAddLabel(_this->sl_iso_v,DS3V_ISO_V_RES,text);
 }
 
@@ -2168,7 +2168,7 @@ void ds3ViewerUpdateZoomLabels(DS3Viewer *_this){
  char text[32];
  int  i;
  for(i=0;i<=200;i+=100){
-  sprintf(text,"%0.4lg",i*0.01*_this->ds3view->offs);
+  sprintf(text,"%0.4g",i*0.01*_this->ds3view->offs);
   glwSliderAddLabel(_this->sl_zoom,i,text);} }
 */
 
@@ -2178,7 +2178,7 @@ void ds3ViewerSetPointR(DS3Viewer *_this,double _r)
     char   text[32];
     ds3ViewSetPointR(_this->ds3view,_r);
     _r=_this->ds3view->point_r;
-    sprintf(text,"%0.3lg",_r);
+    sprintf(text,"%0.3g",_r);
     glwTextFieldSetChangedFunc(_this->tf_point_r,
                                (GLWActionFunc)ds3ViewerTextSet);
     glwTextFieldSetText(_this->tf_point_r,text);
@@ -2203,7 +2203,7 @@ void ds3ViewerSetSlice(DS3Viewer *_this,double _t,double _p,double _d)
     _t=_this->ds3view->slice_t;
     _p=_this->ds3view->slice_p;
     _d=_this->ds3view->slice_d;
-    sprintf(text,"%0.3lg",_t);
+    sprintf(text,"%0.3g",_t);
     glwTextFieldSetChangedFunc(_this->tf_slice_t,
                                (GLWActionFunc)ds3ViewerTextSet);
     glwTextFieldSetText(_this->tf_slice_t,text);
@@ -2213,7 +2213,7 @@ void ds3ViewerSetSlice(DS3Viewer *_this,double _t,double _p,double _d)
     _this->sl_slice_t->setVal((int)(_t+0.5),0);
     _this->sl_slice_t->setChangedFunc(
                             (GLWActionFunc)ds3ViewerSliceTSliderChanged);
-    sprintf(text,"%0.3lg",_p);
+    sprintf(text,"%0.3g",_p);
     glwTextFieldSetChangedFunc(_this->tf_slice_p,
                                (GLWActionFunc)ds3ViewerTextSet);
     glwTextFieldSetText(_this->tf_slice_p,text);
@@ -2223,7 +2223,7 @@ void ds3ViewerSetSlice(DS3Viewer *_this,double _t,double _p,double _d)
     glwSliderSetVal(_this->sl_slice_p,(int)(_p+0.5),0);
     glwSliderSetChangedFunc(_this->sl_slice_p,
                             (GLWActionFunc)ds3ViewerSlicePSliderChanged);
-    sprintf(text,"%0.3lg",_d);
+    sprintf(text,"%0.3g",_d);
     glwTextFieldSetChangedFunc(_this->tf_slice_d,
                                (GLWActionFunc)ds3ViewerTextSet);
     glwTextFieldSetText(_this->tf_slice_d,text);
@@ -2241,7 +2241,7 @@ void ds3ViewerSetIso(DS3Viewer *_this,double _v,int _d)
     ds3ViewSetIso(_this->ds3view,_v,_d);
     _v=_this->ds3view->iso_v;
     _d=_this->ds3view->iso_d;
-    sprintf(text,"%0.4lg",_v);
+    sprintf(text,"%0.4g",_v);
     glwTextFieldSetChangedFunc(_this->tf_iso_v,(GLWActionFunc)ds3ViewerTextSet);
     glwTextFieldSetText(_this->tf_iso_v,text);
     glwTextFieldSetChangedFunc(_this->tf_iso_v,
@@ -2273,7 +2273,7 @@ void ds3ViewerSetZoom(DS3Viewer *_this,double _z)
                               (GLWActionFunc)ds3ViewerViewZoomChanged);
     _z=_this->ds3view->zoom;
     if (_this->ds3view->offs>1E-16)_z/=_this->ds3view->offs;
-    sprintf(text,"%0.4lg",_z);
+    sprintf(text,"%0.4g",_z);
     glwTextFieldSetChangedFunc(_this->tf_zoom,(GLWActionFunc)ds3ViewerTextSet);
     glwTextFieldSetText(_this->tf_zoom,text);
     glwTextFieldSetChangedFunc(_this->tf_zoom,
@@ -2294,7 +2294,7 @@ void ds3ViewerSetOrientation(DS3Viewer *_this,double _y,double _p,double _r)
     _y=_this->ds3view->yaw;
     _p=_this->ds3view->pitch;
     _r=_this->ds3view->roll;
-    sprintf(text,"%0.3lg",_y);
+    sprintf(text,"%0.3g",_y);
     glwTextFieldSetChangedFunc(_this->tf_ornt_y,(GLWActionFunc)ds3ViewerTextSet);
     glwTextFieldSetText(_this->tf_ornt_y,text);
     glwTextFieldSetChangedFunc(_this->tf_ornt_y,
@@ -2303,7 +2303,7 @@ void ds3ViewerSetOrientation(DS3Viewer *_this,double _y,double _p,double _r)
     glwSliderSetVal(_this->sl_ornt_y,(int)(_y+0.5),0);
     glwSliderSetChangedFunc(_this->sl_ornt_y,
                             (GLWActionFunc)ds3ViewerOrntYSliderChanged);
-    sprintf(text,"%0.3lg",_p);
+    sprintf(text,"%0.3g",_p);
     glwTextFieldSetChangedFunc(_this->tf_ornt_p,(GLWActionFunc)ds3ViewerTextSet);
     glwTextFieldSetText(_this->tf_ornt_p,text);
     glwTextFieldSetChangedFunc(_this->tf_ornt_p,
@@ -2312,7 +2312,7 @@ void ds3ViewerSetOrientation(DS3Viewer *_this,double _y,double _p,double _r)
     glwSliderSetVal(_this->sl_ornt_p,(int)(_p+0.5),0);
     glwSliderSetChangedFunc(_this->sl_ornt_p,
                             (GLWActionFunc)ds3ViewerOrntPSliderChanged);
-    sprintf(text,"%0.3lg",_r);
+    sprintf(text,"%0.3g",_r);
     glwTextFieldSetChangedFunc(_this->tf_ornt_r,(GLWActionFunc)ds3ViewerTextSet);
     glwTextFieldSetText(_this->tf_ornt_r,text);
     glwTextFieldSetChangedFunc(_this->tf_ornt_r,
@@ -2340,7 +2340,7 @@ void ds3ViewerSetCenter(DS3Viewer *_this,double _x,double _y,double _z)
     _x=vectDot3d(_this->ds3view->basinv[X],_this->ds3view->cntr);
     _y=vectDot3d(_this->ds3view->basinv[Y],_this->ds3view->cntr);
     _z=vectDot3d(_this->ds3view->basinv[Z],_this->ds3view->cntr);
-    sprintf(text,"%0.3lg",_x);
+    sprintf(text,"%0.3g",_x);
     glwTextFieldSetChangedFunc(_this->tf_cntr_x,(GLWActionFunc)ds3ViewerTextSet);
     glwTextFieldSetText(_this->tf_cntr_x,text);
     glwTextFieldSetChangedFunc(_this->tf_cntr_x,
@@ -2349,7 +2349,7 @@ void ds3ViewerSetCenter(DS3Viewer *_this,double _x,double _y,double _z)
     glwSliderSetVal(_this->sl_cntr_x,(int)floor(_x*100+0.5),0);
     glwSliderSetChangedFunc(_this->sl_cntr_x,
                             (GLWActionFunc)ds3ViewerCntrXSliderChanged);
-    sprintf(text,"%0.3lg",_y);
+    sprintf(text,"%0.3g",_y);
     glwTextFieldSetChangedFunc(_this->tf_cntr_y,(GLWActionFunc)ds3ViewerTextSet);
     glwTextFieldSetText(_this->tf_cntr_y,text);
     glwTextFieldSetChangedFunc(_this->tf_cntr_x,
@@ -2358,7 +2358,7 @@ void ds3ViewerSetCenter(DS3Viewer *_this,double _x,double _y,double _z)
     glwSliderSetVal(_this->sl_cntr_y,(int)floor(_y*100+0.5),0);
     glwSliderSetChangedFunc(_this->sl_cntr_y,
                             (GLWActionFunc)ds3ViewerCntrYSliderChanged);
-    sprintf(text,"%0.3lg",_z);
+    sprintf(text,"%0.3g",_z);
     glwTextFieldSetChangedFunc(_this->tf_cntr_z,(GLWActionFunc)ds3ViewerTextSet);
     glwTextFieldSetText(_this->tf_cntr_z,text);
     glwTextFieldSetChangedFunc(_this->tf_cntr_z,
@@ -2383,7 +2383,7 @@ void ds3ViewerSetBox(DS3Viewer *_this,double _minx,double _miny,double _minz,
     _maxx=_this->ds3view->box[1][X];
     _maxy=_this->ds3view->box[1][Y];
     _maxz=_this->ds3view->box[1][Z];
-    sprintf(text,"%0.3lg",_minx);
+    sprintf(text,"%0.3g",_minx);
     glwTextFieldSetChangedFunc(_this->tf_minx,(GLWActionFunc)ds3ViewerTextSet);
     glwTextFieldSetText(_this->tf_minx,text);
     glwTextFieldSetChangedFunc(_this->tf_minx,
@@ -2392,7 +2392,7 @@ void ds3ViewerSetBox(DS3Viewer *_this,double _minx,double _miny,double _minz,
     glwSliderSetVal(_this->sl_minx,(int)floor(_minx*100+0.5),0);
     glwSliderSetChangedFunc(_this->sl_minx,
                             (GLWActionFunc)ds3ViewerMinXSliderChanged);
-    sprintf(text,"%0.3lg",_miny);
+    sprintf(text,"%0.3g",_miny);
     glwTextFieldSetChangedFunc(_this->tf_miny,(GLWActionFunc)ds3ViewerTextSet);
     glwTextFieldSetText(_this->tf_miny,text);
     glwTextFieldSetChangedFunc(_this->tf_miny,
@@ -2401,7 +2401,7 @@ void ds3ViewerSetBox(DS3Viewer *_this,double _minx,double _miny,double _minz,
     glwSliderSetVal(_this->sl_miny,(int)floor(_miny*100+0.5),0);
     glwSliderSetChangedFunc(_this->sl_miny,
                             (GLWActionFunc)ds3ViewerMinYSliderChanged);
-    sprintf(text,"%0.3lg",_minz);
+    sprintf(text,"%0.3g",_minz);
     glwTextFieldSetChangedFunc(_this->tf_minz,(GLWActionFunc)ds3ViewerTextSet);
     glwTextFieldSetText(_this->tf_minz,text);
     glwTextFieldSetChangedFunc(_this->tf_minz,
@@ -2410,7 +2410,7 @@ void ds3ViewerSetBox(DS3Viewer *_this,double _minx,double _miny,double _minz,
     glwSliderSetVal(_this->sl_minz,(int)floor(_minz*100+0.5),0);
     glwSliderSetChangedFunc(_this->sl_minz,
                             (GLWActionFunc)ds3ViewerMinZSliderChanged);
-    sprintf(text,"%0.3lg",_maxx);
+    sprintf(text,"%0.3g",_maxx);
     glwTextFieldSetChangedFunc(_this->tf_maxx,(GLWActionFunc)ds3ViewerTextSet);
     glwTextFieldSetText(_this->tf_maxx,text);
     glwTextFieldSetChangedFunc(_this->tf_maxx,
@@ -2419,7 +2419,7 @@ void ds3ViewerSetBox(DS3Viewer *_this,double _minx,double _miny,double _minz,
     glwSliderSetVal(_this->sl_maxx,(int)floor(_maxx*100+0.5),0);
     glwSliderSetChangedFunc(_this->sl_maxx,
                             (GLWActionFunc)ds3ViewerMaxXSliderChanged);
-    sprintf(text,"%0.3lg",_maxy);
+    sprintf(text,"%0.3g",_maxy);
     glwTextFieldSetChangedFunc(_this->tf_maxy,(GLWActionFunc)ds3ViewerTextSet);
     glwTextFieldSetText(_this->tf_maxy,text);
     glwTextFieldSetChangedFunc(_this->tf_maxy,
@@ -2428,7 +2428,7 @@ void ds3ViewerSetBox(DS3Viewer *_this,double _minx,double _miny,double _minz,
     glwSliderSetVal(_this->sl_maxy,(int)floor(_maxy*100+0.5),0);
     glwSliderSetChangedFunc(_this->sl_maxy,
                             (GLWActionFunc)ds3ViewerMaxYSliderChanged);
-    sprintf(text,"%0.3lg",_maxz);
+    sprintf(text,"%0.3g",_maxz);
     glwTextFieldSetChangedFunc(_this->tf_maxz,(GLWActionFunc)ds3ViewerTextSet);
     glwTextFieldSetText(_this->tf_maxz,text);
     glwTextFieldSetChangedFunc(_this->tf_maxz,
@@ -2457,7 +2457,7 @@ void ds3ViewerSetSelectedPoint(DS3Viewer *_this,long _pt)
                                    (GLWActionFunc)ds3ViewerTextChanged);
         sprintf(text,"Atom type: %i",_this->ds3->points[_pt].typ+1);
         glwLabelSetLabel(_this->lb_point_t,text);
-        sprintf(text,"Atom location: <%0.4lg,%0.4lg,%0.4lg>",
+        sprintf(text,"Atom location: <%0.4g,%0.4g,%0.4g>",
                 _this->ds3->points[_pt].pos[X], _this->ds3->points[_pt].pos[Y],
                 _this->ds3->points[_pt].pos[Z]);
         glwLabelSetLabel(_this->lb_point_l,text);
@@ -2523,7 +2523,7 @@ void ds3ViewerSetBond(DS3Viewer *_this,double _sz)
         if (_sz>0)
         {
             char text[32];
-            sprintf(text,"%0.4lg",_sz*10);
+            sprintf(text,"%0.4g",_sz*10);
             glwTextFieldSetChangedFunc(_this->tf_bond_s,
                                        (GLWActionFunc)ds3ViewerTextSet);
             glwTextFieldSetText(_this->tf_bond_s,text);

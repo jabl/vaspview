@@ -122,9 +122,9 @@ int dsColorLegendSetRange(DSColorLegend *_this,double _min,double _max)
 {
     char text[32];
     int  ret;
-    sprintf(text,"%0.5lg",_min);
+    sprintf(text,"%0.5g",_min);
     ret = glwLabelSetLabel(&_this->lb_min,text);
-    sprintf(text,"%0.5lg",_max);
+    sprintf(text,"%0.5g",_max);
     ret = glwLabelSetLabel(&_this->lb_max,text)&&ret;
     return ret;
 }
