@@ -19,7 +19,7 @@
 #include "ds3view.hh"
 #include "ds3slice.hh"
 
-extern bool use_texture3D;
+extern bool disable_texture3D_mipmap;
 
 /*NOTE: The 2D slice extraction is the only operation that prevents the
   data set from being repeated an arbitrary amount in each direction. If we
@@ -480,7 +480,7 @@ static int ds3SliceTexture3D(DS3Slice *_this,DS3View *_view)
 #ifndef NDEBUG
     printf("Max 3D texture size: %d\n", m);
 #endif
-    if (m>1)m>>=1;
+    //if (m>1)m>>=1;  // Reduce texture size to conserve memory?
     if (_view->ds3!=NULL)
     {
         GLsizei   d[3];
@@ -644,6 +644,7 @@ static int ds3SliceTexture3D(DS3Slice *_this,DS3View *_view)
             }
             glTexImage3D(GL_TEXTURE_3D,0,GL_RGBA,w[X],w[Y],w[Z],
                          0,GL_RGBA,GL_UNSIGNED_BYTE,txtr);
+	    if (!disable_texture3D_mipmap) {
             /*Create mip-maps*/
             for (lod=1; ws[X]||ws[Y]||ws[Z]; lod++)
             {
@@ -686,9 +687,13 @@ static int ds3SliceTexture3D(DS3Slice *_this,DS3View *_view)
                         }
                     }
                 }
+#ifndef NDEBUG
+		printf("creating mipmap level %d with size: x=%d, y=%d, z=%d\n", lod, w[X], w[Y], w[Z]);
+#endif
                 glTexImage3D(GL_TEXTURE_3D,lod,GL_RGBA,w[X],w[Y],w[Z],
                              0,GL_RGBA,GL_UNSIGNED_BYTE,txtr);
             }
+	    }
         }
         glBindTexture(GL_TEXTURE_3D,0);
         free(txtr);
@@ -789,7 +794,7 @@ static void ds3ViewSlicePeerDisplay(DS3ViewComp *_this,
     DS3View       *view;
     view=_this->ds3view;
     /*If we can, use a 3D texture for the slice*/
-    if (use_texture3D)
+    if (GLEW_EXT_texture3D)
         {if (view->t_valid||ds3SliceTexture3D(&view->slice,view))
         {
             DS3SliceVertex slice[16];

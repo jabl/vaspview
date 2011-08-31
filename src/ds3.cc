@@ -19,7 +19,7 @@
 #include "ds3viewr.hh"
 #include <cassert>
 
-bool use_texture3D;
+bool disable_texture3D_mipmap;
 
 /*Initializes the data set to default values*/
 DataSet3D::DataSet3D()
@@ -418,8 +418,10 @@ int main(int _argc,char **_argv)
     DS3Viewer ds3v;
     /*At this point, we've created a window, and so should have a current
       rendering context: test for GL extensions*/
-    //glewExperimental = GL_TRUE; // Enabled paletted textures on R300
-                                  // but it doesn't actually work..
+    
+    // Enabled paletted textures on R300 and i915
+    // but it doesn't actually work..
+    //glewExperimental = GL_TRUE;    
     GLenum err = glewInit();
     if (GLEW_OK != err)
     {
@@ -438,11 +440,10 @@ int main(int _argc,char **_argv)
 	    if (rr.find("Mesa") != std::string::npos &&
 		rr.find("Intel") != std::string::npos)
 	    {
-		    printf("Disabling EXT_texture3D on renderer: %s\n", 
+		    printf("Disabling 3D texture mipmapping on renderer: %s\n", 
 			   rr.c_str());
+		    disable_texture3D_mipmap = true;
 	    }
-	    else
-		    use_texture3D = true;
     }
     if (_argc>1)ds3ViewerOpenFile(&ds3v,_argv[1]);
     glutMainLoop();
