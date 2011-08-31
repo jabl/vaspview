@@ -20,6 +20,7 @@
 #include "ds3slice.hh"
 
 extern bool disable_texture3D_mipmap;
+extern int limit_mipmap_radeon;
 
 /*NOTE: The 2D slice extraction is the only operation that prevents the
   data set from being repeated an arbitrary amount in each direction. If we
@@ -646,7 +647,8 @@ static int ds3SliceTexture3D(DS3Slice *_this,DS3View *_view)
                          0,GL_RGBA,GL_UNSIGNED_BYTE,txtr);
 	    if (!disable_texture3D_mipmap) {
             /*Create mip-maps*/
-            for (lod=1; ws[X]||ws[Y]||ws[Z]; lod++)
+	    for (lod=1; (ws[X]||ws[Y]||ws[Z]) 
+			 && lod <= limit_mipmap_radeon; lod++)
             {
                 o[X]=ws[X]?4:0;
                 o[Y] = ws[Y] ? (w[X] << 2) : 0;

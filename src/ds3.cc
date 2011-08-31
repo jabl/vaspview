@@ -20,6 +20,7 @@
 #include <cassert>
 
 bool disable_texture3D_mipmap;
+int limit_mipmap_radeon = INT_MAX;
 
 /*Initializes the data set to default values*/
 DataSet3D::DataSet3D()
@@ -443,6 +444,14 @@ int main(int _argc,char **_argv)
 		    printf("Disabling 3D texture mipmapping on renderer: %s\n", 
 			   rr.c_str());
 		    disable_texture3D_mipmap = true;
+	    }
+	    else if (rr.find("Mesa") != std::string::npos 
+		     && rr.find("R300") != std::string::npos)
+	    {
+		    printf("Limiting mipmap levels to 7 on renderer: %s\n",
+			   rr.c_str());
+		    printf("See https://bugs.freedesktop.org/show_bug.cgi?id=28284\n");
+		    limit_mipmap_radeon = 7;
 	    }
     }
     if (_argc>1)ds3ViewerOpenFile(&ds3v,_argv[1]);
