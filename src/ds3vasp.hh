@@ -20,7 +20,6 @@
 #if !defined(_ds3vasp_H)
 # define _ds3vasp_H (1)
 
-#include <memory>
 #include "ds3.hh"
 #include "file.hh"
 
@@ -31,9 +30,6 @@ class DS3VaspReader
 {
 public:
 	DS3VaspReader(const char* file_name, const char* mode);
-	// Forbid copying
-	DS3VaspReader& operator=(const DS3VaspReader&) = delete;
-	DS3VaspReader(const DS3VaspReader&) = delete;
 
 	// Reads a block of data from the VASP file
 	int read();
@@ -48,7 +44,11 @@ public:
     File       file;
 
 private:
-    std::unique_ptr<DataSet3D> ds3;
+    // Forbid copying
+    DS3VaspReader& operator=(const DS3VaspReader&);
+    DS3VaspReader(const DS3VaspReader&);
+
+    DataSet3D* ds3;
     size_t     npoints;
     size_t     k;
 };

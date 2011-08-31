@@ -248,7 +248,7 @@ static void glwSliderLayout(GLWLayoutManager *_this,GLWSlider *_slider)
         _slider->label_rect.y=_slider->tick_rect.y-_slider->track_offs+
                               GLW_SLIDER_INSET;
         _slider->label_rect.w=0;
-	for (auto it = _slider->labels.begin(); 
+	for (mapis_itr it = _slider->labels.begin(); 
 	     it != _slider->labels.end(); ++it)
         {
 		std::string& lblp = it->second;
@@ -268,7 +268,7 @@ static void glwSliderLayout(GLWLayoutManager *_this,GLWSlider *_slider)
         _slider->thumb_rect.h=GLW_SLIDER_THUMB_HEIGHT;
         if (!_slider->labels.empty() && _slider->center_labels)
         {
-		auto it = _slider->labels.find(_slider->label_lo);
+	    mapis_itr it = _slider->labels.find(_slider->label_lo);
 		if (it != _slider->labels.end())
 		{
 			std::string& lblp = it->second;
@@ -479,7 +479,7 @@ void glwSliderPeerDisplay(GLWSlider *_this,GLWCallbacks *_cb)
             dy=glwFontGetDescent(_this->super.font);
             //hiInit(&ci,&_this->labels);
             //while (hiInc(&ci))
-	    for (auto it = _this->labels.begin(); 
+	    for (mapis_itr it = _this->labels.begin(); 
 		 it != _this->labels.end(); ++it)
             {
 		    int vp= (*it).first;
@@ -586,7 +586,7 @@ void glwSliderPeerDisplay(GLWSlider *_this,GLWCallbacks *_cb)
             cy=_this->label_rect.y+glwFontGetDescent(_this->super.font);
             //hiInit(&ci,&_this->labels);
             //while (hiInc(&ci))
-	    for (auto it = _this->labels.begin(); 
+	    for (mapis_itr it = _this->labels.begin(); 
 		 it != _this->labels.end(); ++it)
             {
 		    int vp= (*it).first;
@@ -1120,7 +1120,7 @@ int glwSliderDelLabel(GLWSlider *_this,int _val)
         {
             _this->label_lo=INT_MAX;
             _this->label_hi=INT_MIN;
-	    for (auto it = _this->labels.begin(); 
+	    for (mapis_itr it = _this->labels.begin(); 
 		 it != _this->labels.end(); ++it)
             {
 		    int v= (*it).first;

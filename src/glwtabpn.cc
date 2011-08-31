@@ -48,7 +48,7 @@ static int glwTabbedPaneCalcTabAreaHeight(GLWTabbedPane *_this,int _cols)
 static int glwTabbedPaneCalcMaxTabWidth(GLWTabbedPane *_this)
 {
 	int w = 0;
-	for (auto it = _this->tabs.begin(); it != _this->tabs.end(); ++it)
+	for (tab_itr it = _this->tabs.begin(); it != _this->tabs.end(); ++it)
 	{
 		GLWTabPage& tp = *it;
 		int tw = glwFontGetStringWidth(_this->super.font, 
@@ -1152,7 +1152,7 @@ int glwTabbedPaneAdd(GLWTabbedPane *_this,GLWComponent *_comp,
     tab.forec=_this->super.forec;
     tab.run=0;
     tab.comp=_comp;
-    auto ind = _this->tabs.begin() + _idx;
+    tab_itr ind = _this->tabs.begin() + _idx;
     _this->tabs.insert(ind, tab);
     if (_comp==NULL||glwCompAdd(&_this->super,_comp,-1))
     {

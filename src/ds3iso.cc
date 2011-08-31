@@ -126,7 +126,8 @@ static int ds3IsoAddTris(DS3IsoSurface *_this,long _x[3],
   successive frames*/
 static void ds3IsoXForm(DS3IsoSurface *_this,DataSet3D *_ds3)
 {
-    for (auto it = _this->verts.begin(); it != _this->verts.end(); ++it)
+    for (std::vector<DS3IsoVertex>::iterator it = _this->verts.begin(); 
+	 it != _this->verts.end(); ++it)
     {
         Vect3d p;
         double m;

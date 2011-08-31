@@ -83,8 +83,8 @@ public:
 
 	// C++11 version of making private copy constructor and
 	// assignment operator.
-	DataSet3D& operator=(const DataSet3D&) = delete;
-	DataSet3D(const DataSet3D&) = delete;
+	//DataSet3D& operator=(const DataSet3D&) = delete;
+	//DataSet3D(const DataSet3D&) = delete;
 
 	std::string name;                  /*Name of the data set*/
     char           *label[4];                      /*Label of three axes and data*/
@@ -96,9 +96,12 @@ public:
     /*DSLine3D       *lines;*/                                 /*Lines between points*/
     size_t          density[3];       /*Dimensions of packed array of data values*/
 	std::vector<double> data;          /*3D packed array of data*/
-    double          min;                                     /*Minimum data value*/
-    double          max;
-};                                   /*Maximum data value*/
+	double          min;     /*Minimum data value*/
+	double          max;     /*Maximum data value*/
+private:
+	DataSet3D(const DataSet3D&);
+	DataSet3D& operator=(const DataSet3D&);
+};                                  
 
 
 struct DSColorScale

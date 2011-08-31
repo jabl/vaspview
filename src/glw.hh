@@ -26,10 +26,9 @@
 #include <limits.h>
 #include <math.h>
 #include <string.h>
-#include <unordered_map>
+#include <map>
 #include <string>
 #include <vector>
-#include <cstdint>
 
 /*This is a small, portable component library that is dependent only on OpenGL
   and GLUT. It is not very general purpose, and in order to be made so
@@ -59,8 +58,9 @@
 
 // We use GL_RBGA8 for colors, that is 8 bits each for red, green,
 // blue + 8 bits for alpha. Thus GLWColor should be an unsigned 32-bit
-// integer.
-typedef        std::uint32_t         GLWcolor;
+// integer. In C++2011, we could use std::uint32_t from header
+// cstdint, but in practice, unsigned int is fine as well.
+typedef        unsigned int         GLWcolor;
 typedef        void                 *GLWfont;
 typedef        int                   GLWcursor;
 
@@ -227,14 +227,14 @@ struct GLWGridBagLayout
     unsigned          validating:1;
 };
 
+typedef std::vector<GLWComponent*>::iterator comps_itr;
+typedef std::vector<int>::iterator vi_itr;
 
 class GLWComponent
 {
 public:
 	GLWComponent();
 	~GLWComponent();
-	GLWComponent(const GLWComponent&) = delete;
-	GLWComponent& operator=(const GLWComponent&) = delete;
     GLWComponent     *parent;
     const GLWCallbacks     *callbacks;
     GLWRect           bounds;
@@ -257,6 +257,9 @@ public:
     unsigned          validate_root:1;
     unsigned          focused:1;
     unsigned          focusable:1;
+private:
+	GLWComponent(const GLWComponent&);
+	GLWComponent& operator=(const GLWComponent&);
 };
 
 
@@ -379,10 +382,11 @@ void           glwCompSuperDispose(GLWComponent *_this,
 
 struct GLWFrame
 {
-	GLWFrame() = delete;
 	GLWFrame(const char*);
 	GLWComponent  super;
 	std::string     title;
+private:
+	GLWFrame();
 };
 
 
@@ -396,10 +400,11 @@ void      glwFramePack(GLWFrame *_this);
 
 struct GLWLabel
 {
-	GLWLabel() = delete;
 	GLWLabel(const char*);
 	GLWComponent super;
 	std::string    label;
+private:
+	GLWLabel();
 };
 
 
@@ -414,7 +419,6 @@ int       glwLabelAddLabel(GLWLabel *_this,const char *_label);
 class GLWButton
 {
 public:
-	GLWButton() = delete;
 	GLWButton(const char*);
 	GLWComponent   super;
 	std::string      label;
@@ -422,6 +426,8 @@ public:
     void          *pressed_ctx;
     unsigned       down:1;
     unsigned       release:1;
+private:
+	GLWButton();
 };
 
 
@@ -439,7 +445,6 @@ void           glwButtonSetPressedCtx(GLWButton *_this,void *_ctx);
 
 struct GLWTextField
 {
-	GLWTextField() = delete;
 	GLWTextField(const char*, int);
     GLWComponent   super;
     GLWActionFunc  action;                      /*Enter pressed callback function*/
@@ -457,8 +462,10 @@ struct GLWTextField
     int            echo;                                         /*Echo character*/
     int            blink_timer;                       /*Timer for blinking cursor*/
     unsigned       editable:1;
-    unsigned       caret:1;
-};                                       /*Draw caret?*/
+    unsigned       caret:1;        /*Draw caret?*/
+private:
+	GLWTextField();
+};
 
 
 extern const GLWCallbacks GLW_TEXT_FIELD_CALLBACKS;
@@ -526,7 +533,6 @@ void              glwCheckBoxGroupSetChangedCtx(GLWCheckBoxGroup *_this,
 
 struct GLWCheckBox
 {
-	GLWCheckBox() = delete;
 	GLWCheckBox(const char*, int, GLWCheckBoxGroup*);
     GLWComponent      super;
     GLWActionFunc     changed;
@@ -535,6 +541,8 @@ struct GLWCheckBox
 	std::string label;
     unsigned          state:1;
     unsigned          down:1;
+private:
+	GLWCheckBox();
 };
 
 
@@ -557,12 +565,11 @@ void             *glwCheckBoxGetChangedCtx(GLWCheckBox *_this);
 void              glwCheckBoxSetChangedCtx(GLWCheckBox *_this,
         void *_ctx);
 
-
+typedef std::map<int, std::string>::iterator mapis_itr;
 
 class GLWSlider
 {
 public:
-	GLWSlider() = delete;
 	GLWSlider(int _min,int _max,int _val,int _ext);
 	int            getVal();
 	void           setVal(int val,int ext);
@@ -577,7 +584,8 @@ public:
     GLWComponent   super;
     GLWActionFunc  changed;
     void          *changed_ctx;
-    std::unordered_map<int, std::string>     labels;
+    // No need for ordering, in C++2011 this could be unordered_map 
+    std::map<int, std::string>     labels;
     int            major_ticks;
     int            major_offs;
     int            minor_ticks;
@@ -597,6 +605,8 @@ public:
     GLWRect        tick_rect;
     GLWRect        label_rect;
     unsigned       center_labels:1;
+private:
+	GLWSlider();
 };
 
 
@@ -641,6 +651,8 @@ struct GLWTabPage
     int           run;
     GLWComponent *comp;
 };
+
+typedef std::vector<GLWTabPage>::iterator tab_itr;
 
 class GLWTabbedPane
 {

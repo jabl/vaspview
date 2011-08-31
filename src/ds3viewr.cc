@@ -943,7 +943,7 @@ static void ds3ViewerAsyncRead(DS3Viewer *_this,GLWComponent *_c)
         }
         else ds3ViewerFinishRead(_this);
         free(_this->read_name);
-	_this->reader.reset();
+	delete _this->reader;
     }
     else if (_this->read_prog!=--ret)
     {
@@ -1065,7 +1065,7 @@ DS3Viewer::DS3Viewer() :
     cm_view = new GLWComponent();
     cm_view_btns = new GLWComponent();
     cm_opts = new GLWComponent();
-    _this->sl_slice_t.reset(new GLWSlider(0,360,0,0));
+    _this->sl_slice_t = new GLWSlider(0,360,0,0);
     lb_slice_p = new GLWLabel("Polar slice angle:");
     _this->sl_slice_p= new GLWSlider(0,360,0,0);
     lb_slice_d = new GLWLabel("Slice offset:");
@@ -1150,7 +1150,7 @@ DS3Viewer::DS3Viewer() :
             _this->tp_ctrl!=NULL&&_this->legend!=NULL&&_this->lb_status!=NULL&&
             _this->lb_datax!=NULL&&_this->lb_datay!=NULL&&_this->lb_dataz!=NULL&&
             _this->lb_datav!=NULL&&_this->cb_draw_slice!=NULL&&lb_slice_t!=NULL&&
-	_this->tf_slice_t!=NULL&&_this->sl_slice_t.get()!=NULL&&lb_slice_p!=NULL&&
+	_this->tf_slice_t!=NULL&&_this->sl_slice_t != NULL&&lb_slice_p!=NULL&&
 	_this->tf_slice_p!=NULL&&_this->sl_slice_p!=NULL&&lb_slice_d!=NULL&&
             _this->tf_slice_d!=NULL&&_this->sl_slice_d!=NULL&&
             _this->cb_draw_iso!=NULL&&lb_iso_v!=NULL&&_this->tf_iso_v!=NULL&&
@@ -2543,7 +2543,7 @@ void ds3ViewerOpenFile(DS3Viewer *_this,const char *_file)
 		_this->read_id=0;
 		_this->reader->cancel();
 		free(_this->read_name);
-		_this->reader.reset();
+		delete _this->reader;
 	}
 	if (_file==NULL||_file[0]=='\0')
 	{
@@ -2561,7 +2561,7 @@ void ds3ViewerOpenFile(DS3Viewer *_this,const char *_file)
 			errno=ENOMEM;
 		}
 		glwTextFieldSetText(_this->tf_file,_file);
-		_this->reader.reset(new DS3VaspReader(_file, "r"));
+		_this->reader = new DS3VaspReader(_file, "r");
 		if (_this->reader->file.f == NULL)
 		{
 			glwLabelSetLabel(_this->lb_status,"Could not open \"");
@@ -2594,7 +2594,7 @@ void ds3ViewerOpenFile(DS3Viewer *_this,const char *_file)
 			}
 			else ds3ViewerFinishRead(_this);
 			free(_this->read_name);
-			_this->reader.reset();
+			delete _this->reader;
 		}
         }
 }

@@ -76,11 +76,11 @@ static void ds3ViewLayout(GLWLayoutManager *_this,DS3View *_ds3view)
 {
     GLWRect *b;
     b=&_ds3view->super.bounds;
-    glwCompSetBounds(&_ds3view->cm_axes->super,0,0,b->w,b->h);
-    glwCompSetBounds(&_ds3view->cm_box->super,0,0,b->w,b->h);
-    glwCompSetBounds(&_ds3view->cm_slice->super,0,0,b->w,b->h);
-    glwCompSetBounds(&_ds3view->cm_iso->super,0,0,b->w,b->h);
-    glwCompSetBounds(&_ds3view->cm_pts->super,0,0,b->w,b->h);
+    glwCompSetBounds(&_ds3view->cm_axes.super,0,0,b->w,b->h);
+    glwCompSetBounds(&_ds3view->cm_box.super,0,0,b->w,b->h);
+    glwCompSetBounds(&_ds3view->cm_slice.super,0,0,b->w,b->h);
+    glwCompSetBounds(&_ds3view->cm_iso.super,0,0,b->w,b->h);
+    glwCompSetBounds(&_ds3view->cm_pts.super,0,0,b->w,b->h);
 }
 
 
@@ -353,9 +353,9 @@ static void ds3ViewPeerDisplayChildren(DS3View *_this,
             glLightfv(GL_LIGHT0,GL_DIFFUSE,LIGHT0_D);
             glLightfv(GL_LIGHT0,GL_SPECULAR,LIGHT0_S);
             glLightfv(GL_LIGHT0,GL_POSITION,LIGHT_P);
-            if ((_this->track_mp >= 0 && glwCompIsCapturing(&_this->cm_pts->super))
+            if ((_this->track_mp >= 0 && glwCompIsCapturing(&_this->cm_pts.super))
 # if defined(__DS3_ADD_BONDS__)
-		|| (_this->track_mbf >= 0 && glwCompIsCapturing(&_this->cm_bnds->super))
+		|| (_this->track_mbf >= 0 && glwCompIsCapturing(&_this->cm_bnds.super))
 # endif
                )
             {
@@ -397,26 +397,26 @@ static void ds3ViewPeerDisplayChildren(DS3View *_this,
         }
         if (_this->draw_coords)                                          /*Draw axes*/
         {
-            glwCompDisplay(&_this->cm_axes->super);
+            glwCompDisplay(&_this->cm_axes.super);
         }
         if (_this->draw_points)                                    /*Draw the points*/
         {
 # if defined(__DS3_ADD_BONDS__)
-            glwCompDisplay(&_this->cm_bnds->super);
+            glwCompDisplay(&_this->cm_bnds.super);
 # endif
-            glwCompDisplay(&_this->cm_pts->super);
+            glwCompDisplay(&_this->cm_pts.super);
         }
         if (_this->draw_slice)                                 /*Draw the data slice*/
         {
-            glwCompDisplay(&_this->cm_slice->super);
+            glwCompDisplay(&_this->cm_slice.super);
         }
         if (_this->draw_iso)                                  /*Draw the iso-surface*/
         {
-            glwCompDisplay(&_this->cm_iso->super);
+            glwCompDisplay(&_this->cm_iso.super);
         }
         if (_this->draw_coords)                                  /*Draw bounding box*/
         {
-            glwCompDisplay(&_this->cm_box->super);
+            glwCompDisplay(&_this->cm_box.super);
         }
         if (_this->track_cb)                           /*Draw the projected clip box*/
         {
@@ -739,7 +739,7 @@ static int ds3ViewGetPointsPoint(DS3View *_this,Vect3d _p,double *_t,
                     for (i=0; i<_this->ds3->npoints; i++)
                     {
                         if (ds3ViewGetPointVisible(_this,(long)i)||
-			    ((size_t)_this->track_sp == i && glwCompIsFocused(&_this->cm_pts->super)))
+			    ((size_t)_this->track_sp == i && glwCompIsFocused(&_this->cm_pts.super)))
                         {
                             Vect3d p;
                             Vect3d q;
@@ -1015,14 +1015,14 @@ static void ds3ViewTransferCapture(DS3View *_this,int _x,int _y)
                 ds3ViewGetAxesPoint(_this,_this->track_pt,&_this->track_t,
                                     _this->track_p0,_this->track_p1))
         {
-            cap=&_this->cm_axes->super;
+            cap=&_this->cm_axes.super;
         }
         if (_this->draw_points&&
                 ds3ViewGetPointsPoint(_this,p,&t,_this->track_p0,_this->track_p1))
         {
             if (cap==NULL||t<_this->track_t)
             {
-                cap=&_this->cm_pts->super;
+                cap=&_this->cm_pts.super;
                 vectSet3dv(_this->track_pt,p);
                 _this->track_t=t;
             }
@@ -1033,7 +1033,7 @@ static void ds3ViewTransferCapture(DS3View *_this,int _x,int _y)
         {
             if (cap==NULL||t<_this->track_t)
             {
-                cap=&_this->cm_bnds->super;
+                cap=&_this->cm_bnds.super;
                 vectSet3dv(_this->track_pt,p);
                 _this->track_t=t;
             }
@@ -1044,7 +1044,7 @@ static void ds3ViewTransferCapture(DS3View *_this,int _x,int _y)
         {
             if (cap==NULL||t<_this->track_t)
             {
-                cap=&_this->cm_slice->super;
+                cap=&_this->cm_slice.super;
                 vectSet3dv(_this->track_pt,p);
                 _this->track_t=t;
             }
@@ -1074,7 +1074,7 @@ static int ds3ViewPeerMouse(DS3View *_this,const GLWCallbacks *_cb,
                 ds3ViewSetSelectedBond(_this,-1-_this->track_sbf,_this->track_sbt);
             }
 # endif
-            glwCompRequestFocus(&_this->cm_axes->super);
+            glwCompRequestFocus(&_this->cm_axes.super);
         }
         if (_b==GLUT_LEFT_BUTTON)
         {
@@ -1214,26 +1214,26 @@ DS3ViewComp::DS3ViewComp(DS3View* ds3view)
         this->ds3view = ds3view;
 }
 
-DS3View::DS3View() : cm_axes(new DS3ViewComp(this)), 
-		     cm_box(new DS3ViewComp(this)),
-		     cm_pts(new DS3ViewComp(this)),
+DS3View::DS3View() : cm_axes(this), 
+		     cm_box(this),
+		     cm_pts(this),
 #if defined(__DS3_ADD_BONDS__)
-		     cm_bnds(new DS3ViewComp(this)),
+		     cm_bnds(this),
 #endif
-		     cm_slice(new DS3ViewComp(this)),
-		     cm_iso(new DS3ViewComp(this)),
+		     cm_slice(this),
+		     cm_iso(this),
 		     iso(NULL)
 {
-        if (glwCompAdd(&this->super,&this->cm_axes->super,-1)&&
-                glwCompAdd(&this->super,&this->cm_box->super,-1)&&
-                glwCompAdd(&this->super,&this->cm_slice->super,-1)&&
-                glwCompAdd(&this->super,&this->cm_iso->super,-1)&&
+        if (glwCompAdd(&this->super,&this->cm_axes.super,-1)&&
+                glwCompAdd(&this->super,&this->cm_box.super,-1)&&
+                glwCompAdd(&this->super,&this->cm_slice.super,-1)&&
+                glwCompAdd(&this->super,&this->cm_iso.super,-1)&&
 # if defined(__DS3_ADD_BONDS__)
-                glwCompAdd(&this->super,&this->cm_pts->super,-1)&&
-                glwCompAdd(&this->super,&this->cm_bnds->super,-1))
+                glwCompAdd(&this->super,&this->cm_pts.super,-1)&&
+                glwCompAdd(&this->super,&this->cm_bnds.super,-1))
         {
 # else
-                glwCompAdd(&this->super,&this->cm_pts->super,-1))
+                glwCompAdd(&this->super,&this->cm_pts.super,-1))
         {
 # endif
             this->super.callbacks=&DS3_VIEW_CALLBACKS;
@@ -1241,14 +1241,14 @@ DS3View::DS3View() : cm_axes(new DS3ViewComp(this)),
             glwCompSetForeColor(&this->super,GLW_COLOR_WHITE);
             glwCompSetCursor(&this->super,GLUT_CURSOR_CROSSHAIR);
             glwCompSetLayout(&this->super,&ds3_view_layout);
-            this->cm_axes->super.callbacks=&DS3_VIEW_AXES_CALLBACKS;
-            this->cm_box->super.callbacks=&DS3_VIEW_BOX_CALLBACKS;
-            this->cm_pts->super.callbacks=&DS3_VIEW_PTS_CALLBACKS;
+            this->cm_axes.super.callbacks=&DS3_VIEW_AXES_CALLBACKS;
+            this->cm_box.super.callbacks=&DS3_VIEW_BOX_CALLBACKS;
+            this->cm_pts.super.callbacks=&DS3_VIEW_PTS_CALLBACKS;
 # if defined(__DS3_ADD_BONDS__)
-            this->cm_bnds->super.callbacks=&DS3_VIEW_BNDS_CALLBACKS;
+            this->cm_bnds.super.callbacks=&DS3_VIEW_BNDS_CALLBACKS;
 # endif
-            this->cm_iso->super.callbacks=&DS3_VIEW_ISO_CALLBACKS;
-            this->cm_slice->super.callbacks=&DS3_VIEW_SLICE_CALLBACKS;
+            this->cm_iso.super.callbacks=&DS3_VIEW_ISO_CALLBACKS;
+            this->cm_slice.super.callbacks=&DS3_VIEW_SLICE_CALLBACKS;
             /*Win32 version of GLUT does not support these cursors!*/
             /*glwCompSetCursor(&this->cm_axes->super,GLUT_CURSOR_CYCLE);*/
             /*glwCompSetCursor(&this->cm_pts->super,GLUT_CURSOR_INFO);*/
@@ -1549,13 +1549,13 @@ int ds3ViewSetDataSet(DS3View *_this,DataSet3D *_ds3)
     ds3ViewSetSelectedBond(_this,-1,-1);
 # endif
     _this->view_stack.clear();
-    glwCompSetFocusable(&_this->cm_axes->super,_ds3!=NULL);
-    glwCompSetFocusable(&_this->cm_box->super,_ds3!=NULL);
-    glwCompSetFocusable(&_this->cm_pts->super,_ds3!=NULL&&_ds3->npoints>0);
+    glwCompSetFocusable(&_this->cm_axes.super,_ds3!=NULL);
+    glwCompSetFocusable(&_this->cm_box.super,_ds3!=NULL);
+    glwCompSetFocusable(&_this->cm_pts.super,_ds3!=NULL&&_ds3->npoints>0);
 # if defined(__DS3_ADD_BONDS__)
-    glwCompSetFocusable(&_this->cm_bnds->super,0);
+    glwCompSetFocusable(&_this->cm_bnds.super,0);
 # endif
-    glwCompSetFocusable(&_this->cm_slice->super,_ds3!=NULL);
+    glwCompSetFocusable(&_this->cm_slice.super,_ds3!=NULL);
     glwCompRevalidate(&_this->super);
     return 1;
 }
@@ -1665,8 +1665,8 @@ void ds3ViewSetDrawCoordS(DS3View *_this,int _b)
     if (_this->draw_coords!=(_b?1U:0U))
     {
         _this->draw_coords=_b?1:0;
-        glwCompVisibility(&_this->cm_axes->super,_b);
-        glwCompVisibility(&_this->cm_box->super,_b);
+        glwCompVisibility(&_this->cm_axes.super, _b);
+        glwCompVisibility(&_this->cm_box.super, _b);
         glwCompRepaint(&_this->super,0);
     }
 }
@@ -1676,7 +1676,7 @@ void ds3ViewSetDrawPoints(DS3View *_this,int _b)
     if (_this->draw_points!=(_b?1U:0U))
     {
         _this->draw_points=_b?1:0;
-        glwCompVisibility(&_this->cm_pts->super,_b);
+        glwCompVisibility(&_this->cm_pts.super, _b);
         glwCompRepaint(&_this->super,0);
     }
 }
@@ -1686,7 +1686,7 @@ void ds3ViewSetDrawSlice(DS3View *_this,int _b)
     if (_this->draw_slice!=(_b?1U:0U))
     {
         _this->draw_slice=_b?1:0;
-        glwCompVisibility(&_this->cm_slice->super,_b);
+        glwCompVisibility(&_this->cm_slice.super, _b);
         glwCompRepaint(&_this->super,0);
     }
 }
@@ -1696,7 +1696,7 @@ void ds3ViewSetDrawIso(DS3View *_this,int _b)
     if (_this->draw_iso!=(_b?1U:0U))
     {
         _this->draw_iso=_b?1:0;
-        glwCompVisibility(&_this->cm_iso->super,_b);
+        glwCompVisibility(&_this->cm_iso.super, _b);
         glwCompRepaint(&_this->super,0);
     }
 }
@@ -1913,7 +1913,7 @@ void ds3ViewSetBond(DS3View *_this,long _from,long _to,double _sz)
                 ds3BondsGet(&_this->bonds,_from,_to)!=_sz)
         {
             ds3BondsSet(&_this->bonds,_from,_to,_sz);
-            glwCompSetFocusable(&_this->cm_bnds->super,_this->bonds.nbonds>0);
+            glwCompSetFocusable(&_this->cm_bnds.super, _this->bonds.nbonds>0);
             glwCompRepaint(&_this->super,0);
 #  if defined(__DS3_SAVE_BONDS__)
             if (_this->bonds_changed_func!=NULL)

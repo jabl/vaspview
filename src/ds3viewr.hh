@@ -20,7 +20,6 @@
 #if !defined(_ds3viewr_H)
 # define _ds3viewr_H (1)
 
-#include <memory>
 #include "ds3.hh"
 #include "ds3legnd.hh"
 #include "ds3view.hh"
@@ -34,9 +33,6 @@ class DS3Viewer
 public:
 	DS3Viewer();
 	~DS3Viewer();
-	// Forbid copying
-	DS3Viewer& operator=(const DS3Viewer&) = delete;
-	DS3Viewer(const DS3Viewer&) = delete;
 
 	GLWFrame*         frame;
 	DS3View*          ds3view;
@@ -52,7 +48,7 @@ public:
     GLWLabel         *lb_dataz;
     GLWLabel         *lb_datav;
     GLWTextField     *tf_slice_t;
-	std::unique_ptr<GLWSlider>        sl_slice_t;
+    GLWSlider*        sl_slice_t;
     GLWTextField     *tf_slice_p;
     GLWSlider        *sl_slice_p;
     GLWTextField     *tf_slice_d;
@@ -125,9 +121,13 @@ public:
     char             *bond_name;
 # endif
     char             *read_name;
-    std::unique_ptr<DS3VaspReader>    reader;
+    DS3VaspReader*    reader;
     int               read_prog;
     int               read_id;
+private:
+    // Forbid copying
+    DS3Viewer& operator=(const DS3Viewer&);
+    DS3Viewer(const DS3Viewer&);
 };
 
 void ds3ViewerUpdatePointRLabels(DS3Viewer *_this);

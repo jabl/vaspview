@@ -1,6 +1,7 @@
 /*VASP Data Viewer - Views 3d data sets of molecular charge distribution
   Copyright (C) 1999-2001 Timothy B. Terriberry
   (mailto:tterribe@users.sourceforge.net)
+  2011 Janne Blomqvist
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -33,7 +34,6 @@ typedef struct DS3ViewComp DS3ViewComp;
 # endif
 # include "ds3slice.hh"
 # include "ds3iso.hh"
-#include <memory>
 
 
 # define DS3V_CAPTURE_COLOR GLW_COLOR_RED
@@ -46,10 +46,11 @@ typedef struct DS3ViewComp DS3ViewComp;
 
 struct DS3ViewComp
 {
-	DS3ViewComp() = delete;
-	DS3ViewComp(DS3View*);
+    DS3ViewComp(DS3View*);
     GLWComponent  super;
     DS3View      *ds3view;
+private:
+    DS3ViewComp();
 };
 
 struct DS3ViewParams
@@ -63,14 +64,14 @@ struct DS3View
 {
 	DS3View();
     GLWComponent   super;
-	std::unique_ptr<DS3ViewComp>   cm_axes;
-	std::unique_ptr<DS3ViewComp>   cm_box;
-	std::unique_ptr<DS3ViewComp>   cm_pts;
+    DS3ViewComp   cm_axes;
+    DS3ViewComp   cm_box;
+    DS3ViewComp   cm_pts;
 # if defined(__DS3_ADD_BONDS__)
-	std::unique_ptr<DS3ViewComp>   cm_bnds;
+    DS3ViewComp   cm_bnds;
 # endif
-	std::unique_ptr<DS3ViewComp>   cm_slice;
-	std::unique_ptr<DS3ViewComp>   cm_iso;
+    DS3ViewComp   cm_slice;
+    DS3ViewComp   cm_iso;
     GLWActionFunc  data_changed_func;
     void          *data_changed_ctx;
     GLWActionFunc  slice_changed_func;

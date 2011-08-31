@@ -42,7 +42,7 @@ static void ds3ViewAxesPeerDisplay(DS3ViewComp *_this,
     /*This part is supposed to be in ds3ViewBoxPeerDisplay(), but is here for
       z-buffer accuracy concerns*/
     nc=glwColorBlend(view->super.forec,view->super.backc);
-    if (glwCompIsFocused(&view->cm_box->super))
+    if (glwCompIsFocused(&view->cm_box.super))
     {
         fc=glwColorBlend(nc,DS3V_FOCUS_COLOR);
     }
@@ -53,10 +53,10 @@ static void ds3ViewAxesPeerDisplay(DS3ViewComp *_this,
         for (j=0; j<3; j++)x[j]=i&1<<j?1:0;
         for (j=0; j<3; j++)if (!x[j])
             {
-                if (glwCompIsFocused(&view->cm_box->super)&&view->track_pl>>1!=j&&
+                if (glwCompIsFocused(&view->cm_box.super)&&view->track_pl>>1!=j&&
                         x[view->track_pl>>1]==(view->track_pl&1))c=fc;
                 else c=nc;
-                if (view->track_ax==k&&glwCompIsCapturing(&view->cm_axes->super))
+                if (view->track_ax==k&&glwCompIsCapturing(&view->cm_axes.super))
                 {
                     glwColor(glwColorBlend(c,DS3V_CAPTURE_COLOR));
                 }

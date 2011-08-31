@@ -21,23 +21,24 @@
 // Remove trailing spaces (as determined by std::isspace)
 std::string& trim(std::string& str)
 {
-	size_t found = str.length();
-	for (auto rit = str.rbegin(); rit != str.rend(); ++rit)
-	{
-		if (std::isspace(*rit))
-			found--;
-		else
-			break;
-	}
-	str.erase(found);
-	return str;
+    size_t found = str.length();
+    for (std::string::reverse_iterator rit = str.rbegin(); 
+	 rit != str.rend(); ++rit)
+    {
+	if (std::isspace(*rit))
+	    found--;
+	else
+	    break;
+    }
+    str.erase(found);
+    return str;
 }
 
 // Left adjust a string
 std::string& adjustl(std::string& str)
 {
 	size_t found = 0;
-	for (auto it = str.begin(); it != str.end(); ++it)
+	for (std::string::iterator it = str.begin(); it != str.end(); ++it)
 	{
 		if (std::isspace(*it))
 			found++;

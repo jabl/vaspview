@@ -20,11 +20,14 @@
 #include "glinc.hh"
 #include "glw.hh"
 
-#include <unordered_map>
+#include <map>
 
 /*The highest-level component.*/
 
-std::unordered_map<int, GLWFrame*> glw_frame_table;
+// Ordered semantics not needed, so C++2011 unordered_map would be
+// fine.
+std::map<int, GLWFrame*> glw_frame_table;
+typedef std::map<int, GLWFrame*>::iterator frt_itr;
 
 static void glwFramePeerDispose(GLWFrame *_this,const GLWCallbacks *_cb)
 {
@@ -55,7 +58,7 @@ static void glwFrameGlutDisplay(void)
     wid=glutGetWindow();
     if (wid!=0)
     {
-	auto it = glw_frame_table.find(wid);
+	frt_itr it = glw_frame_table.find(wid);
         if (it != glw_frame_table.end())
         {
 	    GLWFrame *framep = (*it).second;
@@ -98,7 +101,7 @@ static void glwFrameGlutReshape(int _w,int _h)
     wid=glutGetWindow();
     if (wid!=0)
     {
-	auto it = glw_frame_table.find(wid);
+	frt_itr it = glw_frame_table.find(wid);
         if (it != glw_frame_table.end())
         {
 	    GLWFrame * framep = (*it).second;
@@ -114,7 +117,7 @@ static void glwFrameGlutVisibility(int _state)
     wid=glutGetWindow();
     if (wid!=0)
     {
-	auto it = glw_frame_table.find(wid);
+	frt_itr it = glw_frame_table.find(wid);
 	if (it != glw_frame_table.end())
         {
 	    GLWFrame *framep = (*it).second;
@@ -129,7 +132,7 @@ static void glwFrameGlutEntry(int _state)
     wid=glutGetWindow();
     if (wid!=0)
     {
-	auto it = glw_frame_table.find(wid);
+	frt_itr it = glw_frame_table.find(wid);
 	if (it != glw_frame_table.end())
         {
 	    GLWFrame *framep = (*it).second;
@@ -144,7 +147,7 @@ static void glwFrameGlutKeyboard(unsigned char _key,int _x,int _y)
     wid=glutGetWindow();
     if (wid!=0)
     {
-	auto it = glw_frame_table.find(wid);
+	frt_itr it = glw_frame_table.find(wid);
 	if (it != glw_frame_table.end())
         {
 	    GLWFrame *framep = (*it).second;
@@ -161,7 +164,7 @@ static void glwFrameGlutSpecial(int _key,int _x,int _y)
     wid=glutGetWindow();
     if (wid!=0)
     {
-	auto it = glw_frame_table.find(wid);
+	frt_itr it = glw_frame_table.find(wid);
 	if (it != glw_frame_table.end())
         {
 	    GLWFrame *framep = (*it).second;
@@ -178,7 +181,7 @@ static void glwFrameGlutMouse(int _but,int _state,int _x,int _y)
     wid=glutGetWindow();
     if (wid!=0)
     {
-	auto it = glw_frame_table.find(wid);
+	frt_itr it = glw_frame_table.find(wid);
 	if (it != glw_frame_table.end())
         {
 	    GLWFrame *framep = (*it).second;
@@ -195,7 +198,7 @@ static void glwFrameGlutMotion(int _x,int _y)
     wid=glutGetWindow();
     if (wid!=0)
     {
-	auto it = glw_frame_table.find(wid);
+	frt_itr it = glw_frame_table.find(wid);
 	if (it != glw_frame_table.end())
         {
 	    GLWFrame *framep = (*it).second;
@@ -212,7 +215,7 @@ static void glwFrameGlutPassiveMotion(int _x,int _y)
     wid=glutGetWindow();
     if (wid!=0)
     {
-	auto it = glw_frame_table.find(wid);
+	frt_itr it = glw_frame_table.find(wid);
 	if (it != glw_frame_table.end())
         {
 	    GLWFrame *framep = (*it).second;

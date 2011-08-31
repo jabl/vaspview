@@ -28,6 +28,8 @@
 
 # define GLW_CHECK_BOX_INSET (2)
 
+typedef std::vector<GLWCheckBox*>::iterator cbs_itr;
+
 GLWCheckBoxGroup::GLWCheckBoxGroup(void)
 {
     this->seld=-1;
@@ -38,7 +40,7 @@ GLWCheckBoxGroup::GLWCheckBoxGroup(void)
 GLWCheckBoxGroup::~GLWCheckBoxGroup()
 {
     this->changed = NULL;
-    for (auto it = cbs.begin(); it != cbs.end(); ++it)
+    for (cbs_itr it = cbs.begin(); it != cbs.end(); ++it)
 	    glwCheckBoxSetGroup(*it, NULL);
 }
 
@@ -51,7 +53,7 @@ static int glwCheckBoxGroupAdd(GLWCheckBoxGroup* _this, GLWCheckBox* cb)
 static int glwCheckBoxGroupDel(GLWCheckBoxGroup* _this, GLWCheckBox* cb)
 {
 	int i = 0;
-	for (auto it = _this->cbs.begin(); it != _this->cbs.end(); ++it)
+	for (cbs_itr it = _this->cbs.begin(); it != _this->cbs.end(); ++it)
 	{
 		if (*it == cb)
 		{
@@ -303,7 +305,7 @@ static int glwCheckBoxPeerSpecial(GLWCheckBox *_this,const GLWCallbacks *_cb,
         if (_this->group!=NULL)
         {
             int           i;
-	    auto it = _this->group->cbs.begin();
+	    cbs_itr it = _this->group->cbs.begin();
 	    for (i = 0; 
 		 it != _this->group->cbs.end(); ++it, ++i)
 		    if (*it == _this) break;
@@ -493,7 +495,7 @@ void glwCheckBoxSetState(GLWCheckBox *_this,int _state)
                 if (_this->group->seld<0)              /*If nothing is selected, select us*/
                 {
 			int ii;
-			auto it = _this->group->cbs.begin();
+			cbs_itr it = _this->group->cbs.begin();
 			for (ii = 0;
 			     it != _this->group->cbs.end(); ++it, ++ii)
 				if (*it == _this)

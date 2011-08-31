@@ -24,13 +24,14 @@
 class File
 {
 public :
-	File() = delete;
 	File(const char* name, const char* mode);
 	~File();
-	File& operator=(const File&) = delete;
-	File(const File&) = delete;
 	bool fgets(std::string& line);
 	std::FILE* f;
+private:
+    File();
+    File& operator=(const File&);
+    File(const File&);
 };
 
 #endif

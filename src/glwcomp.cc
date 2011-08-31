@@ -20,7 +20,7 @@
 #include "glinc.hh"
 #include "glw.hh"
 
-#include <unordered_map>
+#include <map>
 
 
 
@@ -44,7 +44,10 @@ typedef struct GLWTimerEntry
     GLWActionFunc  func;
 } GLWTimerEntry;
 
-typedef std::unordered_map<int, GLWTimerEntry> timer_map;
+// These maps does not need ordering, so C++2011 unordered_map wuold
+// be fine.
+typedef std::map<int, GLWTimerEntry> timer_map;
+typedef std::map<int, GLWTimerEntry>::iterator timer_itr;
 
 static int glw_timer_id;
 static int glw_idler_id;
@@ -62,7 +65,7 @@ static void glwCompGlutPostRedisplay(int _wid)
 
 static void glwCompGlutTimer(int _id)
 {
-    auto it = glw_timer_table.find(_id);
+    timer_itr it = glw_timer_table.find(_id);
     if (it != glw_timer_table.end())
     {
 	    GLWTimerEntry& timer = it->second;
@@ -77,7 +80,7 @@ static void glwCompGlutIdle(void)
     int clear = 1;
     // Need an unusual iteration structure since the current iterator
     // may be deleted.
-    auto it = glw_idler_table.begin();
+    timer_itr it = glw_idler_table.begin();
     while (it != glw_idler_table.end())
     {
 	    // Tricky part: idler is taken before incrementing
@@ -299,10 +302,13 @@ GLWComponent::GLWComponent()
 GLWComponent::~GLWComponent()
 {
 	delete this->parent;
-	for (auto it = this->comps.begin(); it != this->comps.end(); ++it)
-	{
-		delete *it;
-	}
+// The Components should be owned by their parents and be destroyed
+// when going out of scope. this->comps is just a list of pointers to
+// components without ownership.
+	// for (auto it = this->comps.begin(); it != this->comps.end(); ++it)
+	// {
+	// 	delete *it;
+	// }
     glwCompSetLayout(this,NULL);
     glwCompDispose(this);
 }
@@ -335,7 +341,7 @@ int glwCompIsFocusable(GLWComponent *_this)
 
 int glwCompIsFocusTraversable(GLWComponent *_this)
 {
-    for (auto it = _this->comps.begin(); it != _this->comps.end(); ++it)
+    for (comps_itr it = _this->comps.begin(); it != _this->comps.end(); ++it)
     {
 	    GLWComponent* child = *it;
 	    if (child->focusable||glwCompIsFocusTraversable(child))
@@ -708,7 +714,7 @@ int glwCompAdd(GLWComponent *_this,GLWComponent *_comp,int _idx)
 
 int glwCompDel(GLWComponent *_this,GLWComponent *_comp)
 {
-	for (auto it = _this->comps.begin(); it != _this->comps.end(); ++it)
+    for (comps_itr it = _this->comps.begin(); it != _this->comps.end(); ++it)
 	{
 		if (*it == _comp)
 		{
@@ -729,7 +735,7 @@ int glwCompDel(GLWComponent *_this,GLWComponent *_comp)
 
 void glwCompDelAll(GLWComponent *_this)
 {
-	for (auto it = _this->comps.begin(); it != _this->comps.end(); ++it)
+    for (comps_itr it = _this->comps.begin(); it != _this->comps.end(); ++it)
 	{
 		GLWComponent* comp = *it;
 		comp->parent=NULL;
@@ -1023,7 +1029,7 @@ GLWComponent *glwCompGetComponentAt(GLWComponent *_this,int _x,int _y)
     if (_x<0||_x>=_this->bounds.w||_y<0||_y>=_this->bounds.h)return NULL;
     /*Check each child, in order. The first one hit that contains the point is
       returned (assumes higher components come first)*/
-    for (auto it = _this->comps.begin(); it != _this->comps.end(); ++it)
+    for (comps_itr it = _this->comps.begin(); it != _this->comps.end(); ++it)
     {
         GLWComponent* child = *it;
         if (child!=NULL&&glwCompIsVisible(child)&&
@@ -1045,7 +1051,7 @@ GLWComponent *glwCompFindComponentAt(GLWComponent *_this,int _x,int _y)
     if (_x<0||_x>=_this->bounds.w||_y<0||_y>=_this->bounds.h)return _this;
     /*Check each child, in order. The first one hit that contains the point is
       returned (assumes higher components come first)*/
-    for (auto it = _this->comps.begin(); it != _this->comps.end(); ++it)
+    for (comps_itr it = _this->comps.begin(); it != _this->comps.end(); ++it)
     {
         GLWComponent* child = *it;
 	if (child!=NULL&&glwCompIsVisible(child)&&
@@ -1082,7 +1088,7 @@ int glwCompAddTimer(GLWComponent *_this,GLWActionFunc _func,
 
 int glwCompDelTimer(GLWComponent *_this, int id)
 {
-	for (auto it = _this->timers.begin(); it != _this->timers.end(); ++it)
+	for (vi_itr it = _this->timers.begin(); it != _this->timers.end(); ++it)
 		if (*it == id)
 		{
 			_this->timers.erase(it);
@@ -1094,7 +1100,7 @@ int glwCompDelTimer(GLWComponent *_this, int id)
 
 GLWActionFunc glwCompGetTimerFunc(GLWComponent *_this,int _id)
 {
-    auto it = glw_timer_table.find(_id);
+    timer_itr it = glw_timer_table.find(_id);
     if (it != glw_timer_table.end())
     {
 	    GLWTimerEntry& entry = (*it).second;
@@ -1105,7 +1111,7 @@ GLWActionFunc glwCompGetTimerFunc(GLWComponent *_this,int _id)
 
 void *glwCompGetTimerCtx(GLWComponent *_this,int _id)
 {
-    auto it = glw_timer_table.find(_id);
+    timer_itr it = glw_timer_table.find(_id);
     if (it != glw_timer_table.end())
     {
 	    GLWTimerEntry& entry = (*it).second;
@@ -1144,7 +1150,7 @@ int glwCompAddIdler(GLWComponent *_this,GLWActionFunc _func,void *_ctx)
 
 int glwCompDelIdler(GLWComponent *_this, int id)
 {
-	for (auto it = _this->idlers.begin(); it != _this->idlers.end(); ++it)
+	for (vi_itr it = _this->idlers.begin(); it != _this->idlers.end(); ++it)
 		if (*it == id)
 		{
 			_this->idlers.erase(it);
@@ -1158,7 +1164,7 @@ int glwCompDelIdler(GLWComponent *_this, int id)
 
 GLWActionFunc glwCompGetIdlerFunc(GLWComponent *_this,int _id)
 {
-	auto it = glw_idler_table.find(_id);
+	timer_itr it = glw_idler_table.find(_id);
 	if (it != glw_idler_table.end())
 	{
 		GLWTimerEntry& entry = (*it).second;
@@ -1169,7 +1175,7 @@ GLWActionFunc glwCompGetIdlerFunc(GLWComponent *_this,int _id)
 
 void *glwCompGetIdlerCtx(GLWComponent *_this,int _id)
 {
-	auto it = glw_idler_table.find(_id);
+	timer_itr it = glw_idler_table.find(_id);
 	if (it != glw_idler_table.end())
 	{
 		GLWTimerEntry& entry = (*it).second;
@@ -1209,7 +1215,7 @@ void glwCompValidate(GLWComponent *_this)
         const GLWCallbacks *cb;
         for (cb=_this->callbacks; cb!=NULL&&cb->validate==NULL; cb=cb->super);
         if (cb!=NULL)cb->validate(_this,cb);
-        for (auto it = _this->comps.begin(); it != _this->comps.end(); ++it)
+        for (comps_itr it = _this->comps.begin(); it != _this->comps.end(); ++it)
         {
             glwCompValidate(*it);
         }
