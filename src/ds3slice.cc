@@ -466,7 +466,7 @@ static int ds3SliceMakeFast(DS3Slice *_this,DS3View *_view)
 }
 
 /*Creates a 3D texture, if our version of OpenGL supports it (1.2 or later, or
-  one that supports EXT_texture3d). Also, 256 colors is deemed to be enough,
+  one that supports EXT_texture3D). Also, 256 colors is deemed to be enough,
   so paletted textures are used if supported (1.2 or later, or
   EXT_paletted_texture) to save on memory and processing time. This is much
   more advantageous than a 2D texture, since we do not have to create a 2D
@@ -796,7 +796,7 @@ static void ds3ViewSlicePeerDisplay(DS3ViewComp *_this,
     DS3View       *view;
     view=_this->ds3view;
     /*If we can, use a 3D texture for the slice*/
-    if (GLEW_EXT_texture3D)
+    if (GLEW_VERSION_1_2)
         {if (view->t_valid||ds3SliceTexture3D(&view->slice,view))
         {
             DS3SliceVertex slice[16];

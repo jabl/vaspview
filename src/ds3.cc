@@ -438,8 +438,8 @@ int main(int _argc,char **_argv)
     if (GLEW_EXT_paletted_texture)
 	    printf("EXT_paletted_texture available.\n");
 
-    if (!GLEW_EXT_texture3D) {
-	printf("EXT_texture3D not available. Slice rendering will be excruciatingly slow!\n");
+    if (!GLEW_VERSION_1_2) {
+	printf("OpenGL 1.2 not available. Slice rendering will be excruciatingly slow!\n");
     } else {
 	    std::string rr = (const char*) glGetString(GL_RENDERER);
 	    if (rr.find("Mesa") != std::string::npos &&
