@@ -44,9 +44,14 @@
   d: The new detail level*/
 static void ds3IsoReset(DS3IsoSurface *_this,long _d)
 {
-	_this->verts.clear();
-	_this->nodes.clear();
-	_this->leafs.clear();
+#ifndef NDEBUG
+    printf("Old size of Isosurface datastructures: verts: %ld, nodes: %ld, leafs: %ld\n", 
+	   (long)_this->verts.size(), (long)_this->nodes.size(), 
+	   (long)_this->leafs.size());
+#endif
+    _this->verts.clear();
+    _this->nodes.clear();
+    _this->leafs.clear();
     while (_this->dim<=_d)_this->dim<<=1;
     _this->stp=_d;
 }
@@ -129,16 +134,24 @@ static void ds3IsoXForm(DS3IsoSurface *_this,DataSet3D *_ds3)
     for (std::vector<DS3IsoVertex>::iterator it = _this->verts.begin(); 
 	 it != _this->verts.end(); ++it)
     {
-        Vect3d p;
+        Vect3d p, tmp;
         double m;
         int    j;
 	DS3IsoVertex& vert = *it;
-        for (j = 0; j < 3; j++) p[j] = vectDot3d(_ds3->basis[j], vert.vert);
-        vectSet3dv(vert.vert,p);
-        for (j = 0; j < 3; j++) p[j] = vectDot3d(_ds3->basis[j], vert.norm);
+	for (int ii = 0; ii < 3; ++ii)
+	    p[ii] = vert.vert[ii];
+        for (j = 0; j < 3; j++) vert.vert[j] = vectDot3d(_ds3->basis[j], p);
+
+	for (int ii = 0; ii < 3; ++ii)
+	    tmp[ii] = vert.norm[ii];
+        for (j = 0; j < 3; j++) p[j] = vectDot3d(_ds3->basis[j], tmp);
         m=vectMag2_3d(p);
-        if (m < 1E-100) vectSet3d(vert.norm, 0, 0, 1);
-        else vectMul3d(vert.norm, p, 1/sqrt(m));
+        if (m < 1E-100) vectSet3f(vert.norm, 0, 0, 1);
+        else {
+	    double rsqrtm = 1/sqrt(m);
+	    for (int ii = 0; ii < 3; ++ii)
+		vert.norm[ii] = p[ii] * rsqrtm;
+	}
     }
 }
 
@@ -409,8 +422,8 @@ static void ds3ViewIsoPeerDisplay(DS3ViewComp *_this,const GLWCallbacks *_cb)
     glEnable(GL_LIGHTING);
     glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
-    glVertexPointer(3,GL_DOUBLE, sizeof(DS3IsoVertex), vert.vert);
-    glNormalPointer(GL_DOUBLE, sizeof(DS3IsoVertex), vert.norm);
+    glVertexPointer(3, GL_FLOAT, sizeof(DS3IsoVertex), vert.vert);
+    glNormalPointer(GL_FLOAT, sizeof(DS3IsoVertex), vert.norm);
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
     ds3ViewIsoDrawTree(view,&ctx,box);

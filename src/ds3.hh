@@ -48,6 +48,8 @@
 # define __DS3_SAVE_BONDS__ (1)
 
 _DeclareTypedVect3(double,d)
+_DeclareTypedVect3(float,f)
+
 typedef struct DSPoint3D  DSPoint3D;
 typedef struct DataSet3D  DataSet3D;
 

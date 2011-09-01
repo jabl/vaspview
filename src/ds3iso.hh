@@ -27,8 +27,8 @@
 
 struct DS3IsoVertex
 {
-    Vect3d vert;
-    Vect3d norm;
+    Vect3f vert;
+    Vect3f norm;
 };
 
 

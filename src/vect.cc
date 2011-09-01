@@ -19,5 +19,7 @@
 # include "vect.hh"
 
 _DeclareTypedVect3(double,d)
+_DeclareTypedVect3(float,f)
 
 _DefineTypedVect3(double,d)
+_DefineTypedVect3(float,f)
