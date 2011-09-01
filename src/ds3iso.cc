@@ -184,9 +184,9 @@ static void ds3ViewIsoDrawLeaf(DS3IsoDrawCtx *_this,long _leaf,long _offs)
     leaf = &_this->iso->leafs[_leaf];
     if (GLEW_ARB_vertex_buffer_object) {
 	GLsizeiptr sz = leaf->nverts * sizeof(GLint);
-	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 
-			_this->ibo_off * sizeof(GLint), sz, 
-			leaf->verts);
+	glBufferSubDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 
+			   _this->ibo_off * sizeof(GLint), sz, 
+			   leaf->verts);
 	_this->ibo_off += leaf->nverts;
     } else
 	glDrawElements(GL_TRIANGLES,leaf->nverts,GL_UNSIGNED_INT,leaf->verts);
@@ -440,19 +440,20 @@ static void ds3ViewIsoPeerDisplay(DS3ViewComp *_this,const GLWCallbacks *_cb)
     if (GLEW_ARB_vertex_buffer_object) {
 	ctx.ibo_off = 0;
 	if (!vboinit) {
-	    glGenBuffers(1, &vboid);
-	    glGenBuffers(1, &iboid);
+	    glGenBuffersARB(1, &vboid);
+	    glGenBuffersARB(1, &iboid);
 	    vboinit = true;
 	}
-	glBindBuffer(GL_ARRAY_BUFFER, vboid);
-	glBufferData(GL_ARRAY_BUFFER, 
+	glBindBufferARB(GL_ARRAY_BUFFER_ARB, vboid);
+	glBufferDataARB(GL_ARRAY_BUFFER_ARB, 
 		     view->iso.verts.size() * sizeof(DS3IsoVertex), 
-		     &view->iso.verts[0], GL_STATIC_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, iboid);
+		     &view->iso.verts[0], GL_STATIC_DRAW_ARB);
+	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, iboid);
 	// Need to tell OpenGL the size of the index buffer, filled in
 	// later. This is a conservative maximum guess.
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, view->iso.leafs.size() * 15 
-		     * sizeof(GLint), NULL, GL_STATIC_DRAW);
+	glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 
+			view->iso.leafs.size() * 15 
+			* sizeof(GLint), NULL, GL_STATIC_DRAW_ARB);
 
 	glVertexPointer(3, GL_FLOAT, sizeof(DS3IsoVertex), 0);
 	glNormalPointer(GL_FLOAT, sizeof(DS3IsoVertex), 
@@ -468,8 +469,8 @@ static void ds3ViewIsoPeerDisplay(DS3ViewComp *_this,const GLWCallbacks *_cb)
 #endif
 	glDrawElements(GL_TRIANGLES, ctx.ibo_off, 
 		       GL_UNSIGNED_INT, 0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
 	//glDeleteBuffers(1, &vboid);
 	//glDeleteBuffers(1, &iboid);
     }
