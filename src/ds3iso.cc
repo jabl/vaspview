@@ -1,6 +1,7 @@
 /*VASP Data Viewer - Views 3d data sets of molecular charge distribution
   Copyright (C) 1999-2001 Timothy B. Terriberry
   (mailto:tterribe@users.sourceforge.net)
+  2011 Janne Blomqvist
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -19,6 +20,7 @@
 #include "ds3view.hh"
 #include "ds3iso.hh"
 
+#define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
 /*When generating the iso-surface, we cannot simply make a list of triangles
   to draw, for two reasons. One, the surface is translucent (so that it cannot
@@ -45,9 +47,9 @@
 static void ds3IsoReset(DS3IsoSurface *_this,long _d)
 {
 #ifndef NDEBUG
-    printf("Old size of Isosurface datastructures: verts: %ld, nodes: %ld, leafs: %ld\n", 
-	   (long)_this->verts.size(), (long)_this->nodes.size(), 
-	   (long)_this->leafs.size());
+    // printf("Old size of Isosurface datastructures: verts: %ld, nodes: %ld, leafs: %ld\n", 
+    // 	   (long)_this->verts.size(), (long)_this->nodes.size(), 
+    // 	   (long)_this->leafs.size());
 #endif
     _this->verts.clear();
     _this->nodes.clear();
@@ -159,9 +161,9 @@ static void ds3IsoXForm(DS3IsoSurface *_this,DataSet3D *_ds3)
   surface, which keeps from cluttering the stack*/
 typedef struct DS3IsoDrawCtx
 {
-    DS3IsoSurface *iso;                                 /*The iso-surface to draw*/
-    long           cntr[3];       /*The data-set coordinates of the center of the
-                                                         current oct-tree node*/
+    DS3IsoSurface *iso;           /*The iso-surface to draw*/
+    long           cntr[3];       /*The data-set coordinates of the center of the current oct-tree node*/
+    GLsizeiptr ibo_off; // Current offset into the index buffer
     Vect3d         box[2];                 /*The clip box in data-set coordinates*/
     Vect3d         eye;
 } DS3IsoDrawCtx; /*The eye position in data-set coordinates*/
@@ -180,7 +182,14 @@ static void ds3ViewIsoDrawLeaf(DS3IsoDrawCtx *_this,long _leaf,long _offs)
                 _this->cntr[i]-_offs>_this->box[1][i])return;
     }
     leaf = &_this->iso->leafs[_leaf];
-    glDrawElements(GL_TRIANGLES,leaf->nverts,GL_UNSIGNED_INT,leaf->verts);
+    if (GLEW_ARB_vertex_buffer_object) {
+	GLsizeiptr sz = leaf->nverts * sizeof(GLint);
+	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 
+			_this->ibo_off * sizeof(GLint), sz, 
+			leaf->verts);
+	_this->ibo_off += leaf->nverts;
+    } else
+	glDrawElements(GL_TRIANGLES,leaf->nverts,GL_UNSIGNED_INT,leaf->verts);
 }
 
 /*This sets up the parameters for the below function*/
@@ -422,11 +431,48 @@ static void ds3ViewIsoPeerDisplay(DS3ViewComp *_this,const GLWCallbacks *_cb)
     glEnable(GL_LIGHTING);
     glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
-    glVertexPointer(3, GL_FLOAT, sizeof(DS3IsoVertex), vert.vert);
-    glNormalPointer(GL_FLOAT, sizeof(DS3IsoVertex), vert.norm);
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
+
+    static GLuint vboid;  // Id for vertex buffer object
+    static GLuint iboid;  // Id for index buffer object
+    static bool vboinit;
+    if (GLEW_ARB_vertex_buffer_object) {
+	ctx.ibo_off = 0;
+	if (!vboinit) {
+	    glGenBuffers(1, &vboid);
+	    glGenBuffers(1, &iboid);
+	    vboinit = true;
+	}
+	glBindBuffer(GL_ARRAY_BUFFER, vboid);
+	glBufferData(GL_ARRAY_BUFFER, 
+		     view->iso.verts.size() * sizeof(DS3IsoVertex), 
+		     &view->iso.verts[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, iboid);
+	// Need to tell OpenGL the size of the index buffer, filled in
+	// later. This is a conservative maximum guess.
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, view->iso.leafs.size() * 15 
+		     * sizeof(GLint), NULL, GL_STATIC_DRAW);
+
+	glVertexPointer(3, GL_FLOAT, sizeof(DS3IsoVertex), 0);
+	glNormalPointer(GL_FLOAT, sizeof(DS3IsoVertex), 
+			BUFFER_OFFSET(sizeof(Vect3f)));
+    } else {
+	glVertexPointer(3, GL_FLOAT, sizeof(DS3IsoVertex), vert.vert);
+	glNormalPointer(GL_FLOAT, sizeof(DS3IsoVertex), vert.norm);
+    }
     ds3ViewIsoDrawTree(view,&ctx,box);
+    if (GLEW_ARB_vertex_buffer_object) {
+#ifndef NDEBUG
+	printf("about to draw %ld elements using %ld vertices\n", (long)ctx.ibo_off, (long)view->iso.verts.size());
+#endif
+	glDrawElements(GL_TRIANGLES, ctx.ibo_off, 
+		       GL_UNSIGNED_INT, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	//glDeleteBuffers(1, &vboid);
+	//glDeleteBuffers(1, &iboid);
+    }
     glDisableClientState(GL_NORMAL_ARRAY);
     glDisableClientState(GL_VERTEX_ARRAY);
     glPopClientAttrib();

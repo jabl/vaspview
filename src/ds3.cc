@@ -1,6 +1,7 @@
 /*VASP Data Viewer - Views 3d data sets of molecular charge distribution
   Copyright (C) 1999-2001 Timothy B. Terriberry
   (mailto:tterribe@users.sourceforge.net)
+  2011 Janne Blomqvist 
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -430,13 +431,15 @@ int main(int _argc,char **_argv)
 	    fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
 	    return 1;
     }
+#ifndef NDEBUG
     fprintf(stdout, "Status: Using GLEW %s\n", glewGetString(GLEW_VERSION));
+#endif
     if (GLEW_EXT_paletted_texture)
 	    printf("EXT_paletted_texture available.\n");
 
-    if (GLEW_EXT_texture3D)
-    {
-	    printf("EXT_texture3D available.\n");
+    if (!GLEW_EXT_texture3D) {
+	printf("EXT_texture3D not available. Slice rendering will be excruciatingly slow!\n");
+    } else {
 	    std::string rr = (const char*) glGetString(GL_RENDERER);
 	    if (rr.find("Mesa") != std::string::npos &&
 		rr.find("Intel") != std::string::npos)
@@ -453,6 +456,9 @@ int main(int _argc,char **_argv)
 		    printf("See https://bugs.freedesktop.org/show_bug.cgi?id=28284\n");
 		    limit_mipmap_radeon = 7;
 	    }
+    }
+    if (GLEW_ARB_vertex_buffer_object) {
+	printf("ARB_vertex_buffer_object extension available, will use VBO's for rendering isosurfaces.\n");
     }
     if (_argc>1)ds3ViewerOpenFile(&ds3v,_argv[1]);
     glutMainLoop();
