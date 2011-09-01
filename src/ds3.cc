@@ -421,8 +421,9 @@ int main(int _argc,char **_argv)
     /*At this point, we've created a window, and so should have a current
       rendering context: test for GL extensions*/
     
-    // Enabled paletted textures on R300 and i915
-    // but it doesn't actually work..
+    // With this one can enable paletted textures at least on R300,
+    // i915, and Quadro NVS 295, but it doesn't actually work on any
+    // of them.
     //glewExperimental = GL_TRUE;    
     GLenum err = glewInit();
     if (GLEW_OK != err)
