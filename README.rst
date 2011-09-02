@@ -2,15 +2,22 @@
 Vaspview 2.x
 ============
 
-This is an attempt to modernize the old vaspview (link) application
-for viewing VASP charge density files.
+This is an attempt to modernize the old `vaspview
+<http://vaspview.sf.net>`_ application for viewing VASP charge density
+files.
+
+Projects
+========
 
 DONE
-====
+----
 
 - Previously vaspview used manual setting up of GL function pointers
   on Windows, with only lowest common denominator fallback on
-  non-Windows platforms. This has been replaced with the GLEW library.
+  non-Windows platforms. This has been replaced with the GLEW
+  library. This provides an easy way to set up all the entry points,
+  as well as an easy way to query for available extensions at runtime
+  rather than compile-time.
 
 - As a side-effect of the above, 3D textures are now enabled on all
   current hw, leading to MASSIVE speedup when moving the slice plane
@@ -45,6 +52,8 @@ TODO
 - Remove old EXT_paletted_textures code path, as no current hardware
   supports paletted textures.
 
+- Instead of paletted textures, implement compressed textures.
+
 - Remove old 2D slice texture generation-on-CPU codepath, as all
   current hardware supports EXT_texture3D (part of OpenGL 1.2 core),
   and the fallback is unusably slow.
@@ -74,3 +83,8 @@ TODO
   cards. Batch size should be about the size of the pre-T&L cache size
   on the GPU, which on slightly older cards (Geforce 6800) is
   apparently about ~64000 vertices. 
+
+- Supposedly element rendering is faster if the indices are
+  GL_UNSIGNED_SHORT rather than GL_UNSIGNED_INT. Since it's easy to
+  have more than 2**64 vertices, this would imply batching and sorting
+  the vertices etc.
