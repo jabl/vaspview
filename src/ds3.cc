@@ -22,6 +22,7 @@
 
 bool disable_texture3D_mipmap;
 int limit_mipmap_radeon = INT_MAX;
+bool use_vbo;
 
 /*Initializes the data set to default values*/
 DataSet3D::DataSet3D()
@@ -460,6 +461,7 @@ int main(int _argc,char **_argv)
     }
     if (GLEW_ARB_vertex_buffer_object) {
 	printf("ARB_vertex_buffer_object extension available, will use VBO's for rendering isosurfaces.\n");
+	use_vbo = true;
     }
     if (_argc>1)ds3ViewerOpenFile(&ds3v,_argv[1]);
     glutMainLoop();

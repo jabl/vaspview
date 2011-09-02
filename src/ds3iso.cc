@@ -20,6 +20,7 @@
 #include "ds3view.hh"
 #include "ds3iso.hh"
 
+extern bool use_vbo;
 #define BUFFER_OFFSET(i) ((char *)NULL + (i))
 
 /*When generating the iso-surface, we cannot simply make a list of triangles
@@ -182,7 +183,7 @@ static void ds3ViewIsoDrawLeaf(DS3IsoDrawCtx *_this,long _leaf,long _offs)
                 _this->cntr[i]-_offs>_this->box[1][i])return;
     }
     leaf = &_this->iso->leafs[_leaf];
-    if (GLEW_ARB_vertex_buffer_object) {
+    if (use_vbo) {
 	GLsizeiptr sz = leaf->nverts * sizeof(GLint);
 	glBufferSubDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 
 			   _this->ibo_off * sizeof(GLint), sz, 
@@ -437,7 +438,7 @@ static void ds3ViewIsoPeerDisplay(DS3ViewComp *_this,const GLWCallbacks *_cb)
     static GLuint vboid;  // Id for vertex buffer object
     static GLuint iboid;  // Id for index buffer object
     static bool vboinit;
-    if (GLEW_ARB_vertex_buffer_object) {
+    if (use_vbo) {
 	ctx.ibo_off = 0;
 	if (!vboinit) {
 	    glGenBuffersARB(1, &vboid);
@@ -463,7 +464,7 @@ static void ds3ViewIsoPeerDisplay(DS3ViewComp *_this,const GLWCallbacks *_cb)
 	glNormalPointer(GL_FLOAT, sizeof(DS3IsoVertex), vert.norm);
     }
     ds3ViewIsoDrawTree(view,&ctx,box);
-    if (GLEW_ARB_vertex_buffer_object) {
+    if (use_vbo) {
 #ifndef NDEBUG
 	printf("about to draw %ld elements using %ld vertices\n", (long)ctx.ibo_off, (long)view->iso.verts.size());
 #endif
