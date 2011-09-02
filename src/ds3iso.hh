@@ -33,12 +33,10 @@ struct DS3IsoVertex
 };
 
 
-
 struct DS3IsoOctNode
 {
     long node[8];
 };
-
 
 
 struct DS3IsoOctLeaf
@@ -48,24 +46,26 @@ struct DS3IsoOctLeaf
 };
 
 
-
 struct DS3IsoSurface
 {
-    DS3IsoSurface(size_t[3]);
+    DS3IsoSurface();
     void clear();
     void init(size_t[3]);
+    int isoMake(DataSet3D*, double, int);
     std::vector<DS3IsoVertex> verts;
     std::vector<DS3IsoOctNode> nodes;
     std::vector<DS3IsoOctLeaf> leafs;
     long      dim;
     long      stp;
 private:
-    DS3IsoSurface();
     DS3IsoSurface(const DS3IsoSurface&);
     DS3IsoSurface& operator=(const DS3IsoSurface&);
+    void reset(long);
+    long addNode();
+    long addLeaf(long[12], const int[16]);
+    int addTris(long[3], long[12], const int[16]);
+    void xForm(DataSet3D*);
 };
-
-int ds3IsoMake(DS3IsoSurface *_this,DataSet3D *_ds3,double _v,int _d);
 
 
 extern const GLWCallbacks DS3_VIEW_ISO_CALLBACKS;

@@ -42,31 +42,15 @@ extern bool use_vbo;
   is not a power of two, but the increased simplicity in the code makes it
   worth it both in coding and execution time*/
 
-/*Resets the iso-surface for creating a new surface at the specified detail
-  level
-  d: The new detail level*/
-static void ds3IsoReset(DS3IsoSurface *_this,long _d)
-{
-#ifndef NDEBUG
-    // printf("Old size of Isosurface datastructures: verts: %ld, nodes: %ld, leafs: %ld\n", 
-    // 	   (long)_this->verts.size(), (long)_this->nodes.size(), 
-    // 	   (long)_this->leafs.size());
-#endif
-    _this->verts.clear();
-    _this->nodes.clear();
-    _this->leafs.clear();
-    while (_this->dim<=_d)_this->dim<<=1;
-    _this->stp=_d;
-}
 
 /*Adds an oct-tree node to the iso-surface
   x,y,z: The index of the center of the node*/
-static long ds3IsoAddNode(DS3IsoSurface *_this)
+long DS3IsoSurface::addNode()
 {
     DS3IsoOctNode node;
     for (size_t i = 0; i < 8; i++) node.node[i] = DS3V_NO_CHILD;
-    _this->nodes.push_back(node);
-    return _this->nodes.size() - 1;
+    this->nodes.push_back(node);
+    return this->nodes.size() - 1;
 }
 
 /*Adds a leaf node to the iso-surface
@@ -74,15 +58,14 @@ static long ds3IsoAddNode(DS3IsoSurface *_this)
   tris: A negative terminated list of the edges that compose the triangles
   Return: The index of the leaf created, or DS3V_NO_CHILD if space for the
            leaf could not be allocated*/
-static long ds3IsoAddLeaf(DS3IsoSurface *_this,long _cv[12],
-                          const int _tris[16])
+long DS3IsoSurface::addLeaf(long _cv[12], const int _tris[16])
 {
     long ret;
     int  i;
     for (i=0; _tris[i]>=0; i++);
-    ret = (long)_this->leafs.size();
-    _this->leafs.resize(_this->leafs.size() + i + 1);
-    DS3IsoOctLeaf& leaf = _this->leafs[ret];
+    ret = (long)this->leafs.size();
+    this->leafs.resize(this->leafs.size() + i + 1);
+    DS3IsoOctLeaf& leaf = this->leafs[ret];
     leaf.nverts=i;
     while (i-- > 0) leaf.verts[i] = (GLint)_cv[_tris[i]];
     return ret;
@@ -92,26 +75,25 @@ static long ds3IsoAddLeaf(DS3IsoSurface *_this,long _cv[12],
   x:    The index of the lower-left corner of the cube the triangles go in
   cv:   An array of indices into the vertex table for each edge of the cube
   tris: A negative terminated list of the edges that compose the triangles*/
-static int ds3IsoAddTris(DS3IsoSurface *_this,long _x[3],
-                         long _cv[12],const int _tris[16])
+int DS3IsoSurface::addTris(long _x[3], long _cv[12],const int _tris[16])
 {
     DS3IsoOctNode *nodes;
     long           node;
     long           offs;
     int            idx;
     int            i;
-    offs=_this->dim>>1;
-    if (_this->nodes.size() == 0 && ds3IsoAddNode(_this) < 0) return 0;
-    nodes = &_this->nodes[0];
-    for (node=0; offs>_this->stp; offs>>=1)
+    offs=this->dim>>1;
+    this->addNode();
+    nodes = &this->nodes[0];
+    for (node=0; offs>this->stp; offs>>=1)
     {
         for (i=idx=0; i<3; i++)if (_x[i]&offs)idx|=1<<i;
         if (nodes[node].node[idx]==DS3V_NO_CHILD)
         {
             long n;
-            n=ds3IsoAddNode(_this);
+            n = this->addNode();
             if (n==DS3V_NO_CHILD)return 0;
-            nodes = &_this->nodes[0];
+            nodes = &this->nodes[0]; // Why is this needed?
             nodes[node].node[idx]=n;
         }
         node=nodes[node].node[idx];
@@ -120,7 +102,7 @@ static int ds3IsoAddTris(DS3IsoSurface *_this,long _x[3],
     if (nodes[node].node[idx]==DS3V_NO_CHILD)
     {
         long n;
-        n=ds3IsoAddLeaf(_this,_cv,_tris);
+        n = this->addLeaf(_cv,_tris);
         if (n==DS3V_NO_CHILD)return 0;
         nodes[node].node[idx]=n;
     }
@@ -132,10 +114,10 @@ static int ds3IsoAddTris(DS3IsoSurface *_this,long _x[3],
   vectors. This allows us to unitize the normals (since all the remaining
   transformations do not involve scales), and thus saves on square roots in
   successive frames*/
-static void ds3IsoXForm(DS3IsoSurface *_this,DataSet3D *_ds3)
+void DS3IsoSurface::xForm(DataSet3D *_ds3)
 {
-    for (std::vector<DS3IsoVertex>::iterator it = _this->verts.begin(); 
-	 it != _this->verts.end(); ++it)
+    for (std::vector<DS3IsoVertex>::iterator it = this->verts.begin(); 
+	 it != this->verts.end(); ++it)
     {
         Vect3d p, tmp;
         double m;
@@ -175,7 +157,7 @@ typedef struct DS3IsoDrawCtx
   checks to make sure this leaf at least partially intersects the clip box.
   Technically, we could see exactly which clip planes bisect this leaf, and
   only enable those planes, but right now we always keep them all enabled*/
-static void ds3ViewIsoDrawLeaf(DS3IsoDrawCtx *_this,long _leaf,long _offs)
+void ds3ViewIsoDrawLeaf(DS3IsoDrawCtx *_this,long _leaf,long _offs)
 {
     DS3IsoOctLeaf *leaf;
     int            i;
@@ -407,7 +389,7 @@ static void ds3ViewIsoPeerDisplay(DS3ViewComp *_this,const GLWCallbacks *_cb)
     /*Create the iso-surface if we don't already have one*/
     if (!view->s_valid)
     {
-        if (!ds3IsoMake(&view->iso,view->ds3,view->iso_v,view->iso_d))
+        if (!view->iso.isoMake(view->ds3,view->iso_v,view->iso_d))
         {
             return;
         }
@@ -547,18 +529,34 @@ void DS3IsoSurface::init(size_t _dens[3])
         }
 }
 
-DS3IsoSurface::DS3IsoSurface(size_t dens[3])
+DS3IsoSurface::DS3IsoSurface()
 {
-	this->init(dens);
+	this->init(NULL);
 }
 
 
 /*Frees the memory used by the iso-surface structure*/
 void DS3IsoSurface::clear()
 {
-	this->verts.clear();
-	this->nodes.clear();
-	this->leafs.clear();
+#ifndef NDEBUG
+    // printf("Old size of Isosurface datastructures: verts: %ld, nodes: %ld, leafs: %ld\n", 
+    // 	   (long)this->verts.size(), (long)this->nodes.size(), 
+    // 	   (long)this->leafs.size());
+#endif
+    this->verts.clear();
+    this->nodes.clear();
+    this->leafs.clear();
+}
+
+/*Resets the iso-surface for creating a new surface at the specified
+  detail level
+  d: The new detail level*/
+void DS3IsoSurface::reset(long d)
+{
+    this->clear();
+    while (this->dim <= d) 
+	this->dim <<= 1;
+    this->stp = d;
 }
 
 /*Creates an iso-surface for the given data set using the given data value
@@ -569,7 +567,7 @@ void DS3IsoSurface::clear()
   ds3: The data set to create an iso-surface from
   v:   The value of the data along the surface
   d:   The detail level of the surface*/
-int ds3IsoMake(DS3IsoSurface *_this,DataSet3D *_ds3,double _v,int _d)
+int DS3IsoSurface::isoMake(DataSet3D *_ds3,double _v,int _d)
 {
     /*These tables for computing the Marching Cubes algorithm are from
       http://www.swin.edu.au/astronomy/pbourke/modelling/polygonise/
@@ -908,7 +906,7 @@ int ds3IsoMake(DS3IsoSurface *_this,DataSet3D *_ds3,double _v,int _d)
     edges=(long *)malloc(sz);
     if (edges!=NULL)
     {
-        ds3IsoReset(_this,_d);
+        this->reset(_d);
         memset(edges,0xFF/*DS3V_NO_EDGE*/,sz);
         data = &_ds3->data[0];
         for (x[0][Z]=0; x[0][Z]<dim[Z]; x[0][Z]+=_d)
@@ -990,7 +988,7 @@ int ds3IsoMake(DS3IsoSurface *_this,DataSet3D *_ds3,double _v,int _d)
                                 long          vt;
                                 long          fx[3];
                                 double        d;
-				_this->verts.resize(_this->verts.size() + 1);
+				this->verts.resize(this->verts.size() + 1);
                                 for (vf=vt=l,i=0; i<3; i++)
                                 {
                                     if (F[i][b])
@@ -1005,7 +1003,7 @@ int ds3IsoMake(DS3IsoSurface *_this,DataSet3D *_ds3,double _v,int _d)
                                 if (d<0)d=0;
                                 else if (d>1)d=1;
                                 DS3IsoVertex& vert = 
-					_this->verts[_this->verts.size() - 1];
+					this->verts[this->verts.size() - 1];
                                 for (i=0; i<3; i++)
                                 {
                                     double nf;
@@ -1024,7 +1022,7 @@ int ds3IsoMake(DS3IsoSurface *_this,DataSet3D *_ds3,double _v,int _d)
                                     vert.norm[i]=(nf+d*(nt-nf))/dim[i];
                                 }
                                 edges[e+b] = cv[b] 
-					= (long)(_this->verts.size() - 1);
+					= (long)(this->verts.size() - 1);
                             }
                             else cv[b]=edges[e+b];
                         }                  /*Reuse old edge intersections*/
@@ -1050,10 +1048,10 @@ int ds3IsoMake(DS3IsoSurface *_this,DataSet3D *_ds3,double _v,int _d)
                     }
                     /*Draw the triangles for the current edge intersections:*/
                     tris=TRI_TABLE[idx];
-                    if (tris[0]>=0&&!ds3IsoAddTris(_this,x[0],cv,tris))
+                    if (tris[0] >= 0 && !this->addTris(x[0],cv,tris))
                     {
                         free(edges);
-                        _this->clear();
+                        this->clear();
                         return 0;
                     }
                     l+=dx[0];
@@ -1083,7 +1081,7 @@ int ds3IsoMake(DS3IsoSurface *_this,DataSet3D *_ds3,double _v,int _d)
                 }
             }
         }
-        ds3IsoXForm(_this,_ds3);
+        this->xForm(_ds3);
         free(edges);
         return 1;
     }

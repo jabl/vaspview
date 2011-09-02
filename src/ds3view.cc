@@ -1221,8 +1221,7 @@ DS3View::DS3View() : cm_axes(this),
 		     cm_bnds(this),
 #endif
 		     cm_slice(this),
-		     cm_iso(this),
-		     iso(NULL)
+		     cm_iso(this)
 {
         if (glwCompAdd(&this->super,&this->cm_axes.super,-1)&&
                 glwCompAdd(&this->super,&this->cm_box.super,-1)&&
