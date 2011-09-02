@@ -34,8 +34,7 @@ extern int limit_mipmap_radeon;
 static void ds3SlicePalette(DS3Slice *_this,DS3View *_view)
 {
     int i;
-    for (i=0; i<=UCHAR_MAX; i++)
-    {
+    for (i=0; i<=UCHAR_MAX; i++) {
         GLWcolor c;
         c=dsColorScale(_view->cs,i/(double)UCHAR_MAX);
         _this->ctable[i][0]=(GLubyte)(c&0xFF);
@@ -51,23 +50,19 @@ static void ds3SlicePalette(DS3Slice *_this,DS3View *_view)
   scaling function*/
 static int ds3SliceColor(DS3Slice *_this,DS3View *_view)
 {
-    if (!_view->c_valid)
-    {
+    if (!_view->c_valid) {
         double        *data;
         unsigned char *cdata;
         size_t         size;
         size_t         i;
         size=_view->ds3->density[X]*_view->ds3->density[Y]*_view->ds3->density[Z];
-        if (_this->cdata==NULL)
-        {
+        if (_this->cdata==NULL) {
             cdata=(unsigned char *)malloc(size*sizeof(unsigned char));
             if (cdata==NULL)return 0;
             _this->cdata=cdata;
-        }
-        else cdata=_this->cdata;
+        } else cdata=_this->cdata;
         data = &_view->ds3->data[0];
-        for (i=0; i<size; i++)
-        {
+        for (i=0; i<size; i++) {
             int c;
             c=(int)(dsScale(_view->ds,data[i])*(UCHAR_MAX+1));
             if (c>UCHAR_MAX)cdata[i]=UCHAR_MAX;
@@ -122,8 +117,7 @@ static int ds3SliceMake(DS3Slice *_this,DS3View *_view)
     int            j;
     int            k;
     if (!ds3SliceColor(_this,_view))return 0;
-    if (_this->txtr==NULL)
-    {
+    if (_this->txtr==NULL) {
         _this->txtr=(GLubyte *)malloc(_this->t_sz*_this->t_sz*4*sizeof(GLubyte));
         if (_this->txtr==NULL)return 0;
     }
@@ -171,16 +165,14 @@ static int ds3SliceMake(DS3Slice *_this,DS3View *_view)
     txtr=_this->txtr;
     ctbl=_this->ctable;
     cdat=_this->cdata;
-    for (k=0,i=_this->t_sz;;)
-    {
+    for (k=0,i=_this->t_sz;;) {
         xi=x0i;
         xf=x0f;
         yi=y0i;
         yf=y0f;
         zi=z0i;
         zf=z0f;
-        for (j=_this->t_sz;;)
-        {
+        for (j=_this->t_sz;;) {
             int  x;
             int  y;
             int  z;
@@ -202,24 +194,18 @@ static int ds3SliceMake(DS3Slice *_this,DS3View *_view)
             o[2][0]=z>=0?0:zoff;
             o[2][1]=z<zdim-1?zoff:0;*/
             /*Wrap values around, so wrapping clip-box works properly*/
-            if (xi<0)
-            {
+            if (xi<0) {
                 x=-xi%xdim;
                 if (x)x=xdim-x;
-            }
-            else x=xi%xdim;
-            if (yi<0)
-            {
+            } else x=xi%xdim;
+            if (yi<0) {
                 y=-yi%ydim;
                 if (y)y=ydim-y;
-            }
-            else y=yi%ydim;
-            if (zi<0)
-            {
+            } else y=yi%ydim;
+            if (zi<0) {
                 z=-zi%zdim;
                 if (z)z=zdim-z;
-            }
-            else z=zi%zdim;
+            } else z=zi%zdim;
             o[0][0]=0;
             o[0][1]=x<xdim-1?1:1-xdim;
             o[1][0]=0;
@@ -231,8 +217,7 @@ static int ds3SliceMake(DS3Slice *_this,DS3View *_view)
             xm=((xf>>8)+1)>>1;
             ym=((yf>>8)+1)>>1;
             zm=((zf>>8)+1)>>1;
-            for (m=0; m<4; m++)
-            {
+            for (m=0; m<4; m++) {
                 int d[4];
 # define DS3V_PREC_SHIFT (sizeof(unsigned)*CHAR_BIT-9)
                 d[0]=ctbl[c[0]][m]+(zm*(ctbl[c[4]][m]-ctbl[c[0]][m])>>DS3V_PREC_SHIFT);
@@ -281,8 +266,7 @@ static int ds3SliceMake(DS3Slice *_this,DS3View *_view)
       but it will be for us.*/
     glBindTexture(GL_TEXTURE_2D,0);
     _view->t_valid=1;
-    if (_this->i_id)
-    {
+    if (_this->i_id) {
         glwCompDelTimer(&_view->super,_this->i_id);
         _this->i_id=0;
         glwCompRepaint(&_view->super,0);
@@ -337,8 +321,7 @@ static int ds3SliceMakeFast(DS3Slice *_this,DS3View *_view)
     int            k;
     int            scale;
     if (!ds3SliceColor(_this,_view))return 0;
-    if (_this->txtr==NULL)
-    {
+    if (_this->txtr==NULL) {
         _this->txtr=(GLubyte *)malloc(_this->t_sz*_this->t_sz*4*sizeof(GLubyte));
         if (_this->txtr==NULL)return 0;
     }
@@ -389,39 +372,31 @@ static int ds3SliceMakeFast(DS3Slice *_this,DS3View *_view)
     txtr=_this->txtr;
     ctbl=_this->ctable;
     cdat=_this->cdata;
-    for (k=0,i=scale;;)
-    {
+    for (k=0,i=scale;;) {
         xi=x0i;
         xf=x0f;
         yi=y0i;
         yf=y0f;
         zi=z0i;
         zf=z0f;
-        for (j=scale;;)
-        {
+        for (j=scale;;) {
             int      x;
             int      y;
             int      z;
             GLubyte *c;
             /*Wrap values around, so wrapping clip-box works properly*/
-            if (xi<0)
-            {
+            if (xi<0) {
                 x=-xi%xdim;
                 if (x)x=xdim-x;
-            }
-            else x=xi%xdim;
-            if (yi<0)
-            {
+            } else x=xi%xdim;
+            if (yi<0) {
                 y=-yi%ydim;
                 if (y)y=ydim-y;
-            }
-            else y=yi%ydim;
-            if (zi<0)
-            {
+            } else y=yi%ydim;
+            if (zi<0) {
                 z=-zi%zdim;
                 if (z)z=zdim-z;
-            }
-            else z=zi%zdim;
+            } else z=zi%zdim;
             c=ctbl[cdat[x+xdim*(y+ydim*z)]];
             txtr[k++]=c[0];
             txtr[k++]=c[1];
@@ -482,8 +457,7 @@ static int ds3SliceTexture3D(DS3Slice *_this,DS3View *_view)
     printf("Max 3D texture size: %d\n", m);
 #endif
     //if (m>1)m>>=1;  // Reduce texture size to conserve memory?
-    if (_view->ds3!=NULL)
-    {
+    if (_view->ds3!=NULL) {
         GLsizei   d[3];
         GLsizei   w[3];
         int       ws[3];
@@ -501,20 +475,17 @@ static int ds3SliceTexture3D(DS3Slice *_this,DS3View *_view)
         double   *data;
         double    v[4];
         GLWcolor  c;
-        for (i=0; i<3; i++)
-        {
+        for (i=0; i<3; i++) {
             d[i]=_view->ds3->density[i];
             for (w[i]=1,ws[i]=0; w[i]<d[i]&&w[i]<(GLsizei)m; w[i]<<=1,ws[i]++);
             dx[i]=d[i]/(double)w[i];
         }
 #ifndef NDEBUG
-	printf("calculated texture size: x=%d, y=%d, z=%d\n", w[X], w[Y], w[Z]);
+        printf("calculated texture size: x=%d, y=%d, z=%d\n", w[X], w[Y], w[Z]);
 #endif
-        if (GLEW_EXT_paletted_texture)
-        {
+        if (GLEW_EXT_paletted_texture) {
             txtr=(GLubyte *)malloc(sizeof(GLubyte)*w[X]*w[Y]*w[Z]);
-        }
-        else
+        } else
             txtr=(GLubyte *)malloc(4*sizeof(GLubyte)*w[X]*w[Y]*w[Z]);
         if (txtr==NULL)return 0;
         data = &_view->ds3->data[0];
@@ -528,28 +499,23 @@ static int ds3SliceTexture3D(DS3Slice *_this,DS3View *_view)
         glTexParameteri(GL_TEXTURE_3D,GL_TEXTURE_WRAP_R,GL_REPEAT);
         /*If we have paletted textures available, use those to reduce memory and
           CPU consumption to 1/4 of that for an RGBA texture*/
-        if (GLEW_EXT_paletted_texture)
-        {
-            if (!_view->c_valid)
-            {
+        if (GLEW_EXT_paletted_texture) {
+            if (!_view->c_valid) {
                 ds3SlicePalette(_this,_view);
                 _view->c_valid=1;
             }
             glColorTableEXT(GL_TEXTURE_3D,4,UCHAR_MAX+1,GL_RGBA,
                             GL_UNSIGNED_BYTE,_this->ctable);
             /*Create the full-sized texture*/
-            for (n=0,j[Z]=0,x[Z]=0; j[Z]<w[Z]; j[Z]++,x[Z]+=dx[Z])
-            {
+            for (n=0,j[Z]=0,x[Z]=0; j[Z]<w[Z]; j[Z]++,x[Z]+=dx[Z]) {
                 k[Z]=(GLsizei)x[Z];
                 o[Z]=(k[Z]+1>=d[Z]?-(GLint)k[Z]:1)*d[X]*d[Y];
                 xm[Z]=x[Z]-k[Z];
-                for (j[Y]=0,x[Y]=0; j[Y]<w[Y]; j[Y]++,x[Y]+=dx[Y])
-                {
+                for (j[Y]=0,x[Y]=0; j[Y]<w[Y]; j[Y]++,x[Y]+=dx[Y]) {
                     k[Y]=(GLsizei)x[Y];
                     o[Y]=(k[Y]+1>=d[Y]?-(GLint)k[Y]:1)*d[X];
                     xm[Y]=x[Y]-k[Y];
-                    for (j[X]=0,x[X]=0; j[X]<w[X]; j[X]++,x[X]+=dx[X],n++)
-                    {
+                    for (j[X]=0,x[X]=0; j[X]<w[X]; j[X]++,x[X]+=dx[X],n++) {
                         k[X]=(GLsizei)x[X];
                         o[X]=k[X]+1>=d[X]?-(GLint)k[X]:1;
                         xm[X]=x[X]-k[X];
@@ -569,30 +535,23 @@ static int ds3SliceTexture3D(DS3Slice *_this,DS3View *_view)
             glTexImage3D(GL_TEXTURE_3D,0,GL_COLOR_INDEX8_EXT,w[X],w[Y],w[Z],
                          0,GL_COLOR_INDEX,GL_UNSIGNED_BYTE,txtr);
             /*Create mip-maps*/
-            for (lod=1; ws[X]||ws[Y]||ws[Z]; lod++)
-            {
+            for (lod=1; ws[X]||ws[Y]||ws[Z]; lod++) {
                 o[X]=ws[X]?1:0;
                 o[Y]=ws[Y]?w[X]:0;
                 o[Z]=ws[Z]?w[X]<<ws[Y]:0;
-                for (i=0; i<3; i++)
-                {
-                    if (ws[i])
-                    {
+                for (i=0; i<3; i++) {
+                    if (ws[i]) {
                         ws[i]--;
                         w[i]>>=1;
                         j[i]=1;
-                    }
-                    else j[i]=0;
+                    } else j[i]=0;
                 }
-                for (k[Z]=0; k[Z]<w[Z]; k[Z]++)
-                {
-                    for (k[Y]=0; k[Y]<w[Y]; k[Y]++)
-                    {
-                        for (k[X]=0; k[X]<w[X]; k[X]++)
-                        {
+                for (k[Z]=0; k[Z]<w[Z]; k[Z]++) {
+                    for (k[Y]=0; k[Y]<w[Y]; k[Y]++) {
+                        for (k[X]=0; k[X]<w[X]; k[X]++) {
                             int c;
-                            l = (k[X] + ((k[Y] + (k[Z] << (ws[Y] + j[Z]))) 
-					<< (ws[X] + j[Y]))) << j[X];
+                            l = (k[X] + ((k[Y] + (k[Z] << (ws[Y] + j[Z])))
+                                         << (ws[X] + j[Y]))) << j[X];
                             c=txtr[l];
                             c+=txtr[l+o[X]];
                             c+=txtr[l+o[Y]];
@@ -601,30 +560,26 @@ static int ds3SliceTexture3D(DS3Slice *_this,DS3View *_view)
                             c+=txtr[l+o[Z]+o[X]];
                             c+=txtr[l+o[Z]+o[Y]];
                             c+=txtr[l+o[Z]+o[Y]+o[X]];
-                            txtr[k[X] + ((k[Y] + (k[Z] << ws[Y])) << ws[X])] 
-				    = (GLubyte)(c>>3);
+                            txtr[k[X] + ((k[Y] + (k[Z] << ws[Y])) << ws[X])]
+                            = (GLubyte)(c>>3);
                         }
                     }
                 }
                 glTexImage3D(GL_TEXTURE_3D,lod,GL_COLOR_INDEX8_EXT,w[X],w[Y],w[Z],
                              0,GL_COLOR_INDEX,GL_UNSIGNED_BYTE,txtr);
             }
-        }
-        else
+        } else
             /*Create the full-sized texture*/
         {
-            for (n=0,j[Z]=0,x[Z]=0; j[Z]<w[Z]; j[Z]++,x[Z]+=dx[Z])
-            {
+            for (n=0,j[Z]=0,x[Z]=0; j[Z]<w[Z]; j[Z]++,x[Z]+=dx[Z]) {
                 k[Z]=(GLsizei)x[Z];
                 o[Z]=(k[Z]+1>=d[Z]?-(GLint)k[Z]:1)*d[X]*d[Y];
                 xm[Z]=x[Z]-k[Z];
-                for (j[Y]=0,x[Y]=0; j[Y]<w[Y]; j[Y]++,x[Y]+=dx[Y])
-                {
+                for (j[Y]=0,x[Y]=0; j[Y]<w[Y]; j[Y]++,x[Y]+=dx[Y]) {
                     k[Y]=(GLsizei)x[Y];
                     o[Y]=(k[Y]+1>=d[Y]?-(GLint)k[Y]:1)*d[X];
                     xm[Y]=x[Y]-k[Y];
-                    for (j[X]=0,x[X]=0; j[X]<w[X]; j[X]++,x[X]+=dx[X])
-                    {
+                    for (j[X]=0,x[X]=0; j[X]<w[X]; j[X]++,x[X]+=dx[X]) {
                         k[X]=(GLsizei)x[X];
                         o[X]=k[X]+1>=d[X]?-(GLint)k[X]:1;
                         xm[X]=x[X]-k[X];
@@ -645,57 +600,49 @@ static int ds3SliceTexture3D(DS3Slice *_this,DS3View *_view)
             }
             glTexImage3D(GL_TEXTURE_3D,0,GL_RGBA,w[X],w[Y],w[Z],
                          0,GL_RGBA,GL_UNSIGNED_BYTE,txtr);
-	    if (!disable_texture3D_mipmap) {
-            /*Create mip-maps*/
-	    for (lod=1; (ws[X]||ws[Y]||ws[Z]) 
-			 && lod <= limit_mipmap_radeon; lod++)
-            {
-                o[X]=ws[X]?4:0;
-                o[Y] = ws[Y] ? (w[X] << 2) : 0;
-                o[Z] = ws[Z] ? w[X] << (ws[Y] + 2) : 0;
-                for (i=0; i<3; i++)
-                {
-                    if (ws[i])
-                    {
-                        ws[i]--;
-                        w[i]>>=1;
-                        j[i]=1;
+            if (!disable_texture3D_mipmap) {
+                /*Create mip-maps*/
+                for (lod=1; (ws[X]||ws[Y]||ws[Z])
+                        && lod <= limit_mipmap_radeon; lod++) {
+                    o[X]=ws[X]?4:0;
+                    o[Y] = ws[Y] ? (w[X] << 2) : 0;
+                    o[Z] = ws[Z] ? w[X] << (ws[Y] + 2) : 0;
+                    for (i=0; i<3; i++) {
+                        if (ws[i]) {
+                            ws[i]--;
+                            w[i]>>=1;
+                            j[i]=1;
+                        } else j[i]=0;
                     }
-                    else j[i]=0;
-                }
-                for (k[Z]=0; k[Z]<w[Z]; k[Z]++)
-                {
-                    for (k[Y]=0; k[Y]<w[Y]; k[Y]++)
-                    {
-                        for (k[X]=0; k[X]<w[X]; k[X]++)
-                        {
-                            int c[4];
-                            l = (k[X] + ((k[Y] + (k[Z] << (ws[Y] + j[Z]))) 
-					 << (ws[X] + j[Y]))) << (j[X] + 2);
-                            for (i=0; i<4; i++)
-                            {
-                                c[i]=txtr[l+i];
-                                c[i]+=txtr[l+o[X]];
-                                c[i]+=txtr[l+o[Y]+i];
-                                c[i]+=txtr[l+o[Y]+o[X]+i];
-                                c[i]+=txtr[l+o[Z]+i];
-                                c[i]+=txtr[l+o[Z]+o[X]+i];
-                                c[i]+=txtr[l+o[Z]+o[Y]+i];
-                                c[i]+=txtr[l+o[Z]+o[Y]+o[X]+i];
+                    for (k[Z]=0; k[Z]<w[Z]; k[Z]++) {
+                        for (k[Y]=0; k[Y]<w[Y]; k[Y]++) {
+                            for (k[X]=0; k[X]<w[X]; k[X]++) {
+                                int c[4];
+                                l = (k[X] + ((k[Y] + (k[Z] << (ws[Y] + j[Z])))
+                                             << (ws[X] + j[Y]))) << (j[X] + 2);
+                                for (i=0; i<4; i++) {
+                                    c[i]=txtr[l+i];
+                                    c[i]+=txtr[l+o[X]];
+                                    c[i]+=txtr[l+o[Y]+i];
+                                    c[i]+=txtr[l+o[Y]+o[X]+i];
+                                    c[i]+=txtr[l+o[Z]+i];
+                                    c[i]+=txtr[l+o[Z]+o[X]+i];
+                                    c[i]+=txtr[l+o[Z]+o[Y]+i];
+                                    c[i]+=txtr[l+o[Z]+o[Y]+o[X]+i];
+                                }
+                                l = (k[X] + ((k[Y] + (k[Z] << ws[Y])) << ws[X]))
+                                    << 2;
+                                for (i=0; i<4; i++)txtr[l+i]=(GLubyte)(c[i]>>3);
                             }
-                            l = (k[X] + ((k[Y] + (k[Z] << ws[Y])) << ws[X])) 
-				    << 2;
-                            for (i=0; i<4; i++)txtr[l+i]=(GLubyte)(c[i]>>3);
                         }
                     }
-                }
 #ifndef NDEBUG
-		printf("creating mipmap level %d with size: x=%d, y=%d, z=%d\n", lod, w[X], w[Y], w[Z]);
+                    printf("creating mipmap level %d with size: x=%d, y=%d, z=%d\n", lod, w[X], w[Y], w[Z]);
 #endif
-                glTexImage3D(GL_TEXTURE_3D,lod,GL_RGBA,w[X],w[Y],w[Z],
-                             0,GL_RGBA,GL_UNSIGNED_BYTE,txtr);
+                    glTexImage3D(GL_TEXTURE_3D,lod,GL_RGBA,w[X],w[Y],w[Z],
+                                 0,GL_RGBA,GL_UNSIGNED_BYTE,txtr);
+                }
             }
-	    }
         }
         glBindTexture(GL_TEXTURE_3D,0);
         free(txtr);
@@ -706,8 +653,7 @@ static int ds3SliceTexture3D(DS3Slice *_this,DS3View *_view)
 
 typedef struct DS3SliceVertex DS3SliceVertex;
 
-struct DS3SliceVertex
-{
+struct DS3SliceVertex {
     Vect3d p;
     double tx;
     double ty;
@@ -729,14 +675,12 @@ static int ds3ViewSliceClipPlane(DS3SliceVertex _slice[16],int _nverts,
     double         d1;
     ret=0;
     d0=vectDot3d(_slice[0].p,_plane)+_plane[W];
-    for (i=0; i<_nverts; i++)
-    {
+    for (i=0; i<_nverts; i++) {
         j=i+1;
         if (j>=_nverts)j=0;
         d1=vectDot3d(_slice[j].p,_plane)+_plane[W];
         if (d0>=0)*(slice+ret++)=*(_slice+i);
-        if (((d0 > 0) && (d1 < 0))||(d0 < 0 && (d1 > 0)))
-        {
+        if (((d0 > 0) && (d1 < 0))||(d0 < 0 && (d1 > 0))) {
             Vect3d dp;
             double t;
             vectSub3d(dp,_slice[j].p,_slice[i].p);
@@ -763,12 +707,10 @@ static int ds3ViewSliceClip(DS3View *_this,DS3SliceVertex _slice[16])
     int    nverts;
     int    i;
     int    j;
-    for (i=0; i<4; i++)
-    {
+    for (i=0; i<4; i++) {
         Vect3d p;
         vectSet3d(p,-3+6*(i>>1),-3+6*((i&1)^(i>>1)),0);
-        for (j=0; j<3; j++)
-        {
+        for (j=0; j<3; j++) {
             _slice[i].p[j]=vectDot3d(_this->strans[j],p)+_this->strans[j][W];
         }
         _slice[i].tx=i>>1;
@@ -776,8 +718,7 @@ static int ds3ViewSliceClip(DS3View *_this,DS3SliceVertex _slice[16])
     }
     nverts=4;
     plane[Y]=plane[Z]=0;
-    for (i=0; i<3; i++)
-    {
+    for (i=0; i<3; i++) {
         plane[i]=1;
         plane[W]=-_this->box[0][i]+1E-4;
         nverts=ds3ViewSliceClipPlane(_slice,nverts,plane);
@@ -796,20 +737,17 @@ static void ds3ViewSlicePeerDisplay(DS3ViewComp *_this,
     DS3View       *view;
     view=_this->ds3view;
     /*If we can, use a 3D texture for the slice*/
-    if (GLEW_VERSION_1_2)
-        {if (view->t_valid||ds3SliceTexture3D(&view->slice,view))
-        {
+    if (GLEW_VERSION_1_2) {
+        if (view->t_valid||ds3SliceTexture3D(&view->slice,view)) {
             DS3SliceVertex slice[16];
             int            nverts;
             int            i;
             nverts=ds3ViewSliceClip(view,slice);
-            if (nverts)
-            {
+            if (nverts) {
                 glPushAttrib(GL_TEXTURE_BIT|GL_ENABLE_BIT);
                 glPushMatrix();
                 glMultMatrixd(view->basis);
-                if (glwCompIsFocused(&_this->super))
-                {
+                if (glwCompIsFocused(&_this->super)) {
                     glLineWidth(2);
                     glwColor(glwColorBlend(view->super.forec,DS3V_FOCUS_COLOR));
                     glBegin(GL_LINE_LOOP);
@@ -821,8 +759,7 @@ static void ds3ViewSlicePeerDisplay(DS3ViewComp *_this,
                 glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_REPLACE);
                 glEnable(GL_TEXTURE_3D);
                 glBegin(GL_POLYGON);
-                for (i=0; i<nverts; i++)
-                {
+                for (i=0; i<nverts; i++) {
                     glTexCoord3dv(slice[i].p);
                     glVertex3dv(slice[i].p);
                 }
@@ -832,25 +769,21 @@ static void ds3ViewSlicePeerDisplay(DS3ViewComp *_this,
                 glPopAttrib();
             }
         }
-    }
-    else
+    } else
         /*If we can't use 3D texturing, fall back on extracting 2D textures (slow)*/
     {
-        if (view->t_valid||ds3SliceMakeFast(&view->slice,view))
-        {
+        if (view->t_valid||ds3SliceMakeFast(&view->slice,view)) {
             int i;
             glPushAttrib(GL_TEXTURE_BIT|GL_ENABLE_BIT);
             glPushMatrix();
             glMultMatrixd(view->basis);
             glBindTexture(GL_TEXTURE_2D,view->slice.t_id);
             glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_REPLACE);
-            if (glwCompIsFocused(&_this->super))
-            {
+            if (glwCompIsFocused(&_this->super)) {
                 DS3SliceVertex slice[16];
                 int            nverts;
                 nverts=ds3ViewSliceClip(view,slice);
-                if (nverts)
-                {
+                if (nverts) {
                     glLineWidth(2);
                     glwColor(glwColorBlend(view->super.forec,DS3V_FOCUS_COLOR));
                     glBegin(GL_LINE_LOOP);
@@ -859,16 +792,13 @@ static void ds3ViewSlicePeerDisplay(DS3ViewComp *_this,
                     glLineWidth(1);
                     glEnable(GL_TEXTURE_2D);
                     glBegin(GL_POLYGON);
-                    for (i=0; i<nverts; i++)
-                    {
+                    for (i=0; i<nverts; i++) {
                         glTexCoord2d(slice[i].tx,slice[i].ty);
                         glVertex3dv(slice[i].p);
                     }
                     glEnd();
                 }
-            }
-            else
-            {
+            } else {
                 for (i=0; i<6; i++)glEnable(GL_CLIP_PLANE0+i);
                 glTranslated(0.5,0.5,0.5);
                 glRotated(view->slice_p,1,0,0);
@@ -916,20 +846,16 @@ static void ds3ViewGetSliceTrackCoords(DS3View *_this,Vect3d _track,
     b=vectDot3d(dp,p0);
     c=vectMag2_3d(p0)-1;
     d=b*b-a*c;
-    if (d<0)
-    {
-        switch (_this->proj)
-        {
-        case DS3V_PROJECT_ORTHOGRAPHIC:
-        {
+    if (d<0) {
+        switch (_this->proj) {
+        case DS3V_PROJECT_ORTHOGRAPHIC: {
             int i;
             b=-a*(c+1);
             c=0;
             for (i=0; i<3; i++)c+=p0[i]*dp[i];
             c*=c;
             d=b*b-4*a*c;
-            if (d<0||fabs(c)<1E-100)
-            {
+            if (d<0||fabs(c)<1E-100) {
                 vectSet3d(_track,0,0,1);
                 return;
             }
@@ -940,15 +866,13 @@ static void ds3ViewGetSliceTrackCoords(DS3View *_this,Vect3d _track,
         }
         break;
         /*case DS3V_PROJECT_PERSPECTIVE :*/
-        default                       :
-        {
+        default                       : {
             int i;
             int j;
             c+=1;
             b=-b-c;
             a=0;
-            for (i=0; i<3; i++)
-            {
+            for (i=0; i<3; i++) {
                 static const int next[3]={1,2,0};
                 j=next[i];
                 a+=p1[i]*p1[i];
@@ -956,8 +880,7 @@ static void ds3ViewGetSliceTrackCoords(DS3View *_this,Vect3d _track,
                 a-=d*d;
             }
             d=b*b-a*c;
-            if (d<0||fabs(a)<1E-100)
-            {
+            if (d<0||fabs(a)<1E-100) {
                 vectSet3d(_track,0,0,1);
                 return;
             }
@@ -971,8 +894,7 @@ static void ds3ViewGetSliceTrackCoords(DS3View *_this,Vect3d _track,
         }
     }
     if (fabs(a)<1E-100)vectSet3d(_track,0,0,1);
-    else
-    {
+    else {
         d=(-b+_this->track_rt*sqrt(d))/a;
         vectMul3d(_track,dp,d);
         vectAdd3d(_track,_track,p0);
@@ -1007,8 +929,7 @@ static void ds3ViewSlicePostComposeRot(DS3View *_this,double _t,
     r[Z][X]=-cp*st;
     r[Z][Y]=sp;
     r[Z][Z]=cp*ct;
-    for (i=0; i<3; i++)for (j=0; j<3; j++)
-        {
+    for (i=0; i<3; i++)for (j=0; j<3; j++) {
             s[i][j]=0;
             for (k=0; k<3; k++)s[i][j]+=_rot[i][k]*r[k][j];
         }
@@ -1016,35 +937,28 @@ static void ds3ViewSlicePostComposeRot(DS3View *_this,double _t,
     if (st<-1)st=1;
     else if (st>1)st=1;
     _t=asin(st)*(180/M_PI);
-    if (_t<1E-8)
-    {
+    if (_t<1E-8) {
         if (_t<-1E-4)_t+=360;
         else _t=0;
     }
     if ((fabs(_this->slice_t-_t)>90&&fabs(_this->slice_t-_t+360)>90&&
-            fabs(_this->slice_t-_t-360)>90))
-    {
+            fabs(_this->slice_t-_t-360)>90)) {
         _t=180-_t;
-        if (_t<1E-8)
-        {
+        if (_t<1E-8) {
             if (_t<-1E-4)_t+=360;
             else _t=0;
         }
     }
     ct=cos(_t*M_PI/180);
-    if (fabs(ct)<1E-8)
-    {
+    if (fabs(ct)<1E-8) {
         sp=s[Y][X]/st;
         cp=-s[Z][X]/st;
-    }
-    else
-    {
+    } else {
         sp=-s[Y][Z]/ct;
         cp=s[Z][Z]/ct;
     }
     _p=atan2(sp,cp)*(180/M_PI);
-    if (_p<1E-8)
-    {
+    if (_p<1E-8) {
         if (_p<-1E-4)_p+=360;
         else _p=0;
     }
@@ -1067,45 +981,36 @@ static int ds3ViewSlicePeerSpecial(DS3ViewComp *_this,const GLWCallbacks *_cb,
     int      ret;
     view=_this->ds3view;
     ret=-1;
-    switch (_k)
-    {
-    case GLUT_KEY_LEFT     :
-    {
+    switch (_k) {
+    case GLUT_KEY_LEFT     : {
         ds3ViewSetSlice(view,view->slice_t-5,view->slice_p,view->slice_d);
     }
     break;
-    case GLUT_KEY_RIGHT    :
-    {
+    case GLUT_KEY_RIGHT    : {
         ds3ViewSetSlice(view,view->slice_t+5,view->slice_p,view->slice_d);
     }
     break;
-    case GLUT_KEY_UP       :
-    {
+    case GLUT_KEY_UP       : {
         ds3ViewSetSlice(view,view->slice_t,view->slice_p-5,view->slice_d);
     }
     break;
-    case GLUT_KEY_DOWN     :
-    {
+    case GLUT_KEY_DOWN     : {
         ds3ViewSetSlice(view,view->slice_t,view->slice_p+5,view->slice_d);
     }
     break;
-    case GLUT_KEY_PAGE_DOWN:
-    {
+    case GLUT_KEY_PAGE_DOWN: {
         ds3ViewSetSlice(view,view->slice_t,view->slice_p,view->slice_d-0.05);
     }
     break;
-    case GLUT_KEY_PAGE_UP  :
-    {
+    case GLUT_KEY_PAGE_UP  : {
         ds3ViewSetSlice(view,view->slice_t,view->slice_p,view->slice_d+0.05);
     }
     break;
-    case GLUT_KEY_HOME     :
-    {
+    case GLUT_KEY_HOME     : {
         ds3ViewSetSlice(view,0,0,0);
     }
     break;
-    case GLUT_KEY_END      :
-    {
+    case GLUT_KEY_END      : {
         ds3ViewAlignOrientation(view);
     }
     break;
@@ -1122,8 +1027,7 @@ static int ds3ViewSlicePeerMouse(DS3ViewComp *_this,const GLWCallbacks *_cb,
 {
     int ret;
     ret=glwCompSuperMouse(&_this->super,_cb,_b,_s,_x,_y);
-    if (ret>=0&&_b==GLUT_LEFT_BUTTON&&_s)
-    {
+    if (ret>=0&&_b==GLUT_LEFT_BUTTON&&_s) {
         DS3View *view;
         Vect3d   p;
         Vect3d   q;
@@ -1152,8 +1056,7 @@ static int ds3ViewSlicePeerMotion(DS3ViewComp *_this,const GLWCallbacks *_cb,
 {
     int ret;
     ret=glwCompSuperMotion(&_this->super,_cb,_x,_y);
-    if (ret>=0&&(_this->super.mouse_b&1<<GLUT_LEFT_BUTTON))
-    {
+    if (ret>=0&&(_this->super.mouse_b&1<<GLUT_LEFT_BUTTON)) {
         DS3View *view;
         Vect3d   p;
         Vect3d   axis;
@@ -1163,12 +1066,9 @@ static int ds3ViewSlicePeerMotion(DS3ViewComp *_this,const GLWCallbacks *_cb,
         ds3ViewGetSliceTrackCoords(view,p,view->track_p0,view->track_p1);
         vectCross3d(axis,view->track_an,p);
         qs=vectMag3d(axis);
-        if (qs<1E-8)
-        {
+        if (qs<1E-8) {
             ds3ViewSetSlice(view,view->track_p,view->track_y,view->slice_d);
-        }
-        else
-        {
+        } else {
             double qc;
             double q[3][3];
             int    i,j;
@@ -1176,8 +1076,7 @@ static int ds3ViewSlicePeerMotion(DS3ViewComp *_this,const GLWCallbacks *_cb,
             if (qs>1)qs=1;
             qc=sqrt(1-qs*qs);
             if (vectDot3d(view->track_an,p)<0)qc=-qc;
-            for (i=0; i<3; i++)
-            {
+            for (i=0; i<3; i++) {
                 for (j=0; j<3; j++)q[i][j]=axis[i]*axis[j]*(1-qc);
                 q[i][i]+=qc;
             }
@@ -1196,8 +1095,7 @@ static int ds3ViewSlicePeerMotion(DS3ViewComp *_this,const GLWCallbacks *_cb,
 }
 
 
-const GLWCallbacks DS3_VIEW_SLICE_CALLBACKS=
-{
+const GLWCallbacks DS3_VIEW_SLICE_CALLBACKS= {
     &GLW_COMPONENT_CALLBACKS,
     NULL,
     (GLWDisplayFunc)ds3ViewSlicePeerDisplay,
@@ -1221,12 +1119,10 @@ void ds3SliceInit(DS3Slice *_this,size_t _dens[3])
     int    s;
     GLint  m;
     double d;
-    if (_dens!=NULL)
-    {
+    if (_dens!=NULL) {
         for (s=0,d=0; s<3; s++)d+=_dens[s]*_dens[s];
         d=sqrt(d);
-    }
-    else d=sqrt(3);
+    } else d=sqrt(3);
     d*=6;
     glGetIntegerv(GL_MAX_TEXTURE_SIZE,&m);
     m>>=1;
@@ -1243,8 +1139,7 @@ void ds3SliceInit(DS3Slice *_this,size_t _dens[3])
   view: The view component to remove a callback timer from, if necessary*/
 void ds3SliceDstr(DS3Slice *_this,DS3View *_view)
 {
-    if (_this->i_id)
-    {
+    if (_this->i_id) {
         glwCompDelTimer(&_view->super,_this->i_id);
         _this->i_id=0;
     }

@@ -85,11 +85,9 @@ int DS3IsoSurface::addTris(long _x[3], long _cv[12],const int _tris[16])
     offs=this->dim>>1;
     this->addNode();
     nodes = &this->nodes[0];
-    for (node=0; offs>this->stp; offs>>=1)
-    {
+    for (node=0; offs>this->stp; offs>>=1) {
         for (i=idx=0; i<3; i++)if (_x[i]&offs)idx|=1<<i;
-        if (nodes[node].node[idx]==DS3V_NO_CHILD)
-        {
+        if (nodes[node].node[idx]==DS3V_NO_CHILD) {
             long n;
             n = this->addNode();
             if (n==DS3V_NO_CHILD)return 0;
@@ -99,14 +97,12 @@ int DS3IsoSurface::addTris(long _x[3], long _cv[12],const int _tris[16])
         node=nodes[node].node[idx];
     }
     for (i=idx=0; i<3; i++)if (_x[i]&offs)idx|=1<<i;
-    if (nodes[node].node[idx]==DS3V_NO_CHILD)
-    {
+    if (nodes[node].node[idx]==DS3V_NO_CHILD) {
         long n;
         n = this->addLeaf(_cv,_tris);
         if (n==DS3V_NO_CHILD)return 0;
         nodes[node].node[idx]=n;
-    }
-    else return 0;
+    } else return 0;
     return 1;
 }
 
@@ -116,34 +112,32 @@ int DS3IsoSurface::addTris(long _x[3], long _cv[12],const int _tris[16])
   successive frames*/
 void DS3IsoSurface::xForm(DataSet3D *_ds3)
 {
-    for (std::vector<DS3IsoVertex>::iterator it = this->verts.begin(); 
-	 it != this->verts.end(); ++it)
-    {
+    for (std::vector<DS3IsoVertex>::iterator it = this->verts.begin();
+            it != this->verts.end(); ++it) {
         Vect3d p, tmp;
         double m;
         int    j;
-	DS3IsoVertex& vert = *it;
-	for (int ii = 0; ii < 3; ++ii)
-	    p[ii] = vert.vert[ii];
+        DS3IsoVertex& vert = *it;
+        for (int ii = 0; ii < 3; ++ii)
+            p[ii] = vert.vert[ii];
         for (j = 0; j < 3; j++) vert.vert[j] = vectDot3d(_ds3->basis[j], p);
 
-	for (int ii = 0; ii < 3; ++ii)
-	    tmp[ii] = vert.norm[ii];
+        for (int ii = 0; ii < 3; ++ii)
+            tmp[ii] = vert.norm[ii];
         for (j = 0; j < 3; j++) p[j] = vectDot3d(_ds3->basis[j], tmp);
         m=vectMag2_3d(p);
         if (m < 1E-100) vectSet3f(vert.norm, 0, 0, 1);
         else {
-	    double rsqrtm = 1/sqrt(m);
-	    for (int ii = 0; ii < 3; ++ii)
-		vert.norm[ii] = p[ii] * rsqrtm;
-	}
+            double rsqrtm = 1/sqrt(m);
+            for (int ii = 0; ii < 3; ++ii)
+                vert.norm[ii] = p[ii] * rsqrtm;
+        }
     }
 }
 
 /*This holds information used while traversing the oct-tree to draw the
   surface, which keeps from cluttering the stack*/
-typedef struct DS3IsoDrawCtx
-{
+typedef struct DS3IsoDrawCtx {
     DS3IsoSurface *iso;           /*The iso-surface to draw*/
     long           cntr[3];       /*The data-set coordinates of the center of the current oct-tree node*/
     GLsizeiptr ibo_off; // Current offset into the index buffer
@@ -161,20 +155,19 @@ void ds3ViewIsoDrawLeaf(DS3IsoDrawCtx *_this,long _leaf,long _offs)
 {
     DS3IsoOctLeaf *leaf;
     int            i;
-    for (i=0; i<3; i++)
-    {
+    for (i=0; i<3; i++) {
         if (_this->cntr[i]+_offs<_this->box[0][i]||
                 _this->cntr[i]-_offs>_this->box[1][i])return;
     }
     leaf = &_this->iso->leafs[_leaf];
     if (use_vbo) {
-	GLsizeiptr sz = leaf->nverts * sizeof(GLint);
-	glBufferSubDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 
-			   _this->ibo_off * sizeof(GLint), sz, 
-			   leaf->verts);
-	_this->ibo_off += leaf->nverts;
+        GLsizeiptr sz = leaf->nverts * sizeof(GLint);
+        glBufferSubDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB,
+                           _this->ibo_off * sizeof(GLint), sz,
+                           leaf->verts);
+        _this->ibo_off += leaf->nverts;
     } else
-	glDrawElements(GL_TRIANGLES,leaf->nverts,GL_UNSIGNED_INT,leaf->verts);
+        glDrawElements(GL_TRIANGLES,leaf->nverts,GL_UNSIGNED_INT,leaf->verts);
 }
 
 /*This sets up the parameters for the below function*/
@@ -245,51 +238,39 @@ static void ds3ViewIsoDrawNode(DS3IsoDrawCtx *_this,long _node,long _offs)
     int            j;
     int            k;
     int            idx;
-    for (i=0; i<3; i++)
-    {
+    for (i=0; i<3; i++) {
         if (_this->cntr[i]+_offs<_this->box[0][i]+1E-4||
                 _this->cntr[i]-_offs>_this->box[1][i]-1E-4)return;
     }
     node = &_this->iso->nodes[_node];
     for (idx=j=0; j<3; j++)if (_this->eye[j]<_this->cntr[j])idx|=1<<j;
-    if (_offs>_this->iso->stp)
-    {
+    if (_offs>_this->iso->stp) {
         _offs>>=1;
-        for (i=0; i<8; i++)
-        {
+        for (i=0; i<8; i++) {
             k=i^idx;
-            if (node->node[k]!=DS3V_NO_CHILD)
-            {
-                for (j=0; j<3; j++)
-                {
+            if (node->node[k]!=DS3V_NO_CHILD) {
+                for (j=0; j<3; j++) {
                     if (k&1<<j)_this->cntr[j]+=_offs;
                     else _this->cntr[j]-=_offs;
                 }
                 ds3ViewIsoDrawNode(_this,node->node[k],_offs);
-                for (j=0; j<3; j++)
-                {
+                for (j=0; j<3; j++) {
                     if (k&1<<j)_this->cntr[j]-=_offs;
                     else _this->cntr[j]+=_offs;
                 }
             }
         }
-    }
-    else
-    {
+    } else {
         _offs>>=1;
-        for (i=0; i<8; i++)
-        {
+        for (i=0; i<8; i++) {
             k=i^idx;
-            if (node->node[k]!=DS3V_NO_CHILD)
-            {
-                for (j=0; j<3; j++)
-                {
+            if (node->node[k]!=DS3V_NO_CHILD) {
+                for (j=0; j<3; j++) {
                     if (k&1<<j)_this->cntr[j]+=_offs;
                     else _this->cntr[j]-=_offs;
                 }
                 ds3ViewIsoDrawLeaf(_this,node->node[k],_offs);
-                for (j=0; j<3; j++)
-                {
+                for (j=0; j<3; j++) {
                     if (k&1<<j)_this->cntr[j]-=_offs;
                     else _this->cntr[j]+=_offs;
                 }
@@ -309,11 +290,9 @@ static void ds3ViewIsoDrawTree(DS3View *_this,DS3IsoDrawCtx *_ctx,
     int    i;
     int    j;
     /*If we're not in a 1x1x1 box, split it up and recurse*/
-    for (i=0; i<3; i++)if (_box[0][i]+1<_box[1][i])
-        {
+    for (i=0; i<3; i++)if (_box[0][i]+1<_box[1][i]) {
             int m;
-            if (_ctx->eye[i]<(_box[0][i]+1)*_this->ds3->density[i])
-            {
+            if (_ctx->eye[i]<(_box[0][i]+1)*_this->ds3->density[i]) {
                 _box[0][i]+=1;
                 ds3ViewIsoDrawTree(_this,_ctx,_box);
                 _box[0][i]-=1;
@@ -321,9 +300,7 @@ static void ds3ViewIsoDrawTree(DS3View *_this,DS3IsoDrawCtx *_ctx,
                 _box[1][i]=_box[0][i]+1;
                 ds3ViewIsoDrawTree(_this,_ctx,_box);
                 _box[1][i]=m;
-            }
-            else
-            {
+            } else {
                 m=_box[1][i];
                 _box[1][i]=_box[0][i]+1;
                 ds3ViewIsoDrawTree(_this,_ctx,_box);
@@ -337,40 +314,39 @@ static void ds3ViewIsoDrawTree(DS3View *_this,DS3IsoDrawCtx *_ctx,
     /*We are in a 1x1x1 box: draw a copy of the iso-surface*/
 
     vectSet3d(p,0,0,0);
-    for (i=0; i<3; i++)
-    {
+    for (i=0; i<3; i++) {
         for (j=0; j<3; j++)p[j]+=_this->ds3->basis[j][i]*_box[0][i];
         _ctx->cntr[i]=(_ctx->iso->dim>>1)+_box[0][i]*_this->ds3->density[i];
     }
     if (use_vbo) {
-	Vect3d tmp;
-	vectSub3d(tmp, p, _ctx->trans);
-	if (tmp[X] != 0 || tmp[Y] != 0 || tmp[Z] != 0) {
-	    // When we change the translation vector, we must first
-	    // paint all the vertices that have been accumulated in
-	    // the VBO with the old translation vector.
-	    glDrawElements(GL_TRIANGLES, _ctx->ibo_off, 
-			   GL_UNSIGNED_INT, 0);
-	    // And reset the offset as we don't need these indices
-	    // anymore.
-	    _ctx->ibo_off = 0;
-	    // Then we set the translation to the difference between
-	    // the new and current vectors.
-	    glTranslated(tmp[X], tmp[Y], tmp[Z]);
-	    // Finally set the current vector to the offset from zero.
-	    vectSet3dv(_ctx->trans, p);
-	}
-	// .. and continue filling in the element buffer.
-	ds3ViewIsoDrawNode(_ctx,0,_ctx->iso->dim>>1);
+        Vect3d tmp;
+        vectSub3d(tmp, p, _ctx->trans);
+        if (tmp[X] != 0 || tmp[Y] != 0 || tmp[Z] != 0) {
+            // When we change the translation vector, we must first
+            // paint all the vertices that have been accumulated in
+            // the VBO with the old translation vector.
+            glDrawElements(GL_TRIANGLES, _ctx->ibo_off,
+                           GL_UNSIGNED_INT, 0);
+            // And reset the offset as we don't need these indices
+            // anymore.
+            _ctx->ibo_off = 0;
+            // Then we set the translation to the difference between
+            // the new and current vectors.
+            glTranslated(tmp[X], tmp[Y], tmp[Z]);
+            // Finally set the current vector to the offset from zero.
+            vectSet3dv(_ctx->trans, p);
+        }
+        // .. and continue filling in the element buffer.
+        ds3ViewIsoDrawNode(_ctx,0,_ctx->iso->dim>>1);
     } else {
-	// Without VBO's, it's a bit simpler, first we save the old matrix.
-	glPushMatrix();
-	// Then set the new one with the translation vector.
-	glTranslated(p[X],p[Y],p[Z]);
-	// Paint.
-	ds3ViewIsoDrawNode(_ctx,0,_ctx->iso->dim>>1);
-	// Restore the old matrix.
-	glPopMatrix();
+        // Without VBO's, it's a bit simpler, first we save the old matrix.
+        glPushMatrix();
+        // Then set the new one with the translation vector.
+        glTranslated(p[X],p[Y],p[Z]);
+        // Paint.
+        ds3ViewIsoDrawNode(_ctx,0,_ctx->iso->dim>>1);
+        // Restore the old matrix.
+        glPopMatrix();
     }
 }
 
@@ -387,10 +363,8 @@ static void ds3ViewIsoPeerDisplay(DS3ViewComp *_this,const GLWCallbacks *_cb)
     int            box[2][3];
     view=_this->ds3view;
     /*Create the iso-surface if we don't already have one*/
-    if (!view->s_valid)
-    {
-        if (!view->iso.isoMake(view->ds3,view->iso_v,view->iso_d))
-        {
+    if (!view->s_valid) {
+        if (!view->iso.isoMake(view->ds3,view->iso_v,view->iso_d)) {
             return;
         }
         view->s_valid=1;
@@ -398,34 +372,28 @@ static void ds3ViewIsoPeerDisplay(DS3ViewComp *_this,const GLWCallbacks *_cb)
     if (view->iso.nodes.size() <= 0) return;
     ctx.iso=&view->iso;
     /*Scale the viewable box into data-set coordinates*/
-    for (i=0; i<2; i++)for (j=0; j<3; j++)
-        {
+    for (i=0; i<2; i++)for (j=0; j<3; j++) {
             ctx.box[i][j]=view->box[i][j]*view->ds3->density[j];
         }
     /*Find the location of the eye in data-set coordinates*/
-    switch (view->proj)
-    {
-    case DS3V_PROJECT_ORTHOGRAPHIC:
-    {
+    switch (view->proj) {
+    case DS3V_PROJECT_ORTHOGRAPHIC: {
         /*Approximate being really, really, far away*/
         vectMul3d(p,view->rot[2],(1+view->zoom)*65536);
     }
     break;
     /*case DS3V_PROJECT_PERSPECTIVE :*/
-    default                       :
-    {
+    default                       : {
         vectMul3d(p,view->rot[2],view->zoom);
     }
     }
     vectAdd3d(p,p,view->cntr);
-    for (i=0; i<3; i++)
-    {
+    for (i=0; i<3; i++) {
         ctx.eye[i]=vectDot3d(p,view->basinv[i]);
         ctx.eye[i]*=view->ds3->density[i];
     }
     /*Figure out what region to tile with surfaces*/
-    for (i=0; i<3; i++)
-    {
+    for (i=0; i<3; i++) {
         box[0][i]=(int)floor(ctx.box[0][i]/view->ds3->density[i]);
         box[1][i]=(int)ceil(ctx.box[1][i]/view->ds3->density[i]);
     }
@@ -452,44 +420,44 @@ static void ds3ViewIsoPeerDisplay(DS3ViewComp *_this,const GLWCallbacks *_cb)
     static GLuint iboid;  // Id for index buffer object
     static bool vboinit;
     if (use_vbo) {
-	ctx.ibo_off = 0;
-	vectSet3d(ctx.trans,0,0,0);
-	glPushMatrix();
-	if (!vboinit) {
-	    glGenBuffersARB(1, &vboid);
-	    glGenBuffersARB(1, &iboid);
-	    vboinit = true;
-	}
-	glBindBufferARB(GL_ARRAY_BUFFER_ARB, vboid);
-	glBufferDataARB(GL_ARRAY_BUFFER_ARB, 
-		     view->iso.verts.size() * sizeof(DS3IsoVertex), 
-		     &view->iso.verts[0], GL_STATIC_DRAW_ARB);
-	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, iboid);
-	// Need to tell OpenGL the size of the index buffer, filled in
-	// later. This is a conservative maximum guess.
-	glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 
-			view->iso.leafs.size() * 15 
-			* sizeof(GLint), NULL, GL_STATIC_DRAW_ARB);
+        ctx.ibo_off = 0;
+        vectSet3d(ctx.trans,0,0,0);
+        glPushMatrix();
+        if (!vboinit) {
+            glGenBuffersARB(1, &vboid);
+            glGenBuffersARB(1, &iboid);
+            vboinit = true;
+        }
+        glBindBufferARB(GL_ARRAY_BUFFER_ARB, vboid);
+        glBufferDataARB(GL_ARRAY_BUFFER_ARB,
+                        view->iso.verts.size() * sizeof(DS3IsoVertex),
+                        &view->iso.verts[0], GL_STATIC_DRAW_ARB);
+        glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, iboid);
+        // Need to tell OpenGL the size of the index buffer, filled in
+        // later. This is a conservative maximum guess.
+        glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB,
+                        view->iso.leafs.size() * 15
+                        * sizeof(GLint), NULL, GL_STATIC_DRAW_ARB);
 
-	glVertexPointer(3, GL_FLOAT, sizeof(DS3IsoVertex), 0);
-	glNormalPointer(GL_FLOAT, sizeof(DS3IsoVertex), 
-			BUFFER_OFFSET(sizeof(Vect3f)));
+        glVertexPointer(3, GL_FLOAT, sizeof(DS3IsoVertex), 0);
+        glNormalPointer(GL_FLOAT, sizeof(DS3IsoVertex),
+                        BUFFER_OFFSET(sizeof(Vect3f)));
     } else {
-	glVertexPointer(3, GL_FLOAT, sizeof(DS3IsoVertex), vert.vert);
-	glNormalPointer(GL_FLOAT, sizeof(DS3IsoVertex), vert.norm);
+        glVertexPointer(3, GL_FLOAT, sizeof(DS3IsoVertex), vert.vert);
+        glNormalPointer(GL_FLOAT, sizeof(DS3IsoVertex), vert.norm);
     }
     ds3ViewIsoDrawTree(view,&ctx,box);
     if (use_vbo) {
 #ifndef NDEBUG
-	//printf("about to draw %ld elements using %ld vertices\n", (long)ctx.ibo_off, (long)view->iso.verts.size());
+        //printf("about to draw %ld elements using %ld vertices\n", (long)ctx.ibo_off, (long)view->iso.verts.size());
 #endif
-	glDrawElements(GL_TRIANGLES, ctx.ibo_off, 
-		       GL_UNSIGNED_INT, 0);
-	glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
-	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
-	glPopMatrix();
-	//glDeleteBuffers(1, &vboid);
-	//glDeleteBuffers(1, &iboid);
+        glDrawElements(GL_TRIANGLES, ctx.ibo_off,
+                       GL_UNSIGNED_INT, 0);
+        glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
+        glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+        glPopMatrix();
+        //glDeleteBuffers(1, &vboid);
+        //glDeleteBuffers(1, &iboid);
     }
     glDisableClientState(GL_NORMAL_ARRAY);
     glDisableClientState(GL_VERTEX_ARRAY);
@@ -497,8 +465,7 @@ static void ds3ViewIsoPeerDisplay(DS3ViewComp *_this,const GLWCallbacks *_cb)
     glPopAttrib();
 }
 
-const GLWCallbacks DS3_VIEW_ISO_CALLBACKS=
-{
+const GLWCallbacks DS3_VIEW_ISO_CALLBACKS= {
     &GLW_COMPONENT_CALLBACKS,
     NULL,
     (GLWDisplayFunc)ds3ViewIsoPeerDisplay,
@@ -523,15 +490,14 @@ void DS3IsoSurface::init(size_t _dens[3])
 {
     int i;
     this->dim=2;
-    if (_dens!=NULL)for (i=0; i<3; i++)
-        {
+    if (_dens!=NULL)for (i=0; i<3; i++) {
             for (; (size_t)this->dim<_dens[i]; this->dim<<=1);
         }
 }
 
 DS3IsoSurface::DS3IsoSurface()
 {
-	this->init(NULL);
+    this->init(NULL);
 }
 
 
@@ -539,8 +505,8 @@ DS3IsoSurface::DS3IsoSurface()
 void DS3IsoSurface::clear()
 {
 #ifndef NDEBUG
-    // printf("Old size of Isosurface datastructures: verts: %ld, nodes: %ld, leafs: %ld\n", 
-    // 	   (long)this->verts.size(), (long)this->nodes.size(), 
+    // printf("Old size of Isosurface datastructures: verts: %ld, nodes: %ld, leafs: %ld\n",
+    // 	   (long)this->verts.size(), (long)this->nodes.size(),
     // 	   (long)this->leafs.size());
 #endif
     this->verts.clear();
@@ -554,8 +520,8 @@ void DS3IsoSurface::clear()
 void DS3IsoSurface::reset(long d)
 {
     this->clear();
-    while (this->dim <= d) 
-	this->dim <<= 1;
+    while (this->dim <= d)
+        this->dim <<= 1;
     this->stp = d;
 }
 
@@ -591,8 +557,7 @@ int DS3IsoSurface::isoMake(DataSet3D *_ds3,double _v,int _d)
       a bit shift could be used to save four compares per iteration. This required
       renaming a lot of things to avoid changing the actual tables, and hence the
       awkwardness.*/
-    static const int EDGE_TABLE[256]=
-    {
+    static const int EDGE_TABLE[256]= {
         0x000,0x109,0x203,0x30A,0x406,0x50F,0x605,0x70C,
         0x80C,0x905,0xA0F,0xB06,0xC0A,0xD03,0xE09,0xF00,
         0x190,0x099,0x393,0x29A,0x596,0x49F,0x795,0x69C,
@@ -626,8 +591,7 @@ int DS3IsoSurface::isoMake(DataSet3D *_ds3,double _v,int _d)
         0xF00,0xE09,0xD03,0xC0A,0xB06,0xA0F,0x905,0x80C,
         0x70C,0x605,0x50F,0x406,0x30A,0x203,0x109,0x000
     };
-    static const int TRI_TABLE[256][16]=
-    {
+    static const int TRI_TABLE[256][16]= {
         {-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
         { 0, 8, 3,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
         { 0, 1, 9,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1},
@@ -894,8 +858,7 @@ int DS3IsoSurface::isoMake(DataSet3D *_ds3,double _v,int _d)
     double        *data;
     long          *edges;
     size_t         sz;
-    for (i=0; i<3; i++)
-    {
+    for (i=0; i<3; i++) {
         dim[i]=(long)_ds3->density[i];
         if (dim[i]<=_d)return 0;
     }
@@ -904,38 +867,29 @@ int DS3IsoSurface::isoMake(DataSet3D *_ds3,double _v,int _d)
     for (i=0; i<3; i++)step[i]=(dim[i]+_d-1)/_d;
     sz=(size_t)(step[0]*step[1])*12*sizeof(long);
     edges=(long *)malloc(sz);
-    if (edges!=NULL)
-    {
+    if (edges!=NULL) {
         this->reset(_d);
         memset(edges,0xFF/*DS3V_NO_EDGE*/,sz);
         data = &_ds3->data[0];
-        for (x[0][Z]=0; x[0][Z]<dim[Z]; x[0][Z]+=_d)
-        {
+        for (x[0][Z]=0; x[0][Z]<dim[Z]; x[0][Z]+=_d) {
             long o[3];
-            if (x[0][Z]+_d<dim[Z])
-            {
+            if (x[0][Z]+_d<dim[Z]) {
                 o[Z]=dx[Z];
                 x[1][Z]=x[0][Z]+_d;
-            }
-            else
-            {
+            } else {
                 o[Z]=-x[0][Z]*off[Z];
                 x[1][Z]=0;
             }
-            for (x[0][Y]=0; x[0][Y]<dim[1]; x[0][Y]+=_d)
-            {
+            for (x[0][Y]=0; x[0][Y]<dim[1]; x[0][Y]+=_d) {
                 size_t l;
                 size_t e;
                 int    idx;
                 l=dim[X]*(x[0][Y]+dim[Y]*x[0][Z]);
                 e=12*step[X]*(x[0][Y]/_d);
-                if (x[0][Y]+_d<dim[Y])
-                {
+                if (x[0][Y]+_d<dim[Y]) {
                     o[Y]=dx[Y];
                     x[1][Y]=x[0][Y]+_d;
-                }
-                else
-                {
+                } else {
                     o[Y]=-x[0][Y]*off[Y];
                     x[1][Y]=0;
                 }
@@ -944,19 +898,15 @@ int DS3IsoSurface::isoMake(DataSet3D *_ds3,double _v,int _d)
                 if (data[l+o[Y]+o[Z]]<_v)idx|=0x02;
                 if (data[l+o[Y]]<_v)idx|=0x04;
                 if (data[l]<_v)idx|=0x08;
-                for (x[0][X]=0; x[0][X]<dim[X]; x[0][X]+=_d)
-                {
+                for (x[0][X]=0; x[0][X]<dim[X]; x[0][X]+=_d) {
                     int   isect;
                     const int  *tris;
                     int   b;
                     long  cv[12];
-                    if (x[0][X]+_d<dim[X])
-                    {
+                    if (x[0][X]+_d<dim[X]) {
                         o[X]=dx[X];
                         x[1][X]=x[0][X]+_d;
-                    }
-                    else
-                    {
+                    } else {
                         o[X]=-x[0][X]/**off[X]*/;
                         x[1][X]=0;
                     }
@@ -966,20 +916,15 @@ int DS3IsoSurface::isoMake(DataSet3D *_ds3,double _v,int _d)
                     if (data[l+o[X]]<_v)idx|=0x80;
                     /*Find out which edges are intersected:*/
                     isect=EDGE_TABLE[idx];
-                    for (b=0; b<12; b++)
-                    {
-                        if (isect&1<<b)
-                        {
-                            if (edges[e+b]==DS3V_NO_EDGE)          /*Compute the edge intersection:*/
-                            {
-                                static const int F[3][12]=
-                                {
+                    for (b=0; b<12; b++) {
+                        if (isect&1<<b) {
+                            if (edges[e+b]==DS3V_NO_EDGE) {        /*Compute the edge intersection:*/
+                                static const int F[3][12]= {
                                     {0,0,0,0,1,1,1,1,0,0,0,0},
                                     {0,1,0,0,0,1,0,0,0,1,1,0},
                                     {1,0,0,0,1,0,0,0,1,1,0,0}
                                 };
-                                static const int T[3][12]=
-                                {
+                                static const int T[3][12]= {
                                     {0,0,0,0,1,1,1,1,1,1,1,1},
                                     {1,1,1,0,1,1,1,0,0,1,1,0},
                                     {1,1,0,1,1,1,0,1,1,1,0,0}
@@ -988,31 +933,26 @@ int DS3IsoSurface::isoMake(DataSet3D *_ds3,double _v,int _d)
                                 long          vt;
                                 long          fx[3];
                                 double        d;
-				this->verts.resize(this->verts.size() + 1);
-                                for (vf=vt=l,i=0; i<3; i++)
-                                {
-                                    if (F[i][b])
-                                    {
+                                this->verts.resize(this->verts.size() + 1);
+                                for (vf=vt=l,i=0; i<3; i++) {
+                                    if (F[i][b]) {
                                         vf+=o[i];
                                         fx[i]=x[1][i]?x[1][i]:dim[i];
-                                    }
-                                    else fx[i]=x[0][i];
+                                    } else fx[i]=x[0][i];
                                     if (T[i][b])vt+=o[i];
                                 }
                                 d=(data[vf]-_v)/(data[vf]-data[vt]);
                                 if (d<0)d=0;
                                 else if (d>1)d=1;
-                                DS3IsoVertex& vert = 
-					this->verts[this->verts.size() - 1];
-                                for (i=0; i<3; i++)
-                                {
+                                DS3IsoVertex& vert =
+                                    this->verts[this->verts.size() - 1];
+                                for (i=0; i<3; i++) {
                                     double nf;
                                     double nt;
                                     vert.vert[i]=fx[i];
-                                    if (F[i][b]!=T[i][b])
-                                    {
+                                    if (F[i][b]!=T[i][b]) {
                                         vert.vert[i]+=d*((T[i][b]?(x[1][i]?x[1][i]:dim[i]):x[0][i])-
-                                                                  fx[i]);
+                                                                 fx[i]);
                                     }
                                     vert.vert[i]/=dim[i];
                                     nf=0.5*(data[vf+(x[F[i][b]][i]+_d<dim[i]?dx[i]:-x[F[i][b]][i]*off[i])]-
@@ -1021,15 +961,13 @@ int DS3IsoSurface::isoMake(DataSet3D *_ds3,double _v,int _d)
                                             data[vt+(x[T[i][b]][i]>=_d?-dx[i]:(step[i]-1)*dx[i])]);
                                     vert.norm[i]=(nf+d*(nt-nf))/dim[i];
                                 }
-                                edges[e+b] = cv[b] 
-					= (long)(this->verts.size() - 1);
-                            }
-                            else cv[b]=edges[e+b];
+                                edges[e+b] = cv[b]
+                                             = (long)(this->verts.size() - 1);
+                            } else cv[b]=edges[e+b];
                         }                  /*Reuse old edge intersections*/
                         else cv[b]=DS3V_NO_EDGE;
                     }
-                    if (x[1][0])                      /*Propagate edge intersections forward:*/
-            {
+                    if (x[1][0]) {                    /*Propagate edge intersections forward:*/
                         e+=12;
                         edges[e+0]=cv[4];
                         edges[e+1]=cv[5];
@@ -1037,8 +975,7 @@ int DS3IsoSurface::isoMake(DataSet3D *_ds3,double _v,int _d)
                         edges[e+3]=cv[7];
                         e-=12;
                     }
-                    if (x[1][1])                     /*Propagate edge intersections sideways:*/
-                    {
+                    if (x[1][1]) {                   /*Propagate edge intersections sideways:*/
                         e+=12*step[0];
                         edges[e+3]=cv[1];
                         edges[e+8]=cv[9];
@@ -1048,8 +985,7 @@ int DS3IsoSurface::isoMake(DataSet3D *_ds3,double _v,int _d)
                     }
                     /*Draw the triangles for the current edge intersections:*/
                     tris=TRI_TABLE[idx];
-                    if (tris[0] >= 0 && !this->addTris(x[0],cv,tris))
-                    {
+                    if (tris[0] >= 0 && !this->addTris(x[0],cv,tris)) {
                         free(edges);
                         this->clear();
                         return 0;
@@ -1059,13 +995,11 @@ int DS3IsoSurface::isoMake(DataSet3D *_ds3,double _v,int _d)
                     idx>>=4;
                 }
             }
-            if (x[1][2])                             /*Propagate edge intersections up:*/
-            {
+            if (x[1][2]) {                           /*Propagate edge intersections up:*/
                 size_t e;
                 size_t m;
                 m=12*step[0]*step[1];
-                for (e=0; e<m; e+=12)
-                {
+                for (e=0; e<m; e+=12) {
                     edges[e+11]=edges[e+8];
                     edges[e+10]=edges[e+9];
                     edges[e+9]=DS3V_NO_EDGE;

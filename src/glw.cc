@@ -113,13 +113,11 @@ GLWfont glwFontGet(int _family,int _size)
     if (_family<0||_family>=3)return NULL;
     d=_size-GLW_FONT_SIZES[GLW_FONT_FAMILIES[_family]];
     if (d<0)d=-d;
-    for (j=0,i=1; i<GLW_FONT_FAM_SIZES[_family]; i++)
-    {
+    for (j=0,i=1; i<GLW_FONT_FAM_SIZES[_family]; i++) {
         int e;
         e=_size-GLW_FONT_SIZES[GLW_FONT_FAMILIES[_family]+i];
         if (e<0)e=-e;
-        if (e<d)
-        {
+        if (e<d) {
             j=i;
             d=e;
         }
@@ -137,8 +135,7 @@ int glwFontGetHeight(GLWfont _font)
 int glwFontGetAscent(GLWfont _font)
 {
     int i;
-    for (i=0; i<7; i++)if (_font==GLW_FONTS[i])
-        {
+    for (i=0; i<7; i++)if (_font==GLW_FONTS[i]) {
             return GLW_FONT_SIZES[i]-GLW_FONT_DESCENTS[i];
         }
     return 0;
@@ -158,7 +155,7 @@ int glwFontGetWidth(GLWfont _font,int _c)
 
 int glwFontGetStringWidth(GLWfont _font, const std::string& s)
 {
-	return glutBitmapLength(_font, (const unsigned char*) s.c_str());
+    return glutBitmapLength(_font, (const unsigned char*) s.c_str());
 }
 
 int glwFontDrawString(GLWfont _font,const char *_s,double _x,double _y)
@@ -166,15 +163,13 @@ int glwFontDrawString(GLWfont _font,const char *_s,double _x,double _y)
     size_t i;
     int    ret;
     ret=0;
-    if (_s!=NULL)
-    {
+    if (_s!=NULL) {
         glPushAttrib(GL_CURRENT_BIT);
         glRasterPos2d(_x,_y);
-        for (i=0; _s[i]; i++)
-        {
-	    glutBitmapCharacter(_font,(unsigned char)_s[i]);
-	}
-	ret = glutBitmapLength(_font, (const unsigned char*) _s);
+        for (i=0; _s[i]; i++) {
+            glutBitmapCharacter(_font,(unsigned char)_s[i]);
+        }
+        ret = glutBitmapLength(_font, (const unsigned char*) _s);
         glPopAttrib();
     }
     return ret;

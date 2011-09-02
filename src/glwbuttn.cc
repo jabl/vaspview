@@ -25,16 +25,14 @@
 static void glwButtonLayoutMinSize(GLWLayoutManager *_this,GLWButton *_button,
                                    int *_w,int *_h)
 {
-    if (_w!=NULL)
-    {
+    if (_w!=NULL) {
         *_w=glwFontGetStringWidth(_button->super.font,
                                   _button->label) + 8;
     }
     if (_h!=NULL)*_h=glwFontGetHeight(_button->super.font)+8;
 }
 
-static GLWLayoutManager glw_button_layout=
-{
+static GLWLayoutManager glw_button_layout= {
     NULL,
     NULL,
     (GLWLayoutSizeFunc)glwButtonLayoutMinSize,
@@ -56,11 +54,9 @@ static void glwButtonPeerDisplay(GLWButton *_this,GLWCallbacks *_cb)
     h=glwFontGetHeight(_this->super.font);
     x=(_this->super.bounds.w-w)*0.5;
     y=(_this->super.bounds.h-h)*0.5;
-    if (glwCompIsEnabled(&_this->super))
-    {
+    if (glwCompIsEnabled(&_this->super)) {
         /*Draw focus rectangle if we have focus*/
-        if (glwCompIsFocused(&_this->super))
-        {
+        if (glwCompIsFocused(&_this->super)) {
             glLineStipple(2,0x5555);
             glEnable(GL_LINE_STIPPLE);
             glBegin(GL_LINE_LOOP);
@@ -73,22 +69,17 @@ static void glwButtonPeerDisplay(GLWButton *_this,GLWCallbacks *_cb)
             glDisable(GL_LINE_STIPPLE);
         }
         /*If the button is down, shift the text and change border colors*/
-        if (_this->down)
-        {
+        if (_this->down) {
             x++;
             y--;
             c1=glwColorDarken(_this->super.backc);
             c2=glwColorLighten(_this->super.backc);
-        }
-        else
-        {
+        } else {
             c1=glwColorLighten(_this->super.backc);
             c2=glwColorDarken(_this->super.backc);
         }
         glwColor(_this->super.forec);
-    }
-    else
-    {
+    } else {
         c1=glwColorLighten(_this->super.backc);
         c2=glwColorDarken(_this->super.backc);
         glwColor(glwColorBlend(_this->super.forec,_this->super.backc));
@@ -118,8 +109,7 @@ static void glwButtonPeerDisplay(GLWButton *_this,GLWCallbacks *_cb)
     glVertex2i(2,1);
     glEnd();
     /*If we were pressed with the keyboard, redisplay ourselves up*/
-    if (_this->down&&_this->release)
-    {
+    if (_this->down&&_this->release) {
         _this->down=0;
         _this->release=0;
         glwCompRepaint(&_this->super,100);
@@ -141,8 +131,7 @@ static void glwButtonPeerFocus(GLWButton *_this,GLWCallbacks *_cb,int _s)
 static int glwButtonPeerKeyboard(GLWButton *_this,const GLWCallbacks *_cb,
                                  unsigned char _k,int _x,int _y)
 {
-    if (_k==' '&&!_this->super.mouse_b)
-    {
+    if (_k==' '&&!_this->super.mouse_b) {
         _this->down=1;
         _this->release=1;
         glwCompRepaint(&_this->super,0);
@@ -157,31 +146,23 @@ static int glwButtonPeerMouse(GLWButton *_this,const GLWCallbacks *_cb,
 {
     int ret;
     ret=glwCompSuperMouse(&_this->super,_cb,_b,_s,_x,_y);
-    if (ret>=0)
-    {
+    if (ret>=0) {
         int rp;
         rp=0;
-        if (_x<0||_x>_this->super.bounds.w||_y<0||_y>_this->super.bounds.h)
-        {
+        if (_x<0||_x>_this->super.bounds.w||_y<0||_y>_this->super.bounds.h) {
             ret=-1;
-            if (_this->down)
-            {
+            if (_this->down) {
                 _this->down=0;
                 rp=1;
             }
-        }
-        else if (!_s&&_this->down&&!_this->super.mouse_b)
-        {
+        } else if (!_s&&_this->down&&!_this->super.mouse_b) {
             ret=-1;
             _this->down=0;
             if (_this->pressed!=NULL)_this->pressed(_this->pressed_ctx,&_this->super);
             rp=1;
-        }
-        else if (_s||_this->super.mouse_b)
-        {
+        } else if (_s||_this->super.mouse_b) {
             ret=-1;
-            if (!_this->down)
-            {
+            if (!_this->down) {
                 _this->down=1;
                 rp=1;
             }
@@ -197,24 +178,18 @@ static int glwButtonPeerMotion(GLWButton *_this,const GLWCallbacks *_cb,
 {
     int ret;
     ret=glwCompSuperMotion(&_this->super,_cb,_x,_y);
-    if (ret>=0)
-    {
+    if (ret>=0) {
         int rp;
         rp=0;
-        if (_x<0||_x>_this->super.bounds.w||_y<0||_y>_this->super.bounds.h)
-        {
+        if (_x<0||_x>_this->super.bounds.w||_y<0||_y>_this->super.bounds.h) {
             ret=1;
-            if (_this->down)
-            {
+            if (_this->down) {
                 _this->down=0;
                 rp=1;
             }
-        }
-        else if (_this->super.mouse_b)
-        {
+        } else if (_this->super.mouse_b) {
             ret=1;
-            if (!_this->down)
-            {
+            if (!_this->down) {
                 _this->down=1;
                 _this->release=0;
                 rp=1;
@@ -231,8 +206,7 @@ static void glwButtonPeerDispose(GLWButton *_this,GLWCallbacks *_cb)
 }
 
 
-const GLWCallbacks GLW_BUTTON_CALLBACKS=
-{
+const GLWCallbacks GLW_BUTTON_CALLBACKS= {
     &GLW_COMPONENT_CALLBACKS,
     (GLWDisposeFunc)glwButtonPeerDispose,
     (GLWDisplayFunc)glwButtonPeerDisplay,
@@ -251,41 +225,39 @@ const GLWCallbacks GLW_BUTTON_CALLBACKS=
 
 GLWButton::GLWButton(const char* label)
 {
-	this->pressed=NULL;
-	this->pressed_ctx=NULL;
-	glwButtonSetLabel(this, label);
-	this->super.callbacks=&GLW_BUTTON_CALLBACKS;
-        glwCompSetLayout(&this->super,&glw_button_layout);
-        glwCompSetFocusable(&this->super,1);
-        this->down = this->release = 0;
+    this->pressed=NULL;
+    this->pressed_ctx=NULL;
+    glwButtonSetLabel(this, label);
+    this->super.callbacks=&GLW_BUTTON_CALLBACKS;
+    glwCompSetLayout(&this->super,&glw_button_layout);
+    glwCompSetFocusable(&this->super,1);
+    this->down = this->release = 0;
 }
 
 const char *glwButtonGetLabel(GLWButton *_this)
 {
-	return _this->label.c_str();
+    return _this->label.c_str();
 }
 
 int glwButtonSetLabel(GLWButton* _this, const char* label)
 {
-	if (label==NULL)
-		_this->label.clear();
-	else
-		_this->label = label;
-	glwCompRevalidate(&_this->super);
-	return 1;
+    if (label==NULL)
+        _this->label.clear();
+    else
+        _this->label = label;
+    glwCompRevalidate(&_this->super);
+    return 1;
 }
 
 int glwButtonAddLabel(GLWButton* _this, const char* label)
 {
-	if (_this->label.size() <= 1)
-		return glwButtonSetLabel(_this, label);
-	else if (label != NULL)
-        {
-		_this->label.append(label);
-		glwCompRevalidate(&_this->super);
-		return 1;
-        }
-	else return 1;
+    if (_this->label.size() <= 1)
+        return glwButtonSetLabel(_this, label);
+    else if (label != NULL) {
+        _this->label.append(label);
+        glwCompRevalidate(&_this->super);
+        return 1;
+    } else return 1;
 }
 
 GLWActionFunc glwButtonGetPressedFunc(GLWButton *_this)

@@ -26,9 +26,8 @@ typedef struct DSColorLegend DSColorLegend;
 
 
 
-struct DSColorLegend
-{
-	DSColorLegend();
+struct DSColorLegend {
+    DSColorLegend();
     GLWComponent  super;
     const DSColorScale *cs;
     GLubyte       ctable[UCHAR_MAX+1][4];

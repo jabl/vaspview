@@ -1,7 +1,7 @@
 /*VASP Data Viewer - Views 3d data sets of molecular charge distribution
   Copyright (C) 1999-2001 Timothy B. Terriberry
   (mailto:tterribe@users.sourceforge.net)
-  2011 Janne Blomqvist 
+  2011 Janne Blomqvist
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -105,52 +105,44 @@ static GLWcolor dsRainbowScale(const DSColorScale *_this,double _c)
     //flr = floor(hue);
     h = static_cast<int>(hue);
     flr = hue - h;
-    switch ((h&INT_MAX)%6)
-    {
-    case 0 :
-    {
+    switch ((h&INT_MAX)%6) {
+    case 0 : {
         red=1.0;
         grn=flr;
         blu=0.0;
     }
     break;
-    case 1 :
-    {
+    case 1 : {
         red=1-flr;
         grn=1.0;
         blu=0;
     }
     break;
-    case 2 :
-    {
+    case 2 : {
         red=0.0;
         grn=1.0;
         blu=flr;
     }
     break;
-    case 3 :
-    {
+    case 3 : {
         red=0;
         grn=1-flr;
         blu=1.0;
     }
     break;
-    case 4 :
-    {
+    case 4 : {
         red=flr;
         grn=0.0;
         blu=1.0;
     }
     break;
-    case 5 :
-    {
+    case 5 : {
         red=1.0;
         grn=0;
         blu=1-flr;
     }
     break;
-    default:
-    {
+    default: {
         red=grn=blu=0.0;
     }
     }
@@ -192,14 +184,13 @@ void dsLinearScaleInit(DSLinearScale *_this,double _min,double _max)
 }
 
 
-const DSLinearScale DS_LINEAR_SCALE_IDENTITY=
-{
-	{
-		(DSScaleFunc)dsLinearScale,
-		(DSUnscaleFunc)dsLinearUnscale
-	},
-	1,
-	0
+const DSLinearScale DS_LINEAR_SCALE_IDENTITY= {
+    {
+        (DSScaleFunc)dsLinearScale,
+        (DSUnscaleFunc)dsLinearUnscale
+    },
+    1,
+    0
 };
 
 
@@ -238,8 +229,7 @@ void dsMatrix3x3Inv(const double _m[3][3],double _i[3][3])
     _i[2][0]=_m[1][0]*_m[2][1]-_m[1][1]*_m[2][0];
     det=_m[0][0]*_i[0][0]+_m[0][1]*_i[1][0]+_m[0][2]*_i[2][0];
     if (fabs(det)<1E-100)dsMatrix3x3PInv(_m,_i);
-    else
-    {
+    else {
         det=1/det;
         _i[0][0]*=det;
         _i[1][0]*=det;
@@ -257,25 +247,19 @@ void dsMatrix3x3Inv(const double _m[3][3],double _i[3][3])
   singular, the identity is returned*/
 static void dsMatrix2x2HInv(const double _m[3][3],double _i[2][2],int _h)
 {
-    switch (_h)
-    {
-    case 1:
-    {
+    switch (_h) {
+    case 1: {
         if (fabs(_m[0][0])<1E-100)_i[0][0]=1;
         else _i[0][0]=1/_m[0][0];
     }
     break;
-    case 2:
-    {
+    case 2: {
         double d;
         d=_m[0][0]*_m[1][1]-_m[0][1]*_m[1][0];
-        if (fabs(d)<1E-100)
-        {
+        if (fabs(d)<1E-100) {
             _i[0][0]=_i[1][1]=1;
             _i[0][1]=_i[1][0]=0;
-        }
-        else
-        {
+        } else {
             _i[0][0]=_m[1][1]/d;
             _i[0][1]=-_m[0][1]/d;
             _i[1][0]=-_m[1][0]/d;
@@ -302,36 +286,30 @@ void dsMatrix3x3PInv(const double _m[3][3],double _i[3][3])
     int    k;
     /*First step: compute an LUP decomposition*/
     memcpy(lu[0],_m[0],sizeof(lu));
-    for (h=k=0; k<3; k++)
-    {
+    for (h=k=0; k<3; k++) {
         double v;
         int l = 0;
         v=0;
-        for (i=h; i<3; i++)
-        {
+        for (i=h; i<3; i++) {
             double aluik;
             aluik=fabs(lu[i][k]);
-            if (aluik>v)
-            {
+            if (aluik>v) {
                 v=aluik;
-		l=i;
+                l=i;
             }
         }
-        if (v>1E-8)
-        {
+        if (v>1E-8) {
             int t;
             t=p[h];
             p[h]=p[l];
             p[l]=t;
-            for (i=0; i<3; i++)
-            {
+            for (i=0; i<3; i++) {
                 double d;
                 d=lu[h][i];
                 lu[h][i]=lu[l][i];
                 lu[l][i]=d;
             }
-            for (i=h+1; i<3; i++)
-            {
+            for (i=h+1; i<3; i++) {
                 lu[i][k]/=lu[h][k];
                 for (j=k+1; j<3; j++)lu[i][j]-=lu[i][k]*lu[h][j];
             }
@@ -351,61 +329,51 @@ void dsMatrix3x3PInv(const double _m[3][3],double _i[3][3])
                *           *
       then m==P LU, where P  means P conjugate-transpose.
       Furthermore, h is the rank of U (and m)*/
-    switch (h)
-    {
-    case 0:
-    {
+    switch (h) {
+    case 0: {
         for (i=0; i<3; i++)for (j=0; j<3; j++)_i[i][j]=0;
         return;
     }
-    case 3:                                               /*Should be impossible*/
-    {
+    case 3: {                                             /*Should be impossible*/
         for (i=0; i<3; i++)for (j=0; j<3; j++)_i[i][j]=i==j;
         return;
     }
     }
-    for (j=0; j<h; j++)
-    {
+    for (j=0; j<h; j++) {
         for (i=0; i<j; i++)x[p[i]][j]=0;
         x[p[i++]][j]=1;
         for (; i<3; i++)x[p[i]][j]=lu[i][j];
     }
-    for (i=0; i<h; i++)
-    {
+    for (i=0; i<h; i++) {
         for (j=0; j<i; j++)y[j][i]=0;
         for (; j<3; j++)y[j][i]=lu[i][j];
     }
     /*At this point,
            *
       m==xy , where x and y are 3 by h matrices, a full-rank decomposition*/
-    for (i=0; i<h; i++)for (j=0; j<h; j++)
-        {
+    for (i=0; i<h; i++)for (j=0; j<h; j++) {
             a[i][j]=0;
             for (k=0; k<3; k++)a[i][j]+=x[k][i]*x[k][j];
         }
     dsMatrix2x2HInv(a,xtxi,h);
     /*              *
       xtxi is now (x x)^-1*/
-    for (i=0; i<h; i++)for (j=0; j<h; j++)
-        {
+    for (i=0; i<h; i++)for (j=0; j<h; j++) {
             a[i][j]=0;
             for (k=0; k<3; k++)a[i][j]+=y[k][i]*y[k][j];
         }
     dsMatrix2x2HInv(a,ytyi,h);
     /*              *
       ytyi is now (y y)^-1*/
-    for (i=0; i<3; i++)for (j=0; j<h; j++)
-        {
+    for (i=0; i<3; i++)for (j=0; j<h; j++) {
             _i[i][j]=0;
             for (k=0; k<h; k++)_i[i][j]+=y[i][k]*ytyi[k][j];
         }
-    for (i=0; i<3; i++)for (j=0; j<h; j++)
-        {
+    for (i=0; i<3; i++)for (j=0; j<h; j++) {
             a[i][j]=0;
             for (k=0; k<h; k++)a[i][j]+=_i[i][j]*xtxi[k][j];
         }
-    for (i=0; i<3; i++)for (j=0; j<3; j++)
-        {
+    for (i=0; i<3; i++)for (j=0; j<3; j++) {
             _i[i][j]=0;
             for (k=0; k<h; k++)_i[i][j]+=a[i][k]*x[j][k];
         }
@@ -421,47 +389,43 @@ int main(int _argc,char **_argv)
     DS3Viewer ds3v;
     /*At this point, we've created a window, and so should have a current
       rendering context: test for GL extensions*/
-    
+
     // With this one can enable paletted textures at least on R300,
     // i915, and Quadro NVS 295, but it doesn't actually work on any
     // of them.
-    //glewExperimental = GL_TRUE;    
+    //glewExperimental = GL_TRUE;
     GLenum err = glewInit();
-    if (GLEW_OK != err)
-    {
-	    /* Problem: glewInit failed, something is seriously wrong. */
-	    fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
-	    return 1;
+    if (GLEW_OK != err) {
+        /* Problem: glewInit failed, something is seriously wrong. */
+        fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
+        return 1;
     }
 #ifndef NDEBUG
     fprintf(stdout, "Status: Using GLEW %s\n", glewGetString(GLEW_VERSION));
 #endif
     if (GLEW_EXT_paletted_texture)
-	    printf("EXT_paletted_texture available.\n");
+        printf("EXT_paletted_texture available.\n");
 
     if (!GLEW_VERSION_1_2) {
-	printf("OpenGL 1.2 not available. Slice rendering will be excruciatingly slow!\n");
+        printf("OpenGL 1.2 not available. Slice rendering will be excruciatingly slow!\n");
     } else {
-	    std::string rr = (const char*) glGetString(GL_RENDERER);
-	    if (rr.find("Mesa") != std::string::npos &&
-		rr.find("Intel") != std::string::npos)
-	    {
-		    printf("Disabling 3D texture mipmapping on renderer: %s\n", 
-			   rr.c_str());
-		    disable_texture3D_mipmap = true;
-	    }
-	    else if (rr.find("Mesa") != std::string::npos 
-		     && rr.find("R300") != std::string::npos)
-	    {
-		    printf("Limiting mipmap levels to 7 on renderer: %s\n",
-			   rr.c_str());
-		    printf("See https://bugs.freedesktop.org/show_bug.cgi?id=28284\n");
-		    limit_mipmap_radeon = 7;
-	    }
+        std::string rr = (const char*) glGetString(GL_RENDERER);
+        if (rr.find("Mesa") != std::string::npos &&
+                rr.find("Intel") != std::string::npos) {
+            printf("Disabling 3D texture mipmapping on renderer: %s\n",
+                   rr.c_str());
+            disable_texture3D_mipmap = true;
+        } else if (rr.find("Mesa") != std::string::npos
+                   && rr.find("R300") != std::string::npos) {
+            printf("Limiting mipmap levels to 7 on renderer: %s\n",
+                   rr.c_str());
+            printf("See https://bugs.freedesktop.org/show_bug.cgi?id=28284\n");
+            limit_mipmap_radeon = 7;
+        }
     }
     if (GLEW_ARB_vertex_buffer_object) {
-	printf("ARB_vertex_buffer_object extension available, will use VBO's for rendering isosurfaces.\n");
-	use_vbo = true;
+        printf("ARB_vertex_buffer_object extension available, will use VBO's for rendering isosurfaces.\n");
+        use_vbo = true;
     }
     if (_argc>1)ds3ViewerOpenFile(&ds3v,_argv[1]);
     glutMainLoop();

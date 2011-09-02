@@ -21,8 +21,8 @@
 #include <vector>
 
 /*Reads the VASP header, and sets up for reading the data asynchronously*/
-DS3VaspReader::DS3VaspReader(const char* file_name, const char* mode) 
-	: file(file_name, mode), ds3(new DataSet3D())
+DS3VaspReader::DS3VaspReader(const char* file_name, const char* mode)
+        : file(file_name, mode), ds3(new DataSet3D())
 {
     std::string    str;
     std::vector<int>    atypes;  // Atom types
@@ -35,17 +35,16 @@ DS3VaspReader::DS3VaspReader(const char* file_name, const char* mode)
     unsigned long  l;
 
     if (file.f == NULL)
-	    return;
+        return;
     if (!file.fgets(ds3->name)) goto err;
     trimlr(ds3->name);
     /*Read the "Universal scaling factor"*/
     if (fscanf(file.f,"%lf",&scale)<1)goto err;
     /*Read the basis for the box*/
-    for (i=0; i<3; i++)
-    {
-	    for (j=0; j<3; j++)
-		    if (fscanf(file.f,"%lf", ds3->basis[j] + i) < 1)
-			    goto err;
+    for (i=0; i<3; i++) {
+        for (j=0; j<3; j++)
+            if (fscanf(file.f,"%lf", ds3->basis[j] + i) < 1)
+                goto err;
     }
     for (i=0; i<3; i++)vectMul3d(ds3->basis[i],ds3->basis[i],scale);
     if (fscanf(file.f," ")<0)goto err;
@@ -56,8 +55,7 @@ DS3VaspReader::DS3VaspReader(const char* file_name, const char* mode)
     if (!file.fgets(str)) goto err;
     trimlr(str);
     p = &str[0];
-    for (npoints=0; *p!='\0';)
-    {
+    for (npoints=0; *p!='\0';) {
         char          *e;
         unsigned long  u;
         u=strtoul(p,&e,0);
@@ -74,17 +72,13 @@ DS3VaspReader::DS3VaspReader(const char* file_name, const char* mode)
     adjustl(str);
     d = atypes.size() > 1 ? 1.0/(atypes.size() - 1) : 1;
     /*Only the first (non-whitespace) character of the line matters*/
-    switch (tolower(str[0]))
-    {
-    case 'd':                                                         /*"Direct"*/
-    {
+    switch (tolower(str[0])) {
+    case 'd': {                                                       /*"Direct"*/
         /*Direct coordinates are fractions of the lattice vectors*/
-	for (k = 0, i = 0; k < atypes.size(); k++)
-        {
+        for (k = 0, i = 0; k < atypes.size(); k++) {
             double col;
             col=k*d;
-            for (int ll = atypes[k]; ll-- > 0; i++)
-            {
+            for (int ll = atypes[k]; ll-- > 0; i++) {
                 for (j=0; j<3; j++)if (fscanf(file.f,"%lf",ds3->points[i].pos+j)<1)goto err;
                 ds3->points[i].typ=(int)k;
                 ds3->points[i].col=col;
@@ -92,18 +86,15 @@ DS3VaspReader::DS3VaspReader(const char* file_name, const char* mode)
         }
     }
     break;
-    case 'c':                                                           /*"Cart"*/
-    {
+    case 'c': {                                                         /*"Cart"*/
         /*Cart coordinates are regular cartesian, but should be scaled by the
           universal scaling factor. We convert them to Direct coordinates.*/
         Vect3d basinv[3];
         dsMatrix3x3Inv(ds3->basis,basinv);
-        for (k = 0,i = 0; k < atypes.size(); k++)
-        {
+        for (k = 0,i = 0; k < atypes.size(); k++) {
             double col;
             col=k*d;
-            for (int ll = atypes[k]; ll-- > 0; i++)
-            {
+            for (int ll = atypes[k]; ll-- > 0; i++) {
                 Vect3d pos;
                 for (j=0; j<3; j++)if (fscanf(file.f,"%lf",&pos[j])<1)goto err;
                 for (j=0; j<3; j++)ds3->points[i].pos[j]=scale*vectDot3d(pos,basinv[j]);
@@ -117,24 +108,20 @@ DS3VaspReader::DS3VaspReader(const char* file_name, const char* mode)
         goto err;
     }
     /*Read in data dimensions*/
-    for (i=0; i<3; i++)
-    {
+    for (i=0; i<3; i++) {
         if (fscanf(file.f,"%lu",&l)<1)goto err;
         ds3->density[i]=(size_t)l;
     }
     /*Read in the data*/
     this->npoints = ds3->density[0]*ds3->density[1]*ds3->density[2];
     ds3->data.reserve(this->npoints);
-    if (this->npoints)
-    {
-	double val;
+    if (this->npoints) {
+        double val;
         if (fscanf(file.f, "%lf", &val) < 1) goto err;
-	ds3->data.push_back(val);
+        ds3->data.push_back(val);
         ds3->min = ds3->max = ds3->data[0];
         this->k = 1;
-    }
-    else
-    {
+    } else {
         ds3->min = ds3->max = 0;
         this->k = 0;
     }
@@ -156,26 +143,21 @@ int DS3VaspReader::read()
     int     ret;
     min = this->ds3->min;
     max= this->ds3->max;
-    if (this->npoints - this->k > DS3_VASP_BLOCK_SIZE)
-    {
+    if (this->npoints - this->k > DS3_VASP_BLOCK_SIZE) {
         s = this->k + DS3_VASP_BLOCK_SIZE;
         ret = s * 100 / this->npoints + 1;
-    }
-    else
-    {
+    } else {
         s = this->npoints;
         ret=-1;
     }
-    for (k=this->k; k<s; k++)
-    {
-        if (fscanf(this->file.f, "%lf", &val) < 1)
-        {
+    for (k=this->k; k<s; k++) {
+        if (fscanf(this->file.f, "%lf", &val) < 1) {
             if (!errno)errno=ENOMEM;
             delete ds3;
             ret=0;
             break;
         }
-	this->ds3->data.push_back(val);
+        this->ds3->data.push_back(val);
         if (ds3->data[k] < min) min = ds3->data[k];
         else if (ds3->data[k] > max) max = ds3->data[k];
     }
@@ -187,7 +169,7 @@ int DS3VaspReader::read()
 
 int DS3VaspReader::cancel()
 {
-	fprintf(stderr, "Canceling chgcar read\n");
+    fprintf(stderr, "Canceling chgcar read\n");
     delete ds3;
     return 1;
 }

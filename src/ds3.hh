@@ -65,8 +65,7 @@ typedef double   (*DSUnscaleFunc)(const DSDataScale *_this,double _v);
 
 
 
-struct DSPoint3D
-{
+struct DSPoint3D {
     Vect3d   pos;
     int      typ;
     double   col;
@@ -77,37 +76,34 @@ struct DSPoint3D
 # define _DS3Index(_this,_x,_y,_z)                                            \
  ((_x)+(_this)->density[0]*((_y)+(_this)->density[1]*(_z)))
 
-class DataSet3D
-{
+class DataSet3D {
 public:
-	DataSet3D();
-	~DataSet3D();
+    DataSet3D();
+    ~DataSet3D();
 
-	// C++11 version of making private copy constructor and
-	// assignment operator.
-	//DataSet3D& operator=(const DataSet3D&) = delete;
-	//DataSet3D(const DataSet3D&) = delete;
+    // C++11 version of making private copy constructor and
+    // assignment operator.
+    //DataSet3D& operator=(const DataSet3D&) = delete;
+    //DataSet3D(const DataSet3D&) = delete;
 
-	std::string name;                  /*Name of the data set*/
-    char           *label[4];                      /*Label of three axes and data*/
-    char           *units[4];                     /*Units for three axes and data*/
-    Vect3d          basis[3];                         /*Basis vectors for lattice*/
-    Vect3d          center;                               /*Center of the lattice*/
-    size_t          npoints;                                   /*Number of points*/
-	std::vector<DSPoint3D> points;     /*Discrete points*/
-    /*DSLine3D       *lines;*/                                 /*Lines between points*/
-    size_t          density[3];       /*Dimensions of packed array of data values*/
-	std::vector<double> data;          /*3D packed array of data*/
-	double          min;     /*Minimum data value*/
-	double          max;     /*Maximum data value*/
+    std::string name;               /*Name of the data set*/
+    char           *label[4];       /*Label of three axes and data*/
+    char           *units[4];       /*Units for three axes and data*/
+    Vect3d          basis[3];       /*Basis vectors for lattice*/
+    Vect3d          center;         /*Center of the lattice*/
+    size_t          npoints;        /*Number of points*/
+    std::vector<DSPoint3D> points;  /*Discrete points*/
+    size_t          density[3];     //Dimensions of packed array of data values
+    std::vector<double> data;       /*3D packed array of data*/
+    double          min;     /*Minimum data value*/
+    double          max;     /*Maximum data value*/
 private:
-	DataSet3D(const DataSet3D&);
-	DataSet3D& operator=(const DataSet3D&);
-};                                  
+    DataSet3D(const DataSet3D&);
+    DataSet3D& operator=(const DataSet3D&);
+};
 
 
-struct DSColorScale
-{
+struct DSColorScale {
     DSColorScaleFunc scale;
 };
 
@@ -127,8 +123,7 @@ extern const DSColorScale DS_RAINBOW_SCALE;
 
 
 
-struct DSDataScale
-{
+struct DSDataScale {
     DSScaleFunc   scale;
     DSUnscaleFunc unscale;
 };
@@ -142,8 +137,7 @@ struct DSDataScale
 
 
 
-struct DSLinearScale
-{
+struct DSLinearScale {
     DSDataScale super;
     double      mul;
     double      offs;
@@ -157,8 +151,7 @@ extern const DSLinearScale DS_LINEAR_SCALE_IDENTITY;
 
 
 
-struct DSLogScale
-{
+struct DSLogScale {
     DSDataScale super;
     double      mul;
     double      offs;

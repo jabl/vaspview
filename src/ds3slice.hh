@@ -26,8 +26,7 @@ typedef struct DS3Slice DS3Slice;
 
 
 
-struct DS3Slice
-{
+struct DS3Slice {
     int            t_sz;                              /*Size of the slice texture*/
     int            i_id;              /*Timer ID for making the high-detail slice*/
     GLuint         t_id;                                /*ID of the slice texture*/

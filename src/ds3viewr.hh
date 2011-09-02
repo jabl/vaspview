@@ -28,14 +28,13 @@
 # define DS3V_ISO_V_RES (200)
 # define DS3V_SLIDER_SMALL_WIDTH (100)
 
-class DS3Viewer
-{
+class DS3Viewer {
 public:
-	DS3Viewer();
-	~DS3Viewer();
+    DS3Viewer();
+    ~DS3Viewer();
 
-	GLWFrame*         frame;
-	DS3View*          ds3view;
+    GLWFrame*         frame;
+    DS3View*          ds3view;
     GLWButton        *bn_open;
     GLWTextField     *tf_file;
     GLWLabel         *lb_data_set;

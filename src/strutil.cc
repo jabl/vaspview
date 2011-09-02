@@ -22,13 +22,12 @@
 std::string& trim(std::string& str)
 {
     size_t found = str.length();
-    for (std::string::reverse_iterator rit = str.rbegin(); 
-	 rit != str.rend(); ++rit)
-    {
-	if (std::isspace(*rit))
-	    found--;
-	else
-	    break;
+    for (std::string::reverse_iterator rit = str.rbegin();
+            rit != str.rend(); ++rit) {
+        if (std::isspace(*rit))
+            found--;
+        else
+            break;
     }
     str.erase(found);
     return str;
@@ -37,20 +36,19 @@ std::string& trim(std::string& str)
 // Left adjust a string
 std::string& adjustl(std::string& str)
 {
-	size_t found = 0;
-	for (std::string::iterator it = str.begin(); it != str.end(); ++it)
-	{
-		if (std::isspace(*it))
-			found++;
-		else
-			break;
-	}
-	str.erase(0, found);
-	return str;
+    size_t found = 0;
+    for (std::string::iterator it = str.begin(); it != str.end(); ++it) {
+        if (std::isspace(*it))
+            found++;
+        else
+            break;
+    }
+    str.erase(0, found);
+    return str;
 }
 
 // Trim a string at both ends
 std::string& trimlr(std::string& str)
 {
-	return trim(adjustl(str));
+    return trim(adjustl(str));
 }

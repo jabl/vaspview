@@ -41,36 +41,32 @@ GLWCheckBoxGroup::~GLWCheckBoxGroup()
 {
     this->changed = NULL;
     for (cbs_itr it = cbs.begin(); it != cbs.end(); ++it)
-	    glwCheckBoxSetGroup(*it, NULL);
+        glwCheckBoxSetGroup(*it, NULL);
 }
 
 static int glwCheckBoxGroupAdd(GLWCheckBoxGroup* _this, GLWCheckBox* cb)
 {
-	_this->cbs.push_back(cb);
-	return 1;
+    _this->cbs.push_back(cb);
+    return 1;
 }
 
 static int glwCheckBoxGroupDel(GLWCheckBoxGroup* _this, GLWCheckBox* cb)
 {
-	int i = 0;
-	for (cbs_itr it = _this->cbs.begin(); it != _this->cbs.end(); ++it)
-	{
-		if (*it == cb)
-		{
-			_this->cbs.erase(it);
-			if (i == _this->seld)
-			{
-				_this->seld=-1;
-				if (_this->changed != NULL)
-					_this->changed(_this->changed_ctx, 
-						       NULL);
-			}
-			else if ((int)i<_this->seld)_this->seld--;
-			return 1;
-		}
-		++i;
-	}
-	return 0;
+    int i = 0;
+    for (cbs_itr it = _this->cbs.begin(); it != _this->cbs.end(); ++it) {
+        if (*it == cb) {
+            _this->cbs.erase(it);
+            if (i == _this->seld) {
+                _this->seld=-1;
+                if (_this->changed != NULL)
+                    _this->changed(_this->changed_ctx,
+                                   NULL);
+            } else if ((int)i<_this->seld)_this->seld--;
+            return 1;
+        }
+        ++i;
+    }
+    return 0;
 }
 
 int glwCheckBoxGroupGetSelectedIdx(GLWCheckBoxGroup *_this)
@@ -80,26 +76,25 @@ int glwCheckBoxGroupGetSelectedIdx(GLWCheckBoxGroup *_this)
 
 void glwCheckBoxGroupSetSelectedIdx(GLWCheckBoxGroup* _this, int ii)
 {
-	if (ii >= 0 && (size_t)ii < _this->cbs.size())
-	{
-		glwCheckBoxSetState(_this->cbs[ii], 1);
-	}
+    if (ii >= 0 && (size_t)ii < _this->cbs.size()) {
+        glwCheckBoxSetState(_this->cbs[ii], 1);
+    }
 }
 
 void glwCheckBoxGroupSelectNext(GLWCheckBoxGroup *_this)
 {
-	if ((size_t)_this->seld + 1 >= _this->cbs.size())
-		glwCheckBoxGroupSetSelectedIdx(_this, 0);
-	else 
-		glwCheckBoxGroupSetSelectedIdx(_this, _this->seld + 1);
+    if ((size_t)_this->seld + 1 >= _this->cbs.size())
+        glwCheckBoxGroupSetSelectedIdx(_this, 0);
+    else
+        glwCheckBoxGroupSetSelectedIdx(_this, _this->seld + 1);
 }
 
 void glwCheckBoxGroupSelectPrev(GLWCheckBoxGroup *_this)
 {
     if (_this->seld - 1 < 0)
-	    glwCheckBoxGroupSetSelectedIdx(_this, (int)_this->cbs.size() - 1);
-    else 
-	    glwCheckBoxGroupSetSelectedIdx(_this, _this->seld - 1);
+        glwCheckBoxGroupSetSelectedIdx(_this, (int)_this->cbs.size() - 1);
+    else
+        glwCheckBoxGroupSetSelectedIdx(_this, _this->seld - 1);
 }
 
 GLWActionFunc glwCheckBoxGroupGetChangedFunc(GLWCheckBoxGroup *_this)
@@ -130,16 +125,14 @@ static void glwCheckBoxLayoutMinSize(GLWLayoutManager *_this,GLWCheckBox *_cb,
 {
     int h;
     h=glwFontGetHeight(_cb->super.font);
-    if (_w!=NULL)
-    {
-	    *_w = glwFontGetStringWidth(_cb->super.font, _cb->label)
-		    + h + (GLW_CHECK_BOX_INSET<<2);
+    if (_w!=NULL) {
+        *_w = glwFontGetStringWidth(_cb->super.font, _cb->label)
+              + h + (GLW_CHECK_BOX_INSET<<2);
     }
     if (_h!=NULL)*_h=h+(GLW_CHECK_BOX_INSET<<1);
 }
 
-static GLWLayoutManager glw_check_box_layout=
-{
+static GLWLayoutManager glw_check_box_layout= {
     NULL,
     NULL,
     (GLWLayoutSizeFunc)glwCheckBoxLayoutMinSize,
@@ -159,11 +152,9 @@ static void glwCheckBoxPeerDisplay(GLWCheckBox *_this,GLWCallbacks *_cb)
     w = glwFontGetStringWidth(_this->super.font, _this->label);
     h=glwFontGetHeight(_this->super.font);
     y=(_this->super.bounds.h-h)*0.5;
-    if (glwCompIsEnabled(&_this->super))
-    {
+    if (glwCompIsEnabled(&_this->super)) {
         /*Draw focus rectangle if we have focus*/
-        if (glwCompIsFocused(&_this->super))
-        {
+        if (glwCompIsFocused(&_this->super)) {
             glLineStipple(2,0x5555);
             glEnable(GL_LINE_STIPPLE);
             glBegin(GL_LINE_LOOP);
@@ -178,22 +169,18 @@ static void glwCheckBoxPeerDisplay(GLWCheckBox *_this,GLWCallbacks *_cb)
         glwColor(_this->super.forec);
         bc=glwColorBlend(_this->super.backc,glwColorInvert(_this->super.forec));
         fc=_this->super.forec;
-    }
-    else
-    {
+    } else {
         glwColor(glwColorBlend(_this->super.forec,_this->super.backc));
         bc=glwColorBlend(_this->super.backc,_this->super.forec);
         fc=glwColorBlend(_this->super.forec,bc);
     }
-    glwFontDrawString(_this->super.font, _this->label.c_str(), 
-		      h + GLW_CHECK_BOX_INSET * 3,
+    glwFontDrawString(_this->super.font, _this->label.c_str(),
+                      h + GLW_CHECK_BOX_INSET * 3,
                       y+glwFontGetDescent(_this->super.font));
-    if (_this->group==NULL)                                  /*Draw the check box*/
-    {
+    if (_this->group==NULL) {                                /*Draw the check box*/
         glwColor(bc);
         glRectd(GLW_CHECK_BOX_INSET,y,h+GLW_CHECK_BOX_INSET,y+h);
-        if (_this->state^_this->down)
-        {
+        if (_this->state^_this->down) {
             glBegin(GL_LINES);
             glwColor(fc);
             glVertex2d(GLW_CHECK_BOX_INSET+1,y+2);
@@ -230,9 +217,7 @@ static void glwCheckBoxPeerDisplay(GLWCheckBox *_this,GLWCallbacks *_cb)
         glVertex2d(GLW_CHECK_BOX_INSET+h-2,y+1);
         glVertex2d(GLW_CHECK_BOX_INSET+2,y+1);
         glEnd();
-    }
-    else                                                  /*Draw the radio button*/
-    {
+    } else {                                               /*Draw the radio button*/
         double r;
         double m;
         int    detail;
@@ -248,8 +233,7 @@ static void glwCheckBoxPeerDisplay(GLWCheckBox *_this,GLWCallbacks *_cb)
         glBegin(GL_POLYGON);
         for (i=0; i<detail; i++)glVertex2d(r*cos(i*m),r*sin(i*m));
         glEnd();
-        if (_this->state^_this->down)
-        {
+        if (_this->state^_this->down) {
             r-=3;
             glwColor(fc);
             glBegin(GL_POLYGON);
@@ -259,13 +243,11 @@ static void glwCheckBoxPeerDisplay(GLWCheckBox *_this,GLWCallbacks *_cb)
         }
         glBegin(GL_LINE_STRIP);
         glwColor(glwColorDarken(bc));
-        for (i=0; i<=detail>>1; i++)
-        {
+        for (i=0; i<=detail>>1; i++) {
             glVertex2d(r*cos(i*m+M_PI*0.25),r*sin(i*m+M_PI*0.25));
         }
         glwColor(glwColorLighten(bc));
-        for (i=detail>>1; i<=detail; i++)
-        {
+        for (i=detail>>1; i<=detail; i++) {
             glVertex2d(r*cos(i*m+M_PI*0.25),r*sin(i*m+M_PI*0.25));
         }
         glEnd();
@@ -288,8 +270,7 @@ static void glwCheckBoxPeerFocus(GLWCheckBox *_this,GLWCallbacks *_cb,int _s)
 static int glwCheckBoxPeerKeyboard(GLWCheckBox *_this,const GLWCallbacks *_cb,
                                    unsigned char _k,int _x,int _y)
 {
-    if (_k==' '&&!_this->super.mouse_b)
-    {
+    if (_k==' '&&!_this->super.mouse_b) {
         glwCheckBoxSetState(_this,_this->state?0:1);
         glwCompRepaint(&_this->super,0);
         return -1;
@@ -300,57 +281,46 @@ static int glwCheckBoxPeerKeyboard(GLWCheckBox *_this,const GLWCallbacks *_cb,
 static int glwCheckBoxPeerSpecial(GLWCheckBox *_this,const GLWCallbacks *_cb,
                                   int _k,int _x,int _y)
 {
-    if (!_this->super.mouse_b)
-    {
-        if (_this->group!=NULL)
-        {
+    if (!_this->super.mouse_b) {
+        if (_this->group!=NULL) {
             int           i;
-	    cbs_itr it = _this->group->cbs.begin();
-	    for (i = 0; 
-		 it != _this->group->cbs.end(); ++it, ++i)
-		    if (*it == _this) break;
-            switch (_k)
-            {
+            cbs_itr it = _this->group->cbs.begin();
+            for (i = 0;
+                    it != _this->group->cbs.end(); ++it, ++i)
+                if (*it == _this) break;
+            switch (_k) {
             case GLUT_KEY_UP   :
-            case GLUT_KEY_LEFT :
-            {
+            case GLUT_KEY_LEFT : {
                 if (i>0)i--;
                 else i = (int)_this->group->cbs.size() - 1;
-                if (i>=0)
-                {
+                if (i>=0) {
                     if (_this->state)
-			    glwCheckBoxSetState(_this->group->cbs[i], 1);
+                        glwCheckBoxSetState(_this->group->cbs[i], 1);
                     glwCompRequestFocus(&_this->group->cbs[i]->super);
                 }
                 return -1;
             }
             case GLUT_KEY_DOWN :
-            case GLUT_KEY_RIGHT:
-            {
-		    if ((size_t)i + 1 < _this->group->cbs.size()) i++;
-		    else i = 0;
-		    if ((size_t)i < _this->group->cbs.size())
-		    {
-			    if (_this->state)
-				    glwCheckBoxSetState(_this->group->cbs[i],
-							1);
-			    glwCompRequestFocus(&_this->group->cbs[i]->super);
-		    }
-		    return -1;
+            case GLUT_KEY_RIGHT: {
+                if ((size_t)i + 1 < _this->group->cbs.size()) i++;
+                else i = 0;
+                if ((size_t)i < _this->group->cbs.size()) {
+                    if (_this->state)
+                        glwCheckBoxSetState(_this->group->cbs[i],
+                                            1);
+                    glwCompRequestFocus(&_this->group->cbs[i]->super);
+                }
+                return -1;
             }
             }
-        }
-        else switch (_k)
-            {
+        } else switch (_k) {
             case GLUT_KEY_UP   :
-            case GLUT_KEY_LEFT :
-            {
+            case GLUT_KEY_LEFT : {
                 glwCompPrevFocus(&_this->super);
                 return -1;
             }
             case GLUT_KEY_DOWN :
-            case GLUT_KEY_RIGHT:
-            {
+            case GLUT_KEY_RIGHT: {
                 glwCompNextFocus(&_this->super);
                 return -1;
             }
@@ -364,31 +334,23 @@ static int glwCheckBoxPeerMouse(GLWCheckBox *_this,const GLWCallbacks *_cb,
 {
     int ret;
     ret=glwCompSuperMouse(&_this->super,_cb,_b,_s,_x,_y);
-    if (ret>=0)
-    {
+    if (ret>=0) {
         int rp;
         rp=0;
-        if (_x<0||_x>_this->super.bounds.w||_y<0||_y>_this->super.bounds.h)
-        {
+        if (_x<0||_x>_this->super.bounds.w||_y<0||_y>_this->super.bounds.h) {
             ret=-1;
-            if (_this->down)
-            {
+            if (_this->down) {
                 _this->down=0;
                 rp=1;
             }
-        }
-        else if (!_s&&_this->down&&!_this->super.mouse_b)
-        {
+        } else if (!_s&&_this->down&&!_this->super.mouse_b) {
             ret=-1;
             _this->down=0;
             glwCheckBoxSetState(_this,_this->state?0:1);
             rp=1;
-        }
-        else if (_s||_this->super.mouse_b)
-        {
+        } else if (_s||_this->super.mouse_b) {
             ret=-1;
-            if (!_this->down)
-            {
+            if (!_this->down) {
                 _this->down=1;
                 rp=1;
             }
@@ -403,24 +365,18 @@ static int glwCheckBoxPeerMotion(GLWCheckBox *_this,const GLWCallbacks *_cb,
 {
     int ret;
     ret=glwCompSuperMotion(&_this->super,_cb,_x,_y);
-    if (ret>=0)
-    {
+    if (ret>=0) {
         int rp;
         rp=0;
-        if (_x<0||_x>_this->super.bounds.w||_y<0||_y>_this->super.bounds.h)
-        {
+        if (_x<0||_x>_this->super.bounds.w||_y<0||_y>_this->super.bounds.h) {
             ret=1;
-            if (_this->down)
-            {
+            if (_this->down) {
                 _this->down=0;
                 rp=1;
             }
-        }
-        else if (_this->super.mouse_b)
-        {
+        } else if (_this->super.mouse_b) {
             ret=1;
-            if (!_this->down)
-            {
+            if (!_this->down) {
                 _this->down=1;
                 rp=1;
             }
@@ -437,8 +393,7 @@ static void glwCheckBoxPeerDispose(GLWCheckBox *_this,GLWCallbacks *_cb)
 }
 
 
-const GLWCallbacks GLW_CHECK_BOX_CALLBACKS=
-{
+const GLWCallbacks GLW_CHECK_BOX_CALLBACKS= {
     &GLW_COMPONENT_CALLBACKS,
     (GLWDisposeFunc)glwCheckBoxPeerDispose,
     (GLWDisplayFunc)glwCheckBoxPeerDisplay,
@@ -456,20 +411,20 @@ const GLWCallbacks GLW_CHECK_BOX_CALLBACKS=
 };
 
 GLWCheckBox::GLWCheckBox(const char* label, int _state,
-			 GLWCheckBoxGroup* _group)
+                         GLWCheckBoxGroup* _group)
 {
-	this->changed=NULL;
-	this->changed_ctx=NULL;
-	glwCheckBoxSetLabel(this, label);
-        this->super.callbacks=&GLW_CHECK_BOX_CALLBACKS;
-        glwCompSetLayout(&this->super,&glw_check_box_layout);
-        glwCompSetFocusable(&this->super,1);
-        glwCompSetAlignX(&this->super,0);
-        this->state=_state?1:0;
-        this->down=0;
-        this->group=NULL;
-	if (_group != NULL)
-		glwCheckBoxSetGroup(this, _group);
+    this->changed=NULL;
+    this->changed_ctx=NULL;
+    glwCheckBoxSetLabel(this, label);
+    this->super.callbacks=&GLW_CHECK_BOX_CALLBACKS;
+    glwCompSetLayout(&this->super,&glw_check_box_layout);
+    glwCompSetFocusable(&this->super,1);
+    glwCompSetAlignX(&this->super,0);
+    this->state=_state?1:0;
+    this->down=0;
+    this->group=NULL;
+    if (_group != NULL)
+        glwCheckBoxSetGroup(this, _group);
 }
 
 int glwCheckBoxGetState(GLWCheckBox *_this)
@@ -479,56 +434,43 @@ int glwCheckBoxGetState(GLWCheckBox *_this)
 
 void glwCheckBoxSetState(GLWCheckBox *_this,int _state)
 {
-    if (_this->state!=(_state?1U:0U))
-    {
-        if (_this->group!=NULL)
-        {
+    if (_this->state!=(_state?1U:0U)) {
+        if (_this->group!=NULL) {
             int idx;
             idx=_this->group->seld;
-            if (_state&&_this->group->seld>=0)     /*Unselect a previously selected box*/
-            {
+            if (_state&&_this->group->seld>=0) {   /*Unselect a previously selected box*/
                 _this->group->seld=-1;
                 glwCheckBoxSetState(_this->group->cbs[idx], 0);
             }
-            if (_state)
-            {
-                if (_this->group->seld<0)              /*If nothing is selected, select us*/
-                {
-			int ii;
-			cbs_itr it = _this->group->cbs.begin();
-			for (ii = 0;
-			     it != _this->group->cbs.end(); ++it, ++ii)
-				if (*it == _this)
-				{
-					_this->group->seld = (int)ii;
-					break;
-				}
-			if (_this->group->seld<0) _state=0;
+            if (_state) {
+                if (_this->group->seld<0) {            /*If nothing is selected, select us*/
+                    int ii;
+                    cbs_itr it = _this->group->cbs.begin();
+                    for (ii = 0;
+                            it != _this->group->cbs.end(); ++it, ++ii)
+                        if (*it == _this) {
+                            _this->group->seld = (int)ii;
+                            break;
+                        }
+                    if (_this->group->seld<0) _state=0;
                 }        /*We're not in the group! (BAD)*/
                 /*If we tried to unselect a previously selected checkbox, and something
                   has remained selected, allow it to override the request to select this
                   checkbox*/
                 else return;
-            }
-            else if (_this->group->seld>=0)_state=1;     /*Can't deselect selected item*/
-            if (_this->state!=(_state?1U:0U))
-            {
+            } else if (_this->group->seld>=0)_state=1;    /*Can't deselect selected item*/
+            if (_this->state!=(_state?1U:0U)) {
                 _this->state=_state?1:0;
-                if (_this->changed!=NULL)
-                {
+                if (_this->changed!=NULL) {
                     _this->changed(_this->changed_ctx,&_this->super);
                 }
             }
-            if (idx!=_this->group->seld&&_this->group->changed!=NULL)
-            {
+            if (idx!=_this->group->seld&&_this->group->changed!=NULL) {
                 _this->group->changed(_this->group->changed_ctx,&_this->super);
             }
-        }
-        else
-        {
+        } else {
             _this->state=_state?1:0;
-            if (_this->changed!=NULL)
-            {
+            if (_this->changed!=NULL) {
                 _this->changed(_this->changed_ctx,&_this->super);
             }
         }
@@ -537,30 +479,28 @@ void glwCheckBoxSetState(GLWCheckBox *_this,int _state)
 
 const char *glwCheckBoxGetLabel(GLWCheckBox *_this)
 {
-	return _this->label.c_str();
+    return _this->label.c_str();
 }
 
 int glwCheckBoxSetLabel(GLWCheckBox* _this, const char* label)
 {
     if (label==NULL)
-	    _this->label.clear();
+        _this->label.clear();
     else
-	    _this->label = label;
+        _this->label = label;
     glwCompRevalidate(&_this->super);
     return 1;
 }
 
 int glwCheckBoxAddLabel(GLWCheckBox* _this,const char* label)
 {
-	if (_this->label.size() <= 1)
-		return glwCheckBoxSetLabel(_this, label);
-	else if (label != NULL)
-	{
-		_this->label.append(label);
-                glwCompRevalidate(&_this->super);
-                return 1;
-	}
-        else return 1;
+    if (_this->label.size() <= 1)
+        return glwCheckBoxSetLabel(_this, label);
+    else if (label != NULL) {
+        _this->label.append(label);
+        glwCompRevalidate(&_this->super);
+        return 1;
+    } else return 1;
 }
 
 GLWCheckBoxGroup *glwCheckBoxGetGroup(GLWCheckBox *_this)
@@ -572,15 +512,12 @@ int glwCheckBoxSetGroup(GLWCheckBox *_this,GLWCheckBoxGroup *_group)
 {
     if (_this->group!=NULL)glwCheckBoxGroupDel(_this->group,_this);
     _this->group=_group;
-    if (_group!=NULL)
-    {
+    if (_group!=NULL) {
         if (!glwCheckBoxGroupAdd(_this->group,_this))return 0;
-        if (_this->state)
-        {
+        if (_this->state) {
             _this->state=0;
             glwCheckBoxSetState(_this,1);
-            if (!_this->state)
-            {
+            if (!_this->state) {
                 _this->state=1;
                 glwCheckBoxSetState(_this,0);
             }

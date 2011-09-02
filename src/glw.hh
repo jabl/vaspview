@@ -70,8 +70,7 @@ typedef struct GLWComponent          GLWComponent;
 typedef struct GLWCallbacks          GLWCallbacks;
 
 
-struct GLWRect
-{
+struct GLWRect {
     int x;
     int y;
     int w;
@@ -80,8 +79,7 @@ struct GLWRect
 
 
 
-struct GLWInsets
-{
+struct GLWInsets {
     int t;
     int b;
     int l;
@@ -114,8 +112,7 @@ typedef int  (*GLWMotionFunc)(GLWComponent *_this,const GLWCallbacks *_cb,
                               int _x,int _y);
 typedef int  (*GLWDisposeFunc)(GLWComponent *_this,const GLWCallbacks *_cb);
 
-struct GLWCallbacks
-{
+struct GLWCallbacks {
     const GLWCallbacks      *super;
     GLWDisposeFunc     dispose;
     GLWDisplayFunc     display;
@@ -155,8 +152,7 @@ struct GLWCallbacks
 # define GLWC_SNAP_ALWAYS (-1)
 # define GLWC_SNAP_NEVER  (0)
 
-struct GLWConstraints
-{
+struct GLWConstraints {
     int       minw;
     int       minh;
     int       prew;
@@ -179,8 +175,7 @@ typedef void (*GLWLayoutFunc)(GLWLayoutManager *_this,GLWComponent *_comp);
 typedef void (*GLWLayoutSizeFunc)(GLWLayoutManager *_this,GLWComponent *_comp,
                                   int *_w,int *_h);
 
-struct GLWLayoutManager
-{
+struct GLWLayoutManager {
     GLWLayoutFunc     layout;
     GLWLayoutFunc     invalidate;
     GLWLayoutSizeFunc min_size;
@@ -190,8 +185,7 @@ struct GLWLayoutManager
 
 
 
-typedef struct GLWGBLCInfo
-{
+typedef struct GLWGBLCInfo {
     int min_w;
     int min_h;
     int pre_w;
@@ -204,10 +198,9 @@ typedef struct GLWGBLCInfo
     int h;
 } GLWGBLCInfo;
 
-struct GLWGridBagLayout
-{
-	GLWGridBagLayout();
-	~GLWGridBagLayout();
+struct GLWGridBagLayout {
+    GLWGridBagLayout();
+    ~GLWGridBagLayout();
     GLWLayoutManager  super;
     int               w;
     int               h;
@@ -230,11 +223,10 @@ struct GLWGridBagLayout
 typedef std::vector<GLWComponent*>::iterator comps_itr;
 typedef std::vector<int>::iterator vi_itr;
 
-class GLWComponent
-{
+class GLWComponent {
 public:
-	GLWComponent();
-	~GLWComponent();
+    GLWComponent();
+    ~GLWComponent();
     GLWComponent     *parent;
     const GLWCallbacks     *callbacks;
     GLWRect           bounds;
@@ -243,9 +235,9 @@ public:
     GLWcolor          backc;
     GLWfont           font;
     GLWcursor         cursor;
-	std::vector<GLWComponent*>         comps;
-	std::vector<int>         timers;
-	std::vector<int>         idlers;
+    std::vector<GLWComponent*>         comps;
+    std::vector<int>         timers;
+    std::vector<int>         idlers;
     GLWLayoutManager *layout;
     GLWComponent     *focus;                 /*Currently focused descendant*/
     GLWComponent     *capture;           /*Current child with mouse capture*/
@@ -258,8 +250,8 @@ public:
     unsigned          focused:1;
     unsigned          focusable:1;
 private:
-	GLWComponent(const GLWComponent&);
-	GLWComponent& operator=(const GLWComponent&);
+    GLWComponent(const GLWComponent&);
+    GLWComponent& operator=(const GLWComponent&);
 };
 
 
@@ -380,13 +372,12 @@ void           glwCompSuperDispose(GLWComponent *_this,
 
 
 
-struct GLWFrame
-{
-	GLWFrame(const char*);
-	GLWComponent  super;
-	std::string     title;
+struct GLWFrame {
+    GLWFrame(const char*);
+    GLWComponent  super;
+    std::string     title;
 private:
-	GLWFrame();
+    GLWFrame();
 };
 
 
@@ -398,13 +389,12 @@ void      glwFramePack(GLWFrame *_this);
 
 
 
-struct GLWLabel
-{
-	GLWLabel(const char*);
-	GLWComponent super;
-	std::string    label;
+struct GLWLabel {
+    GLWLabel(const char*);
+    GLWComponent super;
+    std::string    label;
 private:
-	GLWLabel();
+    GLWLabel();
 };
 
 
@@ -416,18 +406,17 @@ int       glwLabelAddLabel(GLWLabel *_this,const char *_label);
 
 
 
-class GLWButton
-{
+class GLWButton {
 public:
-	GLWButton(const char*);
-	GLWComponent   super;
-	std::string      label;
+    GLWButton(const char*);
+    GLWComponent   super;
+    std::string      label;
     GLWActionFunc  pressed;
     void          *pressed_ctx;
     unsigned       down:1;
     unsigned       release:1;
 private:
-	GLWButton();
+    GLWButton();
 };
 
 
@@ -443,28 +432,27 @@ void          *glwButtonGetPressedCtx(GLWButton *_this);
 void           glwButtonSetPressedCtx(GLWButton *_this,void *_ctx);
 
 
-struct GLWTextField
-{
-	GLWTextField(const char*, int);
+struct GLWTextField {
+    GLWTextField(const char*, int);
     GLWComponent   super;
-    GLWActionFunc  action;                      /*Enter pressed callback function*/
-    void          *action_ctx;                     /*Extra parameter for callback*/
-    GLWActionFunc  changed;                      /*Text changed callback function*/
-    void          *changed_ctx;                    /*Extra parameter for callback*/
-	std::string      text;        /*Current text*/
-	std::string      seld;        /*Currently selected text buffer*/
-    int            sels;                                        /*Selection start*/
-    int            sele;                                          /*Selection end*/
-    int            carp;                                         /*Caret position*/
-    int            mark;               /*Selection mark (for dragging selections)*/
-    int            offs;                                         /*Display offset*/
-    int            cols;                            /*Preferred number of columns*/
-    int            echo;                                         /*Echo character*/
-    int            blink_timer;                       /*Timer for blinking cursor*/
+    GLWActionFunc  action;          /*Enter pressed callback function*/
+    void          *action_ctx;      /*Extra parameter for callback*/
+    GLWActionFunc  changed;         /*Text changed callback function*/
+    void          *changed_ctx;     /*Extra parameter for callback*/
+    std::string      text;        /*Current text*/
+    std::string      seld;        /*Currently selected text buffer*/
+    int            sels;            /*Selection start*/
+    int            sele;            /*Selection end*/
+    int            carp;            /*Caret position*/
+    int            mark;            /*Selection mark (for dragging selections)*/
+    int            offs;            /*Display offset*/
+    int            cols;            /*Preferred number of columns*/
+    int            echo;            /*Echo character*/
+    int            blink_timer;     /*Timer for blinking cursor*/
     unsigned       editable:1;
     unsigned       caret:1;        /*Draw caret?*/
 private:
-	GLWTextField();
+    GLWTextField();
 };
 
 
@@ -506,11 +494,10 @@ void           glwTextFieldSetChangedCtx(GLWTextField *_this,
 
 struct GLWCheckBox;
 
-struct GLWCheckBoxGroup
-{
-	GLWCheckBoxGroup();
-	~GLWCheckBoxGroup();
-	std::vector<GLWCheckBox*>      cbs;
+struct GLWCheckBoxGroup {
+    GLWCheckBoxGroup();
+    ~GLWCheckBoxGroup();
+    std::vector<GLWCheckBox*>      cbs;
     int            seld;
     GLWActionFunc  changed;
     void          *changed_ctx;
@@ -531,18 +518,17 @@ void              glwCheckBoxGroupSetChangedCtx(GLWCheckBoxGroup *_this,
 
 
 
-struct GLWCheckBox
-{
-	GLWCheckBox(const char*, int, GLWCheckBoxGroup*);
+struct GLWCheckBox {
+    GLWCheckBox(const char*, int, GLWCheckBoxGroup*);
     GLWComponent      super;
     GLWActionFunc     changed;
     void             *changed_ctx;
     GLWCheckBoxGroup *group;
-	std::string label;
+    std::string label;
     unsigned          state:1;
     unsigned          down:1;
 private:
-	GLWCheckBox();
+    GLWCheckBox();
 };
 
 
@@ -567,24 +553,23 @@ void              glwCheckBoxSetChangedCtx(GLWCheckBox *_this,
 
 typedef std::map<int, std::string>::iterator mapis_itr;
 
-class GLWSlider
-{
+class GLWSlider {
 public:
-	GLWSlider(int _min,int _max,int _val,int _ext);
-	int            getVal();
-	void           setVal(int val,int ext);
-	void           setChangedFunc(GLWActionFunc func);
-	void           setChangedCtx(void* ctx);
-	void           setMajorTickSpacing(int s);
-	void           setMinorTickSpacing(int s);
-	int            makeLabels(int start,int inc);
-	void           setSnap(int s);
+    GLWSlider(int _min,int _max,int _val,int _ext);
+    int            getVal();
+    void           setVal(int val,int ext);
+    void           setChangedFunc(GLWActionFunc func);
+    void           setChangedCtx(void* ctx);
+    void           setMajorTickSpacing(int s);
+    void           setMinorTickSpacing(int s);
+    int            makeLabels(int start,int inc);
+    void           setSnap(int s);
 
 
     GLWComponent   super;
     GLWActionFunc  changed;
     void          *changed_ctx;
-    // No need for ordering, in C++2011 this could be unordered_map 
+    // No need for ordering, in C++2011 this could be unordered_map
     std::map<int, std::string>     labels;
     int            major_ticks;
     int            major_offs;
@@ -596,7 +581,7 @@ public:
     int            max;
     int            val;
     int            ext;
-    int            label_hi;                      /*Values used for slider layout*/
+    int            label_hi;        /*Values used for slider layout*/
     int            label_lo;
     int            thumb_offs;
     GLWRect        thumb_rect;
@@ -606,7 +591,7 @@ public:
     GLWRect        label_rect;
     unsigned       center_labels:1;
 private:
-	GLWSlider();
+    GLWSlider();
 };
 
 
@@ -642,9 +627,8 @@ void          *glwSliderGetChangedCtx(GLWSlider *_this);
 void           glwSliderSetChangedCtx(GLWSlider *_this,void *_ctx);
 
 
-struct GLWTabPage
-{
-	std::string     title;
+struct GLWTabPage {
+    std::string     title;
     GLWRect       bounds;
     GLWcolor      backc;
     GLWcolor      forec;
@@ -654,13 +638,12 @@ struct GLWTabPage
 
 typedef std::vector<GLWTabPage>::iterator tab_itr;
 
-class GLWTabbedPane
-{
+class GLWTabbedPane {
 public:
-	GLWTabbedPane();
+    GLWTabbedPane();
     GLWComponent super;
-	std::vector<GLWTabPage>    tabs;
-	std::vector<int>    runs;
+    std::vector<GLWTabPage>    tabs;
+    std::vector<int>    runs;
     GLWRect      area;
     int          tplc;
     int          seld;
@@ -729,4 +712,4 @@ void glwInsetsInit(GLWInsets *_this,int _t,int _b,int _l,int _r);
 
 void glwInit(int *_argc,char **_argv);
 
-#endif                                                                /*_glw_H*/
+#endif  /*_glw_H*/

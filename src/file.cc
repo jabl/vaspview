@@ -20,26 +20,26 @@
 
 File::File(const char* name, const char* mode)
 {
-	f = std::fopen(name, mode);
+    f = std::fopen(name, mode);
 }
 
 File::~File()
 {
-	if (f)
-		fclose(f);
+    if (f)
+        fclose(f);
 }
 
 // fgets style function that fills a string up to the next newline or
 // EOF. Returns true if something was read, false otherwise.
 bool File::fgets(std::string& line)
 {
-	char buffer[1024];
-	line.clear();
-	do {
-		if(!std::fgets(buffer, sizeof(buffer), this->f))
-			return !line.empty();
-		
-		line.append(buffer); 
-	} while(!std::strchr(buffer, '\n'));
-	return true;
+    char buffer[1024];
+    line.clear();
+    do {
+        if (!std::fgets(buffer, sizeof(buffer), this->f))
+            return !line.empty();
+
+        line.append(buffer);
+    } while (!std::strchr(buffer, '\n'));
+    return true;
 }

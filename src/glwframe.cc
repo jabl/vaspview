@@ -56,12 +56,10 @@ static void glwFrameGlutDisplay(void)
 {
     int wid;
     wid=glutGetWindow();
-    if (wid!=0)
-    {
-	frt_itr it = glw_frame_table.find(wid);
-        if (it != glw_frame_table.end())
-        {
-	    GLWFrame *framep = (*it).second;
+    if (wid!=0) {
+        frt_itr it = glw_frame_table.find(wid);
+        if (it != glw_frame_table.end()) {
+            GLWFrame *framep = (*it).second;
             int minw;
             int minh;
             int maxw;
@@ -76,12 +74,9 @@ static void glwFrameGlutDisplay(void)
             if (maxh>=0&&h>maxh)h=maxh;
             if (minw>=0&&w<minw)w=minw;
             if (minh>=0&&h<minh)h=minh;
-            if (w!=framep->super.bounds.w||h!=framep->super.bounds.h)
-            {
+            if (w!=framep->super.bounds.w||h!=framep->super.bounds.h) {
                 glutReshapeWindow(w,h);
-            }
-            else
-            {
+            } else {
                 glwCompValidate(&framep->super);
                 glDrawBuffer(GL_BACK);
                 glPushAttrib(GL_ALL_ATTRIB_BITS);
@@ -99,12 +94,10 @@ static void glwFrameGlutReshape(int _w,int _h)
 {
     int wid;
     wid=glutGetWindow();
-    if (wid!=0)
-    {
-	frt_itr it = glw_frame_table.find(wid);
-        if (it != glw_frame_table.end())
-        {
-	    GLWFrame * framep = (*it).second;
+    if (wid!=0) {
+        frt_itr it = glw_frame_table.find(wid);
+        if (it != glw_frame_table.end()) {
+            GLWFrame * framep = (*it).second;
             glwCompSetBounds(&framep->super,framep->super.bounds.x,
                              framep->super.bounds.y,_w,_h);
         }
@@ -115,12 +108,10 @@ static void glwFrameGlutVisibility(int _state)
 {
     int wid;
     wid=glutGetWindow();
-    if (wid!=0)
-    {
-	frt_itr it = glw_frame_table.find(wid);
-	if (it != glw_frame_table.end())
-        {
-	    GLWFrame *framep = (*it).second;
+    if (wid!=0) {
+        frt_itr it = glw_frame_table.find(wid);
+        if (it != glw_frame_table.end()) {
+            GLWFrame *framep = (*it).second;
             glwCompVisibility(&framep->super,_state==GLUT_VISIBLE?1:0);
         }
     }
@@ -130,12 +121,10 @@ static void glwFrameGlutEntry(int _state)
 {
     int wid;
     wid=glutGetWindow();
-    if (wid!=0)
-    {
-	frt_itr it = glw_frame_table.find(wid);
-	if (it != glw_frame_table.end())
-        {
-	    GLWFrame *framep = (*it).second;
+    if (wid!=0) {
+        frt_itr it = glw_frame_table.find(wid);
+        if (it != glw_frame_table.end()) {
+            GLWFrame *framep = (*it).second;
             glwCompEntry(&framep->super,_state==GLUT_ENTERED?1:0);
         }
     }
@@ -145,12 +134,10 @@ static void glwFrameGlutKeyboard(unsigned char _key,int _x,int _y)
 {
     int wid;
     wid=glutGetWindow();
-    if (wid!=0)
-    {
-	frt_itr it = glw_frame_table.find(wid);
-	if (it != glw_frame_table.end())
-        {
-	    GLWFrame *framep = (*it).second;
+    if (wid!=0) {
+        frt_itr it = glw_frame_table.find(wid);
+        if (it != glw_frame_table.end()) {
+            GLWFrame *framep = (*it).second;
             glwCompKeyboard(&framep->super,_key,
                             _x,framep->super.bounds.h-_y);
             glwFrameGlutCursor(framep);
@@ -162,12 +149,10 @@ static void glwFrameGlutSpecial(int _key,int _x,int _y)
 {
     int wid;
     wid=glutGetWindow();
-    if (wid!=0)
-    {
-	frt_itr it = glw_frame_table.find(wid);
-	if (it != glw_frame_table.end())
-        {
-	    GLWFrame *framep = (*it).second;
+    if (wid!=0) {
+        frt_itr it = glw_frame_table.find(wid);
+        if (it != glw_frame_table.end()) {
+            GLWFrame *framep = (*it).second;
             glwCompSpecial(&framep->super,_key,
                            _x,framep->super.bounds.h-_y);
             glwFrameGlutCursor(framep);
@@ -179,12 +164,10 @@ static void glwFrameGlutMouse(int _but,int _state,int _x,int _y)
 {
     int wid;
     wid=glutGetWindow();
-    if (wid!=0)
-    {
-	frt_itr it = glw_frame_table.find(wid);
-	if (it != glw_frame_table.end())
-        {
-	    GLWFrame *framep = (*it).second;
+    if (wid!=0) {
+        frt_itr it = glw_frame_table.find(wid);
+        if (it != glw_frame_table.end()) {
+            GLWFrame *framep = (*it).second;
             glwCompMouse(&framep->super,_but,_state==GLUT_DOWN?1:0,
                          _x,framep->super.bounds.h-_y);
             glwFrameGlutCursor(framep);
@@ -196,12 +179,10 @@ static void glwFrameGlutMotion(int _x,int _y)
 {
     int wid;
     wid=glutGetWindow();
-    if (wid!=0)
-    {
-	frt_itr it = glw_frame_table.find(wid);
-	if (it != glw_frame_table.end())
-        {
-	    GLWFrame *framep = (*it).second;
+    if (wid!=0) {
+        frt_itr it = glw_frame_table.find(wid);
+        if (it != glw_frame_table.end()) {
+            GLWFrame *framep = (*it).second;
             glwCompMotion(&framep->super,
                           _x,framep->super.bounds.h-_y);
             glwFrameGlutCursor(framep);
@@ -213,12 +194,10 @@ static void glwFrameGlutPassiveMotion(int _x,int _y)
 {
     int wid;
     wid=glutGetWindow();
-    if (wid!=0)
-    {
-	frt_itr it = glw_frame_table.find(wid);
-	if (it != glw_frame_table.end())
-        {
-	    GLWFrame *framep = (*it).second;
+    if (wid!=0) {
+        frt_itr it = glw_frame_table.find(wid);
+        if (it != glw_frame_table.end()) {
+            GLWFrame *framep = (*it).second;
             glwCompPassiveMotion(&framep->super,
                                  _x,framep->super.bounds.h-_y);
             glwFrameGlutCursor(framep);
@@ -227,8 +206,7 @@ static void glwFrameGlutPassiveMotion(int _x,int _y)
 }
 
 
-const GLWCallbacks GLW_FRAME_CALLBACKS=
-{
+const GLWCallbacks GLW_FRAME_CALLBACKS= {
     &GLW_COMPONENT_CALLBACKS,
     (GLWDisposeFunc)glwFramePeerDispose,
     NULL,
@@ -248,28 +226,27 @@ const GLWCallbacks GLW_FRAME_CALLBACKS=
 
 GLWFrame::GLWFrame(const char* title)
 {
-	int wid;
-	wid=glutCreateWindow(title);
-	if (wid!=0)
-	{
-		glw_frame_table.insert(std::pair<int, GLWFrame*>(wid, this));
-		this->title = title;
-		this->super.wid=wid;
-		this->super.callbacks=&GLW_FRAME_CALLBACKS;
-		glwCompSetCursor(&this->super,GLUT_CURSOR_RIGHT_ARROW);
-		glutDisplayFunc(glwFrameGlutDisplay);
-		glutReshapeFunc(glwFrameGlutReshape);
-		glutVisibilityFunc(glwFrameGlutVisibility);
-		glutEntryFunc(glwFrameGlutEntry);
-		glutKeyboardFunc(glwFrameGlutKeyboard);
-		glutSpecialFunc(glwFrameGlutSpecial);
-		glutMouseFunc(glwFrameGlutMouse);
-		glutMotionFunc(glwFrameGlutMotion);
-		glutPassiveMotionFunc(glwFrameGlutPassiveMotion);
-		return;
-	}
-	glw_frame_table.erase(wid);
-	glutDestroyWindow(wid);
+    int wid;
+    wid=glutCreateWindow(title);
+    if (wid!=0) {
+        glw_frame_table.insert(std::pair<int, GLWFrame*>(wid, this));
+        this->title = title;
+        this->super.wid=wid;
+        this->super.callbacks=&GLW_FRAME_CALLBACKS;
+        glwCompSetCursor(&this->super,GLUT_CURSOR_RIGHT_ARROW);
+        glutDisplayFunc(glwFrameGlutDisplay);
+        glutReshapeFunc(glwFrameGlutReshape);
+        glutVisibilityFunc(glwFrameGlutVisibility);
+        glutEntryFunc(glwFrameGlutEntry);
+        glutKeyboardFunc(glwFrameGlutKeyboard);
+        glutSpecialFunc(glwFrameGlutSpecial);
+        glutMouseFunc(glwFrameGlutMouse);
+        glutMotionFunc(glwFrameGlutMotion);
+        glutPassiveMotionFunc(glwFrameGlutPassiveMotion);
+        return;
+    }
+    glw_frame_table.erase(wid);
+    glutDestroyWindow(wid);
 }
 
 void glwFrameShow(GLWFrame *_this)
@@ -295,8 +272,7 @@ void glwFramePack(GLWFrame *_this)
     int prew;
     int preh;
     glwCompGetPreSize(&_this->super,&prew,&preh);
-    if (prew>=0||preh>=0)
-    {
+    if (prew>=0||preh>=0) {
         int wid;
         if (prew<0)prew=_this->super.bounds.w;
         if (preh<0)preh=_this->super.bounds.h;

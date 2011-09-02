@@ -44,8 +44,7 @@ typedef struct DS3ViewComp DS3ViewComp;
 # define DS3V_PROJECT_PERSPECTIVE  (0)
 # define DS3V_PROJECT_ORTHOGRAPHIC (1)
 
-struct DS3ViewComp
-{
+struct DS3ViewComp {
     DS3ViewComp(DS3View*);
     GLWComponent  super;
     DS3View      *ds3view;
@@ -53,16 +52,14 @@ private:
     DS3ViewComp();
 };
 
-struct DS3ViewParams
-{
+struct DS3ViewParams {
     double box[2][3];
     Vect3d cntr;
     double zoom;
 };
 
-struct DS3View
-{
-	DS3View();
+struct DS3View {
+    DS3View();
     GLWComponent   super;
     DS3ViewComp   cm_axes;
     DS3ViewComp   cm_box;
@@ -95,8 +92,8 @@ struct DS3View
 #  endif
 # endif
     DataSet3D     *ds3;
-    const DSColorScale  *cs;             /*Color scale for data->color conversion*/
-    const DSDataScale   *ds;       /*Data scale for data<->[0,1] interval mapping*/
+    const DSColorScale  *cs;        /*Color scale for data->color conversion*/
+    const DSDataScale   *ds;   /*Data scale for data<->[0,1] interval mapping*/
     /*Display structures*/
 # if defined(__DS3_ADD_BONDS__)
     DS3Bonds       bonds;                             /*Bonds between atoms*/
@@ -109,7 +106,7 @@ struct DS3View
     double         basis[16];                   /*GL-formatted basis matrix*/
     double         basinv[3][3];                    /*Inverted basis matrix*/
     double         strans[3][4];              /*Slice transformation matrix*/
-	std::vector<DS3ViewParams>  view_stack;  /*Saved clip boxes*/
+    std::vector<DS3ViewParams>  view_stack;  /*Saved clip boxes*/
     /*Viewing parameters*/
     double         point_r;                                  /*Point radius*/
     double         slice_t;                         /*Slice angles/distance*/
@@ -159,7 +156,7 @@ struct DS3View
     long           track_dy;
     long           track_dz;
     /*Which items to draw*/
-	std::vector<int>      draw_point;      /*Whether to draw each point*/
+    std::vector<int>      draw_point;      /*Whether to draw each point*/
     unsigned       draw_coords:1;   /*Whether to draw the coordinate system*/
     unsigned       draw_points:1;       /*Whether or not to draw any points*/
     unsigned       draw_slice:1;         /*Whether or not to draw the slice*/

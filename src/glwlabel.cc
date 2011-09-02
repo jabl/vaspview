@@ -27,19 +27,16 @@
 static void glwLabelLayoutMinSize(GLWLayoutManager *_this,GLWLabel *_label,
                                   int *_w,int *_h)
 {
-    if (_w!=NULL)
-    {
+    if (_w!=NULL) {
         *_w=glwFontGetStringWidth(_label->super.font,glwLabelGetLabel(_label))+
             (GLW_LABEL_INSET<<1);
     }
-    if (_h!=NULL)
-    {
+    if (_h!=NULL) {
         *_h=glwFontGetHeight(_label->super.font)+(GLW_LABEL_INSET<<1);
     }
 }
 
-static GLWLayoutManager glw_label_layout=
-{
+static GLWLayoutManager glw_label_layout= {
     NULL,
     NULL,
     (GLWLayoutSizeFunc)glwLabelLayoutMinSize,
@@ -66,8 +63,7 @@ static void glwLabelPeerDisplay(GLWLabel *_this,GLWCallbacks *_cb)
     x+=GLW_LABEL_INSET;
     y+=GLW_LABEL_INSET;
     /*Draw focus rectangle if we have focus*/
-    if (glwCompIsFocused(&_this->super))
-    {
+    if (glwCompIsFocused(&_this->super)) {
         glLineStipple(2,0x5555);
         glEnable(GL_LINE_STIPPLE);
         glBegin(GL_LINE_LOOP);
@@ -95,8 +91,7 @@ static void glwLabelPeerDispose(GLWLabel *_this,GLWCallbacks *_cb)
     glwCompSuperDispose(&_this->super,_cb);
 }
 
-const GLWCallbacks GLW_LABEL_CALLBACKS=
-{
+const GLWCallbacks GLW_LABEL_CALLBACKS= {
     &GLW_COMPONENT_CALLBACKS,
     (GLWDisposeFunc)glwLabelPeerDispose,
     (GLWDisplayFunc)glwLabelPeerDisplay,
@@ -115,38 +110,36 @@ const GLWCallbacks GLW_LABEL_CALLBACKS=
 
 GLWLabel::GLWLabel(const char* label)
 {
-	glwLabelSetLabel(this, label);
-        this->super.callbacks=&GLW_LABEL_CALLBACKS;
-        glwCompSetAlignX(&this->super,0);
-        glwCompSetLayout(&this->super,&glw_label_layout);
-        return;
+    glwLabelSetLabel(this, label);
+    this->super.callbacks=&GLW_LABEL_CALLBACKS;
+    glwCompSetAlignX(&this->super,0);
+    glwCompSetLayout(&this->super,&glw_label_layout);
+    return;
 }
 
 const char *glwLabelGetLabel(GLWLabel *_this)
 {
-	return _this->label.c_str();
+    return _this->label.c_str();
 }
 
 int glwLabelSetLabel(GLWLabel *_this, const char* label)
 {
-	if (label == NULL)
-		_this->label.clear();
-	else
-		_this->label = label;
-	glwCompRevalidate(&_this->super);
-	return 1;
+    if (label == NULL)
+        _this->label.clear();
+    else
+        _this->label = label;
+    glwCompRevalidate(&_this->super);
+    return 1;
 }
 
 int glwLabelAddLabel(GLWLabel *_this, const char* label)
 {
-	if (_this->label.size() <= 1) 
-		return glwLabelSetLabel(_this, label);
-	else if (label != NULL)
-	{
-		_this->label.append(label);
-		glwCompRevalidate(&_this->super);
-		return 1;
-	}
-	else return 1;
-	return 0;
+    if (_this->label.size() <= 1)
+        return glwLabelSetLabel(_this, label);
+    else if (label != NULL) {
+        _this->label.append(label);
+        glwCompRevalidate(&_this->super);
+        return 1;
+    } else return 1;
+    return 0;
 }

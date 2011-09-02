@@ -25,14 +25,12 @@ static void dsColorLegendScalePeerDisplay(GLWComponent *_this,
 {
     typedef GLubyte GLubyte4[4];
     glwCompSuperDisplay(_this,_cb);
-    if (_this->parent!=NULL&&_this->bounds.w>1)
-    {
+    if (_this->parent!=NULL&&_this->bounds.w>1) {
         GLubyte4 *ctable;
         int       i;
         ctable=((DSColorLegend *)_this->parent)->ctable;
         glBegin(GL_LINES);
-        for (i=0; i<_this->bounds.w; i++)
-        {
+        for (i=0; i<_this->bounds.w; i++) {
             glColor4ubv(ctable[i*UCHAR_MAX/_this->bounds.w]);
             glVertex2i(i,0);
             glVertex2i(i,_this->bounds.h-1);
@@ -42,8 +40,7 @@ static void dsColorLegendScalePeerDisplay(GLWComponent *_this,
 }
 
 
-static const GLWCallbacks DS_COLOR_LEGEND_SCALE_CALLBACKS=
-{
+static const GLWCallbacks DS_COLOR_LEGEND_SCALE_CALLBACKS= {
     &GLW_COMPONENT_CALLBACKS,
     NULL,
     (GLWDisplayFunc)dsColorLegendScalePeerDisplay
@@ -53,26 +50,25 @@ static const GLWCallbacks DS_COLOR_LEGEND_SCALE_CALLBACKS=
 
 DSColorLegend::DSColorLegend() : lb_min("0"), lb_max("1"), lb_label(NULL)
 {
-	GLWGridBagLayout *layout = new GLWGridBagLayout();
-	this->cm_scale.callbacks = &DS_COLOR_LEGEND_SCALE_CALLBACKS;
-        if (glwCompAdd(&this->super,&this->cm_scale,-1)&&
-	    glwCompAdd(&this->super,&this->lb_min.super,-1)&&
-	    glwCompAdd(&this->super,&this->lb_label.super,-1)&&
-	    glwCompAdd(&this->super,&this->lb_max.super,-1))
-        {
-		glwCompSetMinWidth(&this->cm_scale,64);
-		glwCompSetMinHeight(&this->cm_scale,16);
-		glwCompSetGridWidth(&this->cm_scale,GLWC_REMAINDER);
-		glwCompSetWeightX(&this->cm_scale,1);
-		glwCompSetWeightY(&this->cm_scale,1);
-		glwCompSetFill(&this->cm_scale,GLWC_BOTH);
-		glwCompSetAlignX(&this->lb_label.super,0.5);
-		glwCompSetAlignX(&this->lb_max.super,1);
-		glwCompSetLayout(&this->super,&layout->super);
-		dsColorLegendSetColorScale(this,NULL);
-		return;
-        }
-        glwCompDelAll(&this->super);
+    GLWGridBagLayout *layout = new GLWGridBagLayout();
+    this->cm_scale.callbacks = &DS_COLOR_LEGEND_SCALE_CALLBACKS;
+    if (glwCompAdd(&this->super,&this->cm_scale,-1)&&
+            glwCompAdd(&this->super,&this->lb_min.super,-1)&&
+            glwCompAdd(&this->super,&this->lb_label.super,-1)&&
+            glwCompAdd(&this->super,&this->lb_max.super,-1)) {
+        glwCompSetMinWidth(&this->cm_scale,64);
+        glwCompSetMinHeight(&this->cm_scale,16);
+        glwCompSetGridWidth(&this->cm_scale,GLWC_REMAINDER);
+        glwCompSetWeightX(&this->cm_scale,1);
+        glwCompSetWeightY(&this->cm_scale,1);
+        glwCompSetFill(&this->cm_scale,GLWC_BOTH);
+        glwCompSetAlignX(&this->lb_label.super,0.5);
+        glwCompSetAlignX(&this->lb_max.super,1);
+        glwCompSetLayout(&this->super,&layout->super);
+        dsColorLegendSetColorScale(this,NULL);
+        return;
+    }
+    glwCompDelAll(&this->super);
 }
 
 
@@ -81,20 +77,16 @@ DSColorLegend::DSColorLegend() : lb_min("0"), lb_max("1"), lb_label(NULL)
 int dsColorLegendSetDataSet(DSColorLegend *_this,DataSet3D *_ds3)
 {
     dsColorLegendSetRange(_this,_ds3->min,_ds3->max);
-    if (_ds3->label[3]!=NULL&&_ds3->label[3][0]!='\0')
-    {
-        if (_ds3->units[3]!=NULL&&_ds3->units[3][0]!='\0')
-        {
-	    std::string label;
-	    label += _ds3->label[3];
-	    label += " (";
-	    label += _ds3->units[3];
-	    label += ")";
-	    return dsColorLegendSetLabel(_this, label.c_str());
-        }
-        else return dsColorLegendSetLabel(_this,_ds3->label[3]);
-    }
-    else return dsColorLegendSetLabel(_this,_ds3->units[3]);
+    if (_ds3->label[3]!=NULL&&_ds3->label[3][0]!='\0') {
+        if (_ds3->units[3]!=NULL&&_ds3->units[3][0]!='\0') {
+            std::string label;
+            label += _ds3->label[3];
+            label += " (";
+            label += _ds3->units[3];
+            label += ")";
+            return dsColorLegendSetLabel(_this, label.c_str());
+        } else return dsColorLegendSetLabel(_this,_ds3->label[3]);
+    } else return dsColorLegendSetLabel(_this,_ds3->units[3]);
 }
 
 /*Sets the color scale to use
@@ -103,8 +95,7 @@ void dsColorLegendSetColorScale(DSColorLegend *_this,const DSColorScale *_cs)
 {
     int i;
     _this->cs=_cs!=NULL?_cs:&DS_RAINBOW_SCALE;
-    for (i=0; i<=UCHAR_MAX; i++)
-    {
+    for (i=0; i<=UCHAR_MAX; i++) {
         GLWcolor c;
         c=dsColorScale(_this->cs,i/(double)UCHAR_MAX);
         _this->ctable[i][0]=(GLubyte)(c&0xFF);

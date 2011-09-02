@@ -43,8 +43,7 @@ static int glwSliderGetXPos(GLWSlider *_this,int _val)
     if (!range)range=1;
     ppv=_this->track_rect.w/(double)range;
     ret=_this->track_rect.x+(int)(0.5+ppv*(_val-_this->min));
-    if (ret>=_this->track_rect.x+_this->track_rect.w)
-    {
+    if (ret>=_this->track_rect.x+_this->track_rect.w) {
         ret=_this->track_rect.x+_this->track_rect.w-1;
     }
     if (ret<_this->track_rect.x)ret=_this->track_rect.x;
@@ -60,8 +59,7 @@ static int glwSliderGetYPos(GLWSlider *_this,int _val)
     if (!range)range=1;
     ppv=_this->track_rect.h/range;
     ret=_this->track_rect.y+_this->track_rect.h-(int)(0.5+ppv*(_val-_this->min));
-    if (ret>=_this->track_rect.y+_this->track_rect.h)
-    {
+    if (ret>=_this->track_rect.y+_this->track_rect.h) {
         ret=_this->track_rect.y+_this->track_rect.h-1;
     }
     if (ret<_this->track_rect.y)ret=_this->track_rect.y;
@@ -72,8 +70,7 @@ static int glwSliderGetXValue(GLWSlider *_this,int _x)
 {
     if (_x<=_this->track_rect.x)return _this->min;
     else if (_x>=_this->track_rect.x+_this->track_rect.w)return _this->max;
-    else
-    {
+    else {
         double vpp;
         int    range;
         _x-=_this->track_rect.x;
@@ -88,8 +85,7 @@ static int glwSliderGetYValue(GLWSlider *_this,int _y)
 {
     if (_y<=_this->track_rect.y)return _this->max;
     else if (_y>=_this->track_rect.y+_this->track_rect.h)return _this->min;
-    else
-    {
+    else {
         double vpp;
         int    range;
         _y-=_this->track_rect.y;
@@ -102,13 +98,10 @@ static int glwSliderGetYValue(GLWSlider *_this,int _y)
 
 static void glwSliderUpdateThumb(GLWSlider *_this)
 {
-    if (_this->ornt==GLWC_VERTICAL)
-    {
+    if (_this->ornt==GLWC_VERTICAL) {
         _this->thumb_rect.y=glwSliderGetYPos(_this,_this->val)-
                             (_this->thumb_rect.h>>1);
-    }
-    else
-    {
+    } else {
         _this->thumb_rect.x=glwSliderGetXPos(_this,_this->val)-
                             (_this->thumb_rect.w>>1);
     }
@@ -117,32 +110,25 @@ static void glwSliderUpdateThumb(GLWSlider *_this)
 
 static void glwSliderMoveThumb(GLWSlider *_this,int _x,int _y)
 {
-    if (_this->ornt==GLWC_VERTICAL)
-    {
+    if (_this->ornt==GLWC_VERTICAL) {
         _this->thumb_rect.y=_y-_this->thumb_offs;
         if (_this->thumb_rect.y+(_this->thumb_rect.h>>1)>=
-                _this->track_rect.y+_this->track_rect.h)
-        {
+                _this->track_rect.y+_this->track_rect.h) {
             _this->thumb_rect.y=_this->track_rect.y+_this->track_rect.h-1-
                                 (_this->thumb_rect.h>>1);
         }
-        if (_this->thumb_rect.y+(_this->thumb_rect.h>>1)<_this->track_rect.y)
-        {
+        if (_this->thumb_rect.y+(_this->thumb_rect.h>>1)<_this->track_rect.y) {
             _this->thumb_rect.y=_this->track_rect.y-(_this->thumb_rect.h>>1);
         }
         _this->thumb_offs=_this->thumb_rect.h>>1;
-    }
-    else
-    {
+    } else {
         _this->thumb_rect.x=_x-_this->thumb_offs;
         if (_this->thumb_rect.x+(_this->thumb_rect.w>>1)>=
-                _this->track_rect.x+_this->track_rect.w)
-        {
+                _this->track_rect.x+_this->track_rect.w) {
             _this->thumb_rect.x=_this->track_rect.x+_this->track_rect.w-1-
                                 (_this->thumb_rect.w>>1);
         }
-        if (_this->thumb_rect.x+(_this->thumb_rect.w>>1)<_this->track_rect.x)
-        {
+        if (_this->thumb_rect.x+(_this->thumb_rect.w>>1)<_this->track_rect.x) {
             _this->thumb_rect.x=_this->track_rect.x-(_this->thumb_rect.w>>1);
         }
         _this->thumb_offs=_this->thumb_rect.w>>1;
@@ -159,30 +145,23 @@ static int glwSliderCheckSnap(GLWSlider *_this,int _int,int _offs)
     int v;
     int d;
     x=_this->val-_this->min-_offs;
-    if (x>=0)
-    {
+    if (x>=0) {
         a=_this->val-(x%_int);
         b=a+_int;
-    }
-    else
-    {
+    } else {
         a=_this->val+(-x%_int);
         b=a-_int;
     }
-    if (_this->ornt==GLWC_VERTICAL)
-    {
+    if (_this->ornt==GLWC_VERTICAL) {
         u=glwSliderGetYPos(_this,a);
         v=glwSliderGetYPos(_this,b);
         x=_this->thumb_rect.y+(_this->thumb_rect.h>>1);
-    }
-    else
-    {
+    } else {
         u=glwSliderGetXPos(_this,a);
         v=glwSliderGetXPos(_this,b);
         x=_this->thumb_rect.x+(_this->thumb_rect.w>>1);
     }
-    if (u>v)
-    {
+    if (u>v) {
         d=a;
         a=b;
         b=d;
@@ -190,13 +169,10 @@ static int glwSliderCheckSnap(GLWSlider *_this,int _int,int _offs)
         u=v;
         v=u;
     }
-    if ((_this->snap==GLWC_SNAP_ALWAYS||x-u<=_this->snap)&&v-x>=x-u)
-    {
+    if ((_this->snap==GLWC_SNAP_ALWAYS||x-u<=_this->snap)&&v-x>=x-u) {
         glwSliderSetVal(_this,a,_this->ext);
         return 1;
-    }
-    else if (_this->snap==GLWC_SNAP_ALWAYS||v-x<=_this->snap)
-    {
+    } else if (_this->snap==GLWC_SNAP_ALWAYS||v-x<=_this->snap) {
         glwSliderSetVal(_this,b,_this->ext);
         return 1;
     }
@@ -205,14 +181,11 @@ static int glwSliderCheckSnap(GLWSlider *_this,int _int,int _offs)
 
 static void glwSliderSnap(GLWSlider *_this)
 {
-    if (_this->snap!=GLWC_SNAP_NEVER)
-    {
+    if (_this->snap!=GLWC_SNAP_NEVER) {
         if (_this->major_ticks<=0||
-                !glwSliderCheckSnap(_this,_this->major_ticks,_this->major_offs))
-        {
+                !glwSliderCheckSnap(_this,_this->major_ticks,_this->major_offs)) {
             if (_this->minor_ticks<=0||
-                    !glwSliderCheckSnap(_this,_this->minor_ticks,_this->minor_offs))
-            {
+                    !glwSliderCheckSnap(_this,_this->minor_ticks,_this->minor_offs)) {
                 if (!glwSliderCheckSnap(_this,1,0))return;
             }
         }
@@ -222,17 +195,14 @@ static void glwSliderSnap(GLWSlider *_this)
 
 static void glwSliderLayout(GLWLayoutManager *_this,GLWSlider *_slider)
 {
-    if (_slider->ornt==GLWC_VERTICAL)
-    {
+    if (_slider->ornt==GLWC_VERTICAL) {
         int           h;
         _slider->thumb_rect.w=GLW_SLIDER_THUMB_HEIGHT;
         _slider->thumb_rect.h=GLW_SLIDER_THUMB_WIDTH;
-        if (_slider->labels.size() > 0 && _slider->center_labels)
-        {
+        if (_slider->labels.size() > 0 && _slider->center_labels) {
             _slider->track_offs=(glwFontGetHeight(_slider->super.font)>>1)+
                                 GLW_SLIDER_INSET;
-        }
-        else _slider->track_offs=GLW_SLIDER_INSET;
+        } else _slider->track_offs=GLW_SLIDER_INSET;
         h=_slider->thumb_rect.h>>1;
         if (h>_slider->track_offs)_slider->track_offs=h;
         _slider->track_rect.x=GLW_SLIDER_INSET;
@@ -248,46 +218,39 @@ static void glwSliderLayout(GLWLayoutManager *_this,GLWSlider *_slider)
         _slider->label_rect.y=_slider->tick_rect.y-_slider->track_offs+
                               GLW_SLIDER_INSET;
         _slider->label_rect.w=0;
-	for (mapis_itr it = _slider->labels.begin(); 
-	     it != _slider->labels.end(); ++it)
-        {
-		std::string& lblp = it->second;
-		int w = glwFontGetStringWidth(_slider->super.font, lblp);
-	    if (w>_slider->label_rect.w)_slider->label_rect.w=w;
+        for (mapis_itr it = _slider->labels.begin();
+                it != _slider->labels.end(); ++it) {
+            std::string& lblp = it->second;
+            int w = glwFontGetStringWidth(_slider->super.font, lblp);
+            if (w>_slider->label_rect.w)_slider->label_rect.w=w;
         }
         _slider->label_rect.h=_slider->tick_rect.h+
-		((_slider->track_offs - GLW_SLIDER_INSET) << 1);
+                              ((_slider->track_offs - GLW_SLIDER_INSET) << 1);
         _slider->thumb_rect.x=_slider->track_rect.x;
         _slider->thumb_rect.y=glwSliderGetYPos(_slider,_slider->val)-
-		((_slider->thumb_rect.h + 1) >> 1);
-    }
-    else
-    {
+                              ((_slider->thumb_rect.h + 1) >> 1);
+    } else {
         int w = 0;
         _slider->thumb_rect.w=GLW_SLIDER_THUMB_WIDTH;
         _slider->thumb_rect.h=GLW_SLIDER_THUMB_HEIGHT;
-        if (!_slider->labels.empty() && _slider->center_labels)
-        {
-	    mapis_itr it = _slider->labels.find(_slider->label_lo);
-		if (it != _slider->labels.end())
-		{
-			std::string& lblp = it->second;
-			_slider->track_offs = (glwFontGetStringWidth(
-						       _slider->super.font,
-						       lblp) >> 1)
-				+ GLW_SLIDER_INSET;
-		}
-		it = _slider->labels.find(_slider->label_hi);
-		if (it != _slider->labels.end())
-		{
-			std::string& lblp= it->second;
-			w = (glwFontGetStringWidth(_slider->super.font,
-						   lblp) >> 1)
-				+ GLW_SLIDER_INSET;
-		}
+        if (!_slider->labels.empty() && _slider->center_labels) {
+            mapis_itr it = _slider->labels.find(_slider->label_lo);
+            if (it != _slider->labels.end()) {
+                std::string& lblp = it->second;
+                _slider->track_offs = (glwFontGetStringWidth(
+                                           _slider->super.font,
+                                           lblp) >> 1)
+                                      + GLW_SLIDER_INSET;
+            }
+            it = _slider->labels.find(_slider->label_hi);
+            if (it != _slider->labels.end()) {
+                std::string& lblp= it->second;
+                w = (glwFontGetStringWidth(_slider->super.font,
+                                           lblp) >> 1)
+                    + GLW_SLIDER_INSET;
+            }
             if (w>_slider->track_offs)_slider->track_offs=w;
-        }
-        else _slider->track_offs=GLW_SLIDER_INSET;
+        } else _slider->track_offs=GLW_SLIDER_INSET;
         w=_slider->thumb_rect.w>>1;
         if (w>_slider->track_offs)_slider->track_offs=w;
         _slider->track_rect.x=_slider->track_offs;
@@ -305,12 +268,10 @@ static void glwSliderLayout(GLWLayoutManager *_this,GLWSlider *_slider)
                               GLW_SLIDER_INSET;
         _slider->label_rect.y=_slider->tick_rect.y;
         _slider->label_rect.w=_slider->tick_rect.w+
-		((_slider->track_offs - GLW_SLIDER_INSET) << 1);
-        if (_slider->labels.size() > 0)
-        {
+                              ((_slider->track_offs - GLW_SLIDER_INSET) << 1);
+        if (_slider->labels.size() > 0) {
             _slider->label_rect.h=glwFontGetHeight(_slider->super.font);
-        }
-        else _slider->label_rect.h=0;
+        } else _slider->label_rect.h=0;
         _slider->label_rect.y-=_slider->label_rect.h;
         _slider->thumb_rect.x=glwSliderGetXPos(_slider,_slider->val)-
                               (_slider->thumb_rect.w>>1);
@@ -324,14 +285,11 @@ static void glwSliderLayoutMinSize(GLWLayoutManager *_this,GLWSlider *_slider,
     int w;
     int h;
     if (!_slider->super.valid)glwSliderLayout(_this,_slider);
-    if (_slider->ornt==GLWC_VERTICAL)
-    {
+    if (_slider->ornt==GLWC_VERTICAL) {
         w=(GLW_SLIDER_INSET<<1)+_slider->track_rect.w+
           _slider->tick_rect.w+_slider->label_rect.w;
         h=(_slider->track_offs<<1)+GLW_SLIDER_MIN_LENGTH;
-    }
-    else
-    {
+    } else {
         w=(_slider->track_offs<<1)+GLW_SLIDER_MIN_LENGTH;
         h=(GLW_SLIDER_INSET<<1)+_slider->track_rect.h+
           _slider->tick_rect.h+_slider->label_rect.h;
@@ -346,14 +304,11 @@ static void glwSliderLayoutPreSize(GLWLayoutManager *_this,GLWSlider *_slider,
     int w;
     int h;
     if (!_slider->super.valid)glwSliderLayout(_this,_slider);
-    if (_slider->ornt==GLWC_VERTICAL)
-    {
+    if (_slider->ornt==GLWC_VERTICAL) {
         w=(GLW_SLIDER_INSET<<1)+_slider->track_rect.w+
           _slider->tick_rect.w+_slider->label_rect.w;
         h=(_slider->track_offs<<1)+GLW_SLIDER_PRE_LENGTH;
-    }
-    else
-    {
+    } else {
         w=(_slider->track_offs<<1)+GLW_SLIDER_PRE_LENGTH;
         h=(GLW_SLIDER_INSET<<1)+_slider->track_rect.h+
           _slider->tick_rect.h+_slider->label_rect.h;
@@ -363,8 +318,7 @@ static void glwSliderLayoutPreSize(GLWLayoutManager *_this,GLWSlider *_slider,
 }
 
 
-static GLWLayoutManager glw_slider_layout=
-{
+static GLWLayoutManager glw_slider_layout= {
     (GLWLayoutFunc)glwSliderLayout,
     NULL,
     (GLWLayoutSizeFunc)glwSliderLayoutMinSize,
@@ -385,8 +339,7 @@ void glwSliderPeerDisplay(GLWSlider *_this,GLWCallbacks *_cb)
     bc=_this->super.backc;
     sc=glwColorDarken(bc);
     hc=glwColorLighten(bc);
-    if (_this->ornt==GLWC_VERTICAL)
-    {
+    if (_this->ornt==GLWC_VERTICAL) {
         int cx,cy,ch;
         cx=_this->track_rect.x+(_this->track_rect.w>>1)-2;   /*Draw the slider track*/
         cy=_this->track_offs;
@@ -406,31 +359,23 @@ void glwSliderPeerDisplay(GLWSlider *_this,GLWCallbacks *_cb)
         glVertex2i(cx+1,cy+ch-1);
         glVertex2i(cx+1,cy+2);
         cx=_this->tick_rect.x;
-        if (_this->minor_ticks>0)                        /*Draw the minor tick marks*/
-        {
+        if (_this->minor_ticks>0) {                      /*Draw the minor tick marks*/
             int v;
             glBegin(GL_LINES);
             glwColor(fc);
             v=_this->minor_offs;
-            if (v<0)
-            {
+            if (v<0) {
                 v=-(-v%_this->minor_ticks);
                 if (v)v=_this->minor_ticks-v;
-            }
-            else v=v%_this->minor_ticks;
-            if (_this->min<=_this->max)
-            {
-                for (v+=_this->min; v<=_this->max; v+=_this->minor_ticks)
-                {
+            } else v=v%_this->minor_ticks;
+            if (_this->min<=_this->max) {
+                for (v+=_this->min; v<=_this->max; v+=_this->minor_ticks) {
                     cy=glwSliderGetYPos(_this,v);
                     glVertex2i(cx,cy);
                     glVertex2i(cx+(_this->tick_rect.w>>1)-1,cy);
                 }
-            }
-            else
-            {
-                for (v=_this->min-v; v>=_this->max; v-=_this->minor_ticks)
-                {
+            } else {
+                for (v=_this->min-v; v>=_this->max; v-=_this->minor_ticks) {
                     cy=glwSliderGetYPos(_this,v);
                     glVertex2i(cx,cy);
                     glVertex2i(cx+(_this->tick_rect.h>>1)-1,cy);
@@ -438,31 +383,23 @@ void glwSliderPeerDisplay(GLWSlider *_this,GLWCallbacks *_cb)
             }
             glEnd();
         }
-        if (_this->major_ticks>0)                        /*Draw the major tick marks*/
-        {
+        if (_this->major_ticks>0) {                      /*Draw the major tick marks*/
             int v;
             glBegin(GL_LINES);
             glwColor(fc);
             v=_this->major_offs;
-            if (v<0)
-            {
+            if (v<0) {
                 v=-(-v%_this->major_ticks);
                 if (v)v=_this->major_ticks-v;
-            }
-            else v=v%_this->major_ticks;
-            if (_this->min<=_this->max)
-            {
-                for (v=+_this->min; v<=_this->max; v+=_this->major_ticks)
-                {
+            } else v=v%_this->major_ticks;
+            if (_this->min<=_this->max) {
+                for (v=+_this->min; v<=_this->max; v+=_this->major_ticks) {
                     cy=glwSliderGetYPos(_this,v);
                     glVertex2i(cx,cy);
                     glVertex2i(cx+_this->tick_rect.w-2,cy);
                 }
-            }
-            else
-            {
-                for (v=_this->min-v; v>=_this->max; v-=_this->major_ticks)
-                {
+            } else {
+                for (v=_this->min-v; v>=_this->max; v-=_this->major_ticks) {
                     cy=glwSliderGetYPos(_this,v);
                     glVertex2i(cx,cy);
                     glVertex2i(cx+_this->tick_rect.w-2,cy);
@@ -470,8 +407,7 @@ void glwSliderPeerDisplay(GLWSlider *_this,GLWCallbacks *_cb)
             }
             glEnd();
         }
-        if (_this->labels.size() > 0)                                  /*Draw the labels*/
-        {
+        if (_this->labels.size() > 0) {                                /*Draw the labels*/
             double          dy;
             int             ch;
             ch=glwFontGetHeight(_this->super.font);
@@ -479,24 +415,20 @@ void glwSliderPeerDisplay(GLWSlider *_this,GLWCallbacks *_cb)
             dy=glwFontGetDescent(_this->super.font);
             //hiInit(&ci,&_this->labels);
             //while (hiInc(&ci))
-	    for (mapis_itr it = _this->labels.begin(); 
-		 it != _this->labels.end(); ++it)
-            {
-		    int vp= (*it).first;
-		    std::string& lblp = (*it).second;
-                    double cy;
-                    cy=glwSliderGetYPos(_this,vp)-0.5*ch;
-                    if (cy<_this->label_rect.y)cy=_this->label_rect.y;
-                    if (cy+ch>_this->label_rect.y+_this->label_rect.h)
-                    {
-                        cy=_this->label_rect.y+_this->label_rect.h-ch;
-                    }
-                    glwFontDrawString(_this->super.font,lblp.c_str(),cx,cy+dy);
-	    }
+            for (mapis_itr it = _this->labels.begin();
+                    it != _this->labels.end(); ++it) {
+                int vp= (*it).first;
+                std::string& lblp = (*it).second;
+                double cy;
+                cy=glwSliderGetYPos(_this,vp)-0.5*ch;
+                if (cy<_this->label_rect.y)cy=_this->label_rect.y;
+                if (cy+ch>_this->label_rect.y+_this->label_rect.h) {
+                    cy=_this->label_rect.y+_this->label_rect.h-ch;
+                }
+                glwFontDrawString(_this->super.font,lblp.c_str(),cx,cy+dy);
+            }
         }
-    }
-    else
-    {
+    } else {
         int cx,cy,cw;
         cx=_this->track_offs;                                /*Draw the slider track*/
         cy = _this->track_rect.y + ((_this->track_rect.h + 1) >> 1) + 2;
@@ -517,31 +449,23 @@ void glwSliderPeerDisplay(GLWSlider *_this,GLWCallbacks *_cb)
         glVertex2i(cx+cw-2,cy-1);
         glEnd();
         cy=_this->tick_rect.y+_this->tick_rect.h;
-        if (_this->minor_ticks>0)                        /*Draw the minor tick marks*/
-        {
+        if (_this->minor_ticks>0) {                      /*Draw the minor tick marks*/
             int v;
             glBegin(GL_LINES);
             glwColor(fc);
             v=_this->minor_offs;
-            if (v<0)
-            {
+            if (v<0) {
                 v=-(-v%_this->minor_ticks);
                 if (v)v=_this->minor_ticks-v;
-            }
-            else v=v%_this->minor_ticks;
-            if (_this->min<=_this->max)
-            {
-                for (v+=_this->min; v<=_this->max; v+=_this->minor_ticks)
-                {
+            } else v=v%_this->minor_ticks;
+            if (_this->min<=_this->max) {
+                for (v+=_this->min; v<=_this->max; v+=_this->minor_ticks) {
                     cx=glwSliderGetXPos(_this,v);
                     glVertex2i(cx,cy);
                     glVertex2i(cx,cy-(_this->tick_rect.h>>1)+1);
                 }
-            }
-            else
-            {
-                for (v=_this->min-v; v>=_this->max; v-=_this->minor_ticks)
-                {
+            } else {
+                for (v=_this->min-v; v>=_this->max; v-=_this->minor_ticks) {
                     cx=glwSliderGetXPos(_this,v);
                     glVertex2i(cx,cy);
                     glVertex2i(cx,cy-(_this->tick_rect.h>>1)+1);
@@ -549,31 +473,23 @@ void glwSliderPeerDisplay(GLWSlider *_this,GLWCallbacks *_cb)
             }
             glEnd();
         }
-        if (_this->major_ticks>0)                        /*Draw the major tick marks*/
-        {
+        if (_this->major_ticks>0) {                      /*Draw the major tick marks*/
             int v;
             glBegin(GL_LINES);
             glwColor(fc);
             v=_this->major_offs;
-            if (v<0)
-            {
+            if (v<0) {
                 v=-(-v%_this->major_ticks);
                 if (v)v=_this->major_ticks-v;
-            }
-            else v=v%_this->major_ticks;
-            if (_this->min<=_this->max)
-            {
-                for (v+=_this->min; v<=_this->max; v+=_this->major_ticks)
-                {
+            } else v=v%_this->major_ticks;
+            if (_this->min<=_this->max) {
+                for (v+=_this->min; v<=_this->max; v+=_this->major_ticks) {
                     cx=glwSliderGetXPos(_this,v);
                     glVertex2i(cx,cy);
                     glVertex2i(cx,cy-_this->tick_rect.h+2);
                 }
-            }
-            else
-            {
-                for (v=_this->min-v; v>=_this->max; v-=_this->major_ticks)
-                {
+            } else {
+                for (v=_this->min-v; v>=_this->max; v-=_this->major_ticks) {
                     cx=glwSliderGetXPos(_this,v);
                     glVertex2i(cx,cy);
                     glVertex2i(cx,cy-_this->tick_rect.h+2);
@@ -581,31 +497,27 @@ void glwSliderPeerDisplay(GLWSlider *_this,GLWCallbacks *_cb)
             }
             glEnd();
         }
-        if (_this->labels.size() > 0)                                  /*Draw the labels*/
-        {
+        if (_this->labels.size() > 0) {                                /*Draw the labels*/
             cy=_this->label_rect.y+glwFontGetDescent(_this->super.font);
             //hiInit(&ci,&_this->labels);
             //while (hiInc(&ci))
-	    for (mapis_itr it = _this->labels.begin(); 
-		 it != _this->labels.end(); ++it)
-            {
-		    int vp= (*it).first;
-		    std::string& lblp = it->second;
-                    double cx;
-                    double cw;
-                    cw = glwFontGetStringWidth(_this->super.font,lblp);
-                    cx=glwSliderGetXPos(_this,vp)-0.5*cw;
-                    if (cx+cw>_this->label_rect.x+_this->label_rect.w)
-                    {
-                        cx=_this->label_rect.x+_this->label_rect.w-cw;
-                    }
-                    if (cx<_this->label_rect.x)cx=_this->label_rect.x;
-                    glwFontDrawString(_this->super.font,lblp.c_str(),cx,cy);
-	    }
+            for (mapis_itr it = _this->labels.begin();
+                    it != _this->labels.end(); ++it) {
+                int vp= (*it).first;
+                std::string& lblp = it->second;
+                double cx;
+                double cw;
+                cw = glwFontGetStringWidth(_this->super.font,lblp);
+                cx=glwSliderGetXPos(_this,vp)-0.5*cw;
+                if (cx+cw>_this->label_rect.x+_this->label_rect.w) {
+                    cx=_this->label_rect.x+_this->label_rect.w-cw;
+                }
+                if (cx<_this->label_rect.x)cx=_this->label_rect.x;
+                glwFontDrawString(_this->super.font,lblp.c_str(),cx,cy);
+            }
         }
     }
-    if (glwCompIsFocused(&_this->super))               /*Draw the focus rectangle*/
-    {
+    if (glwCompIsFocused(&_this->super)) {             /*Draw the focus rectangle*/
         glLineStipple(2,0x5555);
         glEnable(GL_LINE_STIPPLE);
         glBegin(GL_LINE_LOOP);
@@ -620,15 +532,13 @@ void glwSliderPeerDisplay(GLWSlider *_this,GLWCallbacks *_cb)
         glEnd();
         glDisable(GL_LINE_STIPPLE);
     }
-    if (!glwCompIsEnabled(&_this->super))
-    {
+    if (!glwCompIsEnabled(&_this->super)) {
         bc=fc;
         sc=glwColorDarken(bc);
         hc=glwColorLighten(bc);
     }
     /*glEnable(GL_LINE_SMOOTH);*/
-    if (_this->major_ticks<=0&&_this->minor_ticks<=0)    /*Draw un-oriented thumb*/
-    {
+    if (_this->major_ticks<=0&&_this->minor_ticks<=0) {  /*Draw un-oriented thumb*/
         GLWRect *r;
         r=&_this->thumb_rect;
         glwColor(bc);
@@ -645,9 +555,7 @@ void glwSliderPeerDisplay(GLWSlider *_this,GLWCallbacks *_cb)
         glVertex2i(r->x+1,r->y+r->h-1);
         glVertex2i(r->x+r->w-1,r->y+r->h-1);
         glEnd();
-    }
-    else if (_this->ornt==GLWC_VERTICAL)              /*Draw right-pointing thumb*/
-    {
+    } else if (_this->ornt==GLWC_VERTICAL) {           /*Draw right-pointing thumb*/
         GLWRect *r;
         double   ch;
         r=&_this->thumb_rect;
@@ -674,9 +582,7 @@ void glwSliderPeerDisplay(GLWSlider *_this,GLWCallbacks *_cb)
         glVertex2d(r->x+r->w-ch-1,r->y+r->h-1);
         glVertex2d(r->x+r->w-1,r->y+ch+1);
         glEnd();
-    }
-    else                                               /*Draw down-pointing thumb*/
-    {
+    } else {                                            /*Draw down-pointing thumb*/
         GLWRect *r;
         double   cw;
         r=&_this->thumb_rect;
@@ -723,8 +629,7 @@ static void glwSliderScrollByBlock(GLWSlider *_this,int _dir)
     int amt;
     if (_this->major_ticks>0)amt=_this->major_ticks;
     else if (_this->minor_ticks>0)amt=_this->minor_ticks;
-    else
-    {
+    else {
         amt=_this->min<=_this->max?_this->max-_this->min:_this->min-_this->max;
         amt/=10;
         if (amt<=0)amt=1;
@@ -736,22 +641,18 @@ static int glwSliderPeerSpecial(GLWSlider *_this,GLWCallbacks *_cb,
                                 int _k,int _x,int _y)
 {
     int ret;
-    if (!_this->super.mouse_b)
-    {
+    if (!_this->super.mouse_b) {
         int dir;
         dir=_this->min<=_this->max?-1:1;
         ret=-1;
-        switch (_k)
-        {
+        switch (_k) {
         case GLUT_KEY_LEFT     :
-        case GLUT_KEY_DOWN     :
-        {
+        case GLUT_KEY_DOWN     : {
             glwSliderSetVal(_this,_this->val+dir,_this->ext);
         }
         break;
         case GLUT_KEY_RIGHT    :
-        case GLUT_KEY_UP       :
-        {
+        case GLUT_KEY_UP       : {
             glwSliderSetVal(_this,_this->val-dir,_this->ext);
         }
         break;
@@ -770,8 +671,7 @@ static int glwSliderPeerSpecial(GLWSlider *_this,GLWCallbacks *_cb,
         default                :
             ret=0;
         }
-    }
-    else ret=0;
+    } else ret=0;
     if (!ret)ret=glwCompSuperSpecial(&_this->super,_cb,_k,_x,_y);
     return ret;
 }
@@ -781,28 +681,20 @@ static int glwSliderPeerMouse(GLWSlider *_this,GLWCallbacks *_cb,
 {
     int ret;
     ret=glwCompSuperMouse(&_this->super,_cb,_b,_s,_x,_y);
-    if (ret>=0)
-    {
-        if (_s)
-        {
+    if (ret>=0) {
+        if (_s) {
             if (_this->thumb_rect.x<=_x&&_this->thumb_rect.x+_this->thumb_rect.w>_x&&
-                    _this->thumb_rect.y<=_y&&_this->thumb_rect.y+_this->thumb_rect.h>_y)
-            {
+                    _this->thumb_rect.y<=_y&&_this->thumb_rect.y+_this->thumb_rect.h>_y) {
                 if (_this->ornt==GLWC_VERTICAL)_this->thumb_offs=_y-_this->thumb_rect.y;
                 else _this->thumb_offs=_x-_this->thumb_rect.x;
-            }
-            else
-            {
-                if (_this->ornt==GLWC_VERTICAL)
-                {
+            } else {
+                if (_this->ornt==GLWC_VERTICAL) {
                     int dir;
                     if (_this->thumb_rect.y<_y)dir=_this->min<=_this->max?1:-1;
                     else dir=_this->min<=_this->max?-1:1;
                     glwSliderSetVal(_this,glwSliderGetYValue(_this,_y),_this->ext);
                     _this->thumb_offs=_this->thumb_rect.h>>1;
-                }
-                else
-                {
+                } else {
                     int dir;
                     if (_this->thumb_rect.x<_x)dir=_this->min<=_this->max?-1:1;
                     else dir=_this->min<=_this->max?1:-1;
@@ -823,16 +715,12 @@ static int glwSliderPeerMotion(GLWSlider *_this,GLWCallbacks *_cb,
 {
     int ret;
     ret=glwCompSuperMotion(&_this->super,_cb,_x,_y);
-    if (ret>=0)
-    {
-        if (_this->ornt==GLWC_VERTICAL)
-        {
+    if (ret>=0) {
+        if (_this->ornt==GLWC_VERTICAL) {
             glwSliderSetVal(_this,glwSliderGetYValue(_this,_y-_this->thumb_offs+
                             (_this->thumb_rect.h>>1)),
                             _this->ext);
-        }
-        else
-        {
+        } else {
             glwSliderSetVal(_this,glwSliderGetXValue(_this,_x-_this->thumb_offs+
                             (_this->thumb_rect.w>>1)),
                             _this->ext);
@@ -851,8 +739,7 @@ static void glwSliderPeerDispose(GLWSlider *_this,GLWCallbacks *_cb)
 }
 
 
-const GLWCallbacks GLW_SLIDER_CALLBACKS=
-{
+const GLWCallbacks GLW_SLIDER_CALLBACKS= {
     &GLW_COMPONENT_CALLBACKS,
     (GLWDisposeFunc)glwSliderPeerDispose,
     (GLWDisplayFunc)glwSliderPeerDisplay,
@@ -898,8 +785,7 @@ int glwSliderIsCenteringLabels(GLWSlider *_this)
 
 void glwSliderSetCenteringLabels(GLWSlider *_this,int _b)
 {
-    if (_this->center_labels!=(_b?1U:0U))
-    {
+    if (_this->center_labels!=(_b?1U:0U)) {
         _this->center_labels=_b?1:0;
         if (_this->labels.size() > 0) glwCompRepaint(&_this->super,0);
     }
@@ -917,8 +803,7 @@ int glwSliderGetMax(GLWSlider *_this)
 
 void glwSliderSetRange(GLWSlider *_this,int _min,int _max)
 {
-    if (_this->min!=_min||_this->max!=_max)
-    {
+    if (_this->min!=_min||_this->max!=_max) {
         _this->min=_min;
         _this->max=_max;
         glwSliderSetVal(_this,_this->val,_this->ext);
@@ -933,7 +818,7 @@ int glwSliderGetVal(GLWSlider* _this)
 
 int GLWSlider::getVal()
 {
-	return val;
+    return val;
 }
 
 int glwSliderGetExt(GLWSlider *_this)
@@ -943,43 +828,33 @@ int glwSliderGetExt(GLWSlider *_this)
 
 void glwSliderSetVal(GLWSlider *_this,int _val,int _ext)
 {
-	_this->setVal(_val, _ext);
+    _this->setVal(_val, _ext);
 }
 
 void GLWSlider::setVal(int val, int ext)
 {
-    if (this->min<=this->max)
-    {
-        if (ext>=0)
-        {
+    if (this->min<=this->max) {
+        if (ext>=0) {
             if (val+ext>this->max)val=this->max-ext;
             if (val<this->min)val=this->min;
             if (val+ext>this->max)ext=this->max-val;
-        }
-        else
-        {
+        } else {
             if (val+ext<this->min)val=this->min-ext;
             if (val>this->max)val=this->max;
             if (val+ext<this->min)ext=this->min-val;
         }
-    }
-    else
-    {
-        if (ext>=0)
-        {
+    } else {
+        if (ext>=0) {
             if (val+ext>this->min)val=this->min-ext;
             if (val<this->max)val=this->max;
             if (val+ext>this->min)ext=this->min-val;
-        }
-        else
-        {
+        } else {
             if (val+ext<this->max)val=this->max-ext;
             if (val>this->min)val=this->min;
             if (val+ext<this->max)ext=this->max-val;
         }
     }
-    if (val!=this->val||ext!=this->ext)
-    {
+    if (val!=this->val||ext!=this->ext) {
         this->val=val;
         this->ext=ext;
         if (this->changed!=NULL)this->changed(this->changed_ctx,&this->super);
@@ -994,13 +869,12 @@ int glwSliderGetMajorTickSpacing(GLWSlider *_this)
 
 void glwSliderSetMajorTickSpacing(GLWSlider *_this,int _s)
 {
-	_this->setMajorTickSpacing(_s);
+    _this->setMajorTickSpacing(_s);
 }
 
 void GLWSlider::setMajorTickSpacing(int s)
 {
-    if (s != this->major_ticks)
-    {
+    if (s != this->major_ticks) {
         this->major_ticks = s;
         glwCompRevalidate(&this->super);
     }
@@ -1013,8 +887,7 @@ int glwSliderGetMajorTickOffset(GLWSlider *_this)
 
 void glwSliderSetMajorTickOffset(GLWSlider *_this,int _o)
 {
-    if (_o!=_this->major_offs)
-    {
+    if (_o!=_this->major_offs) {
         _this->major_offs=_o;
         glwCompRepaint(&_this->super,0);
     }
@@ -1027,13 +900,12 @@ int glwSliderGetMinorTickSpacing(GLWSlider *_this)
 
 void glwSliderSetMinorTickSpacing(GLWSlider *_this,int _s)
 {
-	_this->setMinorTickSpacing(_s);
+    _this->setMinorTickSpacing(_s);
 }
 
 void GLWSlider::setMinorTickSpacing(int s)
 {
-    if (s != this->minor_ticks)
-    {
+    if (s != this->minor_ticks) {
         this->minor_ticks = s;
         glwCompRevalidate(&this->super);
     }
@@ -1046,8 +918,7 @@ int glwSliderGetMinorTickOffset(GLWSlider *_this)
 
 void glwSliderSetMinorTickOffset(GLWSlider *_this,int _o)
 {
-    if (_o!=_this->minor_offs)
-    {
+    if (_o!=_this->minor_offs) {
         _this->minor_offs=_o;
         glwCompRepaint(&_this->super,0);
     }
@@ -1065,7 +936,7 @@ void glwSliderSetSnap(GLWSlider *_this,int _s)
 
 void GLWSlider::setSnap(int s)
 {
-	snap = s;
+    snap = s;
 }
 
 int glwSliderGetOrientation(GLWSlider *_this)
@@ -1075,8 +946,7 @@ int glwSliderGetOrientation(GLWSlider *_this)
 
 void glwSliderSetOrientation(GLWSlider *_this,int _o)
 {
-    if (_o!=_this->ornt)
-    {
+    if (_o!=_this->ornt) {
         _this->ornt=_o;
         glwCompRevalidate(&_this->super);
     }
@@ -1085,10 +955,9 @@ void glwSliderSetOrientation(GLWSlider *_this,int _o)
 int glwSliderAddLabel(GLWSlider *_this,int _val,const char *_label)
 {
     if (_label==NULL)return glwSliderDelLabel(_this,_val);
-    else
-    {
-	    _this->labels.erase(_val);
-	    _this->labels.insert(std::pair<int, std::string>(_val, _label));
+    else {
+        _this->labels.erase(_val);
+        _this->labels.insert(std::pair<int, std::string>(_val, _label));
         // size_t   len;
         // char    *lbl;
         // char   **lblp;
@@ -1105,8 +974,8 @@ int glwSliderAddLabel(GLWSlider *_this,int _val,const char *_label)
         //     free(lbl);
         //     return 0;
         // }
-	    if (_this->labels.size() == 1||_this->label_lo>_val)_this->label_lo=_val;
-	    if (_this->labels.size() == 1||_this->label_hi<_val)_this->label_hi=_val;
+        if (_this->labels.size() == 1||_this->label_lo>_val)_this->label_lo=_val;
+        if (_this->labels.size() == 1||_this->label_hi<_val)_this->label_hi=_val;
         //memcpy(lbl,_label,len);
         glwCompRevalidate(&_this->super);
         return 1;
@@ -1115,26 +984,24 @@ int glwSliderAddLabel(GLWSlider *_this,int _val,const char *_label)
 
 int glwSliderDelLabel(GLWSlider *_this,int _val)
 {
-	_this->labels.erase(_val);
-        if (_val==_this->label_lo||_val==_this->label_hi)
-        {
-            _this->label_lo=INT_MAX;
-            _this->label_hi=INT_MIN;
-	    for (mapis_itr it = _this->labels.begin(); 
-		 it != _this->labels.end(); ++it)
-            {
-		    int v= (*it).first;
-                    if (v < _this->label_lo) _this->label_lo=v;
-                    if (v > _this->label_hi) _this->label_hi=v;
-	    }
+    _this->labels.erase(_val);
+    if (_val==_this->label_lo||_val==_this->label_hi) {
+        _this->label_lo=INT_MAX;
+        _this->label_hi=INT_MIN;
+        for (mapis_itr it = _this->labels.begin();
+                it != _this->labels.end(); ++it) {
+            int v= (*it).first;
+            if (v < _this->label_lo) _this->label_lo=v;
+            if (v > _this->label_hi) _this->label_hi=v;
         }
-        glwCompRevalidate(&_this->super);
-        return 1;
+    }
+    glwCompRevalidate(&_this->super);
+    return 1;
 }
 
 int glwSliderMakeLabels(GLWSlider *_this,int _start,int _inc)
 {
-	return _this->makeLabels(_start, _inc);
+    return _this->makeLabels(_start, _inc);
 }
 
 int GLWSlider::makeLabels(int start, int inc)
@@ -1142,46 +1009,35 @@ int GLWSlider::makeLabels(int start, int inc)
     int  i;
     int  s;
     if (!inc) return 0;
-    if (inc > 0)
-    {
-        if (this->min < this->max)
-        {
+    if (inc > 0) {
+        if (this->min < this->max) {
             s = this->max;
-            if (start < this->min) 
-		    start += (this->min - start + inc - 1) / inc * inc;
-        }
-        else
-        {
+            if (start < this->min)
+                start += (this->min - start + inc - 1) / inc * inc;
+        } else {
             s = this->min;
             if (start < this->max)
-		    start += (this->max - start + inc - 1) / inc * inc;
+                start += (this->max - start + inc - 1) / inc * inc;
         }
-    }
-    else
-    {
-        if (this->min < this->max)
-        {
+    } else {
+        if (this->min < this->max) {
             s = this->min;
             if (start > this->max)
-		    start -= (start - this->max + inc - 1) / inc * inc;
-        }
-        else
-        {
+                start -= (start - this->max + inc - 1) / inc * inc;
+        } else {
             s = this->max;
             if (start > this->max)
-		    start -= (start - this->max + inc - 1) / inc * inc;
+                start -= (start - this->max + inc - 1) / inc * inc;
         }
         i = s;
         s = start;
         start = i;
         inc = -inc;
     }
-    for (i = start; i <= s; i += inc)
-    {
+    for (i = start; i <= s; i += inc) {
         char n[32];
         sprintf(n,"%i",i);
-        if (!glwSliderAddLabel(this, i, n))
-        {
+        if (!glwSliderAddLabel(this, i, n)) {
             int j;
             for (j = start; j < i; j += inc) glwSliderDelLabel(this, j);
             return 0;
@@ -1202,7 +1058,7 @@ void glwSliderSetChangedFunc(GLWSlider *_this,GLWActionFunc _func)
 
 void GLWSlider::setChangedFunc(GLWActionFunc _func)
 {
-	changed = _func;
+    changed = _func;
 }
 
 void *glwSliderGetChangedCtx(GLWSlider *_this)
@@ -1217,5 +1073,5 @@ void glwSliderSetChangedCtx(GLWSlider *_this,void *_ctx)
 
 void GLWSlider::setChangedCtx(void* ctx)
 {
-	changed_ctx = ctx;
+    changed_ctx = ctx;
 }

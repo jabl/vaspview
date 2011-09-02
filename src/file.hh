@@ -21,13 +21,12 @@
 #include <cstdio>
 #include <string>
 
-class File
-{
+class File {
 public :
-	File(const char* name, const char* mode);
-	~File();
-	bool fgets(std::string& line);
-	std::FILE* f;
+    File(const char* name, const char* mode);
+    ~File();
+    bool fgets(std::string& line);
+    std::FILE* f;
 private:
     File();
     File& operator=(const File&);

@@ -25,8 +25,7 @@ typedef struct DS3Bonds DS3Bonds;
 
 
 
-struct DS3Bonds
-{
+struct DS3Bonds {
     double *bonds;
     long    natoms;
     long    nbonds;
