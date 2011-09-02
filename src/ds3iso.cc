@@ -434,7 +434,7 @@ static void ds3ViewIsoPeerDisplay(DS3ViewComp *_this,const GLWCallbacks *_cb)
 	if (is_octree_new) {
 	    glBufferDataARB(GL_ARRAY_BUFFER_ARB,
 			    view->iso.verts.size() * sizeof(DS3IsoVertex),
-			    &view->iso.verts[0], GL_STATIC_DRAW_ARB);
+			    &view->iso.verts[0], GL_DYNAMIC_DRAW_ARB);
 	}
         glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, iboid);
         // Need to tell OpenGL the size of the index buffer, filled in
