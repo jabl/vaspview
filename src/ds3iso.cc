@@ -445,7 +445,7 @@ static void ds3ViewIsoPeerDisplay(DS3ViewComp *_this,const GLWCallbacks *_cb)
 
         glVertexPointer(3, GL_FLOAT, sizeof(DS3IsoVertex), 0);
         glNormalPointer(GL_FLOAT, sizeof(DS3IsoVertex),
-                        BUFFER_OFFSET(sizeof(Vect3f)));
+                        BUFFER_OFFSET(offsetof(DS3IsoVertex, norm)));
     } else {
         glVertexPointer(3, GL_FLOAT, sizeof(DS3IsoVertex), vert.vert);
         glNormalPointer(GL_FLOAT, sizeof(DS3IsoVertex), vert.norm);

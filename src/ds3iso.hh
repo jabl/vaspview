@@ -26,9 +26,13 @@
 # define DS3V_NO_EDGE  (-1L)
 # define DS3V_NO_CHILD (-1L)
 
+// Padding fields are to make the structure 32-byte aligned, which is
+// preferred by some GPU's.
 struct DS3IsoVertex {
     Vect3f vert;
-    Vect3f norm;
+    float pad1;
+    Vect3f norm; // 16 byte aligned, in case it matters?
+    float pad2; 
 };
 
 

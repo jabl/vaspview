@@ -28,6 +28,11 @@ DONE
   hardware (e.g. NVIDIA Fermi and later) doubles are an order of
   magnitude slower.
 
+- Added pad fields so that the vertex structure is be a multiple of 32
+  bytes in size (previously 24 with GL_FLOAT, 48 with GL_DOUBLE); this
+  is supposedly better on Ati according to
+  http://www.opengl.org/wiki/Vertex_Buffer_Object
+
 - Switch implementation language to C++98, allowing the replacement of
   CDynArray with std::string and std::vector, as appropriate, and
   replacing CHashTable with std::map (std::unordered_map in C++2011
@@ -58,14 +63,11 @@ TODO
   current hardware supports EXT_texture3D (part of OpenGL 1.2 core),
   and the fallback is unusably slow.
 
-- With the VBO codepath, isosurface is rendered only within the
-  original box??
-
 - CUDA experiment: Move the marching cubes algorithm to the GPU. CUDA
   SDK has an example implementing marching cubes, integrate that?
-  Currently this is the biggest performance bottleneck, about 30%
-  spent in ds3IsoMake() when moving the isosurface value slider back
-  and forth.
+  Currently this is the biggest performance bottleneck, up to 46%
+  spent in DS3IsoSurface::isoMake() when moving the isosurface value
+  slider back and forth.
 
 - Replace vect.hh/vect.cc with Eigen?
 
@@ -74,10 +76,6 @@ TODO
   (thanks to GLEW), so mainly some patches to the cmake build scripts
   would be needed. There is also an old src/win32/winmain.c from the
   original vasputil, this could perhaps be resurrected.
-
-- Vertex structure should be a multiple of 32 bytes in size (currently
-  24); supposedly better on Ati according to
-  http://www.opengl.org/wiki/Vertex_Buffer_Object
 
 - VBO rendering in batches to prevent exhausting GPU memory on older
   cards. Batch size should be about the size of the pre-T&L cache size
