@@ -167,7 +167,9 @@ typedef struct DS3IsoDrawCtx
     GLsizeiptr ibo_off; // Current offset into the index buffer
     Vect3d         box[2];                 /*The clip box in data-set coordinates*/
     Vect3d         eye;
+    Vect3d trans;  // Current translation vector
 } DS3IsoDrawCtx; /*The eye position in data-set coordinates*/
+
 
 /*Draws a list of triangles stored in the leaf of an oct-tree node. Also
   checks to make sure this leaf at least partially intersects the clip box.
@@ -351,17 +353,45 @@ static void ds3ViewIsoDrawTree(DS3View *_this,DS3IsoDrawCtx *_ctx,
             return;
         }
     /*We are in a 1x1x1 box: draw a copy of the iso-surface*/
-    glPushMatrix();
+
     vectSet3d(p,0,0,0);
     for (i=0; i<3; i++)
     {
         for (j=0; j<3; j++)p[j]+=_this->ds3->basis[j][i]*_box[0][i];
         _ctx->cntr[i]=(_ctx->iso->dim>>1)+_box[0][i]*_this->ds3->density[i];
     }
-    glTranslated(p[X],p[Y],p[Z]);
-    ds3ViewIsoDrawNode(_ctx,0,_ctx->iso->dim>>1);
-    glPopMatrix();
+    if (use_vbo) {
+	Vect3d tmp;
+	vectSub3d(tmp, p, _ctx->trans);
+	if (tmp[X] != 0 || tmp[Y] != 0 || tmp[Z] != 0) {
+	    // When we change the translation vector, we must first
+	    // paint all the vertices that have been accumulated in
+	    // the VBO with the old translation vector.
+	    glDrawElements(GL_TRIANGLES, _ctx->ibo_off, 
+			   GL_UNSIGNED_INT, 0);
+	    // And reset the offset as we don't need these indices
+	    // anymore.
+	    _ctx->ibo_off = 0;
+	    // Then we set the translation to the difference between
+	    // the new and current vectors.
+	    glTranslated(tmp[X], tmp[Y], tmp[Z]);
+	    // Finally set the current vector to the offset from zero.
+	    vectSet3dv(_ctx->trans, p);
+	}
+	// .. and continue filling in the element buffer.
+	ds3ViewIsoDrawNode(_ctx,0,_ctx->iso->dim>>1);
+    } else {
+	// Without VBO's, it's a bit simpler, first we save the old matrix.
+	glPushMatrix();
+	// Then set the new one with the translation vector.
+	glTranslated(p[X],p[Y],p[Z]);
+	// Paint.
+	ds3ViewIsoDrawNode(_ctx,0,_ctx->iso->dim>>1);
+	// Restore the old matrix.
+	glPopMatrix();
+    }
 }
+
 
 /*Draws the iso-surface*/
 static void ds3ViewIsoPeerDisplay(DS3ViewComp *_this,const GLWCallbacks *_cb)
@@ -417,6 +447,7 @@ static void ds3ViewIsoPeerDisplay(DS3ViewComp *_this,const GLWCallbacks *_cb)
         box[0][i]=(int)floor(ctx.box[0][i]/view->ds3->density[i]);
         box[1][i]=(int)ceil(ctx.box[1][i]/view->ds3->density[i]);
     }
+
     /*Set up OpenGL parameters*/
     DS3IsoVertex& vert = view->iso.verts[0];
     glPushAttrib(GL_COLOR_BUFFER_BIT|GL_CURRENT_BIT|
@@ -440,6 +471,8 @@ static void ds3ViewIsoPeerDisplay(DS3ViewComp *_this,const GLWCallbacks *_cb)
     static bool vboinit;
     if (use_vbo) {
 	ctx.ibo_off = 0;
+	vectSet3d(ctx.trans,0,0,0);
+	glPushMatrix();
 	if (!vboinit) {
 	    glGenBuffersARB(1, &vboid);
 	    glGenBuffersARB(1, &iboid);
@@ -466,12 +499,13 @@ static void ds3ViewIsoPeerDisplay(DS3ViewComp *_this,const GLWCallbacks *_cb)
     ds3ViewIsoDrawTree(view,&ctx,box);
     if (use_vbo) {
 #ifndef NDEBUG
-	printf("about to draw %ld elements using %ld vertices\n", (long)ctx.ibo_off, (long)view->iso.verts.size());
+	//printf("about to draw %ld elements using %ld vertices\n", (long)ctx.ibo_off, (long)view->iso.verts.size());
 #endif
 	glDrawElements(GL_TRIANGLES, ctx.ibo_off, 
 		       GL_UNSIGNED_INT, 0);
 	glBindBufferARB(GL_ARRAY_BUFFER_ARB, 0);
 	glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
+	glPopMatrix();
 	//glDeleteBuffers(1, &vboid);
 	//glDeleteBuffers(1, &iboid);
     }
