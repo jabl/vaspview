@@ -363,11 +363,13 @@ static void ds3ViewIsoPeerDisplay(DS3ViewComp *_this,const GLWCallbacks *_cb)
     int            box[2][3];
     view=_this->ds3view;
     /*Create the iso-surface if we don't already have one*/
+    bool is_octree_new = false; // Did we regenerate the oct-tree?
     if (!view->s_valid) {
         if (!view->iso.isoMake(view->ds3,view->iso_v,view->iso_d)) {
             return;
         }
         view->s_valid=1;
+	is_octree_new = true;
     }
     if (view->iso.nodes.size() <= 0) return;
     ctx.iso=&view->iso;
@@ -429,15 +431,17 @@ static void ds3ViewIsoPeerDisplay(DS3ViewComp *_this,const GLWCallbacks *_cb)
             vboinit = true;
         }
         glBindBufferARB(GL_ARRAY_BUFFER_ARB, vboid);
-        glBufferDataARB(GL_ARRAY_BUFFER_ARB,
-                        view->iso.verts.size() * sizeof(DS3IsoVertex),
-                        &view->iso.verts[0], GL_STATIC_DRAW_ARB);
+	if (is_octree_new) {
+	    glBufferDataARB(GL_ARRAY_BUFFER_ARB,
+			    view->iso.verts.size() * sizeof(DS3IsoVertex),
+			    &view->iso.verts[0], GL_STATIC_DRAW_ARB);
+	}
         glBindBufferARB(GL_ELEMENT_ARRAY_BUFFER_ARB, iboid);
         // Need to tell OpenGL the size of the index buffer, filled in
         // later. This is a conservative maximum guess.
         glBufferDataARB(GL_ELEMENT_ARRAY_BUFFER_ARB,
                         view->iso.leafs.size() * 15
-                        * sizeof(GLint), NULL, GL_STATIC_DRAW_ARB);
+                        * sizeof(GLint), NULL, GL_STREAM_DRAW_ARB);
 
         glVertexPointer(3, GL_FLOAT, sizeof(DS3IsoVertex), 0);
         glNormalPointer(GL_FLOAT, sizeof(DS3IsoVertex),
