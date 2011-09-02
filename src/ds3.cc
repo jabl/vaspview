@@ -20,8 +20,7 @@
 #include "ds3viewr.hh"
 #include <cassert>
 
-bool disable_texture3D_mipmap;
-int limit_mipmap_radeon = INT_MAX;
+int limit_texture3D_mipmap_level = INT_MAX;
 bool use_vbo;
 
 /*Initializes the data set to default values*/
@@ -414,13 +413,13 @@ int main(int _argc,char **_argv)
                 rr.find("Intel") != std::string::npos) {
             printf("Disabling 3D texture mipmapping on renderer: %s\n",
                    rr.c_str());
-            disable_texture3D_mipmap = true;
+            limit_texture3D_mipmap_level = 0;
         } else if (rr.find("Mesa") != std::string::npos
                    && rr.find("R300") != std::string::npos) {
             printf("Limiting mipmap levels to 7 on renderer: %s\n",
                    rr.c_str());
             printf("See https://bugs.freedesktop.org/show_bug.cgi?id=28284\n");
-            limit_mipmap_radeon = 7;
+            limit_texture3D_mipmap_level = 7;
         }
     }
     if (GLEW_ARB_vertex_buffer_object) {

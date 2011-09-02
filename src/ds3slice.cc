@@ -19,8 +19,7 @@
 #include "ds3view.hh"
 #include "ds3slice.hh"
 
-extern bool disable_texture3D_mipmap;
-extern int limit_mipmap_radeon;
+extern int limit_texture3D_mipmap_level;
 
 /*NOTE: The 2D slice extraction is the only operation that prevents the
   data set from being repeated an arbitrary amount in each direction. If we
@@ -612,49 +611,47 @@ static int ds3SliceTexture3D(DS3Slice *_this,DS3View *_view)
 		printf("Compressing texture changed size by factor of %g, %d, %g\n", 
 		       csz / sz, csz, sz);
 	    }
-            if (!disable_texture3D_mipmap) {
-                /*Create mip-maps*/
-                for (lod=1; (ws[X]||ws[Y]||ws[Z])
-                        && lod <= limit_mipmap_radeon; lod++) {
-                    o[X]=ws[X]?4:0;
-                    o[Y] = ws[Y] ? (w[X] << 2) : 0;
-                    o[Z] = ws[Z] ? w[X] << (ws[Y] + 2) : 0;
-                    for (i=0; i<3; i++) {
-                        if (ws[i]) {
-                            ws[i]--;
-                            w[i]>>=1;
-                            j[i]=1;
-                        } else j[i]=0;
-                    }
-                    for (k[Z]=0; k[Z]<w[Z]; k[Z]++) {
-                        for (k[Y]=0; k[Y]<w[Y]; k[Y]++) {
-                            for (k[X]=0; k[X]<w[X]; k[X]++) {
-                                int c[4];
-                                l = (k[X] + ((k[Y] + (k[Z] << (ws[Y] + j[Z])))
-                                             << (ws[X] + j[Y]))) << (j[X] + 2);
-                                for (i=0; i<4; i++) {
-                                    c[i]=txtr[l+i];
-                                    c[i]+=txtr[l+o[X]];
-                                    c[i]+=txtr[l+o[Y]+i];
-                                    c[i]+=txtr[l+o[Y]+o[X]+i];
-                                    c[i]+=txtr[l+o[Z]+i];
-                                    c[i]+=txtr[l+o[Z]+o[X]+i];
-                                    c[i]+=txtr[l+o[Z]+o[Y]+i];
-                                    c[i]+=txtr[l+o[Z]+o[Y]+o[X]+i];
-                                }
-                                l = (k[X] + ((k[Y] + (k[Z] << ws[Y])) << ws[X]))
-                                    << 2;
-                                for (i=0; i<4; i++)txtr[l+i]=(GLubyte)(c[i]>>3);
-                            }
-                        }
-                    }
+	    /*Create mip-maps*/
+	    for (lod=1; (ws[X]||ws[Y]||ws[Z])
+		     && lod <= limit_texture3D_mipmap_level; lod++) {
+		o[X]=ws[X]?4:0;
+		o[Y] = ws[Y] ? (w[X] << 2) : 0;
+		o[Z] = ws[Z] ? w[X] << (ws[Y] + 2) : 0;
+		for (i=0; i<3; i++) {
+		    if (ws[i]) {
+			ws[i]--;
+			w[i]>>=1;
+			j[i]=1;
+		    } else j[i]=0;
+		}
+		for (k[Z]=0; k[Z]<w[Z]; k[Z]++) {
+		    for (k[Y]=0; k[Y]<w[Y]; k[Y]++) {
+			for (k[X]=0; k[X]<w[X]; k[X]++) {
+			    int c[4];
+			    l = (k[X] + ((k[Y] + (k[Z] << (ws[Y] + j[Z])))
+					 << (ws[X] + j[Y]))) << (j[X] + 2);
+			    for (i=0; i<4; i++) {
+				c[i]=txtr[l+i];
+				c[i]+=txtr[l+o[X]];
+				c[i]+=txtr[l+o[Y]+i];
+				c[i]+=txtr[l+o[Y]+o[X]+i];
+				c[i]+=txtr[l+o[Z]+i];
+				c[i]+=txtr[l+o[Z]+o[X]+i];
+				c[i]+=txtr[l+o[Z]+o[Y]+i];
+				c[i]+=txtr[l+o[Z]+o[Y]+o[X]+i];
+			    }
+			    l = (k[X] + ((k[Y] + (k[Z] << ws[Y])) << ws[X]))
+				<< 2;
+			    for (i=0; i<4; i++)txtr[l+i]=(GLubyte)(c[i]>>3);
+			}
+		    }
+		}
 #ifndef NDEBUG
-                    printf("creating mipmap level %d with size: x=%d, y=%d, z=%d\n", lod, w[X], w[Y], w[Z]);
+		printf("creating mipmap level %d with size: x=%d, y=%d, z=%d\n", lod, w[X], w[Y], w[Z]);
 #endif
-                    glTexImage3D(GL_TEXTURE_3D, lod, format, w[X], w[Y], w[Z],
-                                 0,GL_RGBA,GL_UNSIGNED_BYTE,txtr);
-                }
-            }
+		glTexImage3D(GL_TEXTURE_3D, lod, format, w[X], w[Y], w[Z],
+			     0, GL_RGBA, GL_UNSIGNED_BYTE, txtr);
+	    }
         }
         glBindTexture(GL_TEXTURE_3D,0);
         free(txtr);
