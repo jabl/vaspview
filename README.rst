@@ -86,3 +86,5 @@ TODO
   GL_UNSIGNED_SHORT rather than GL_UNSIGNED_INT. Since it's easy to
   have more than 2**64 vertices, this would imply batching and sorting
   the vertices etc.
+
+- http://www.sci.utah.edu/~bavoil/opengl/vbo/batching/
