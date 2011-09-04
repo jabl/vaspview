@@ -873,151 +873,166 @@ int DS3IsoSurface::isoMake(DataSet3D *_ds3,double _v,int _d)
     long def;
     memset(&def, 0xFF/*DS3V_NO_EDGE*/, sizeof(long));
     edges.resize(sz, def);
-        this->reset(_d);
-        data = &_ds3->data[0];
-        for (x[0][Z]=0; x[0][Z]<dim[Z]; x[0][Z]+=_d) {
-            long o[3];
-            if (x[0][Z]+_d<dim[Z]) {
-                o[Z]=dx[Z];
-                x[1][Z]=x[0][Z]+_d;
+    this->reset(_d);
+    data = &_ds3->data[0];
+    for (x[0][Z] = 0; x[0][Z] < dim[Z]; x[0][Z] += _d) {
+        long o[3];
+        if (x[0][Z] + _d < dim[Z]) {
+            o[Z] = dx[Z];
+            x[1][Z] = x[0][Z] + _d;
+        } else {
+            o[Z] = -x[0][Z] * off[Z];
+            x[1][Z] = 0;
+        }
+        for (x[0][Y] = 0; x[0][Y] < dim[1]; x[0][Y] += _d) {
+            size_t l;
+            size_t e;
+            int    idx;
+            l = dim[X] * (x[0][Y] + dim[Y] * x[0][Z]);
+            e = 12 * step[X] * (x[0][Y] / _d);
+            if (x[0][Y] + _d < dim[Y]) {
+                o[Y] = dx[Y];
+                x[1][Y] = x[0][Y] + _d;
             } else {
-                o[Z]=-x[0][Z]*off[Z];
-                x[1][Z]=0;
+                o[Y] = -x[0][Y] * off[Y];
+                x[1][Y] = 0;
             }
-            for (x[0][Y]=0; x[0][Y]<dim[1]; x[0][Y]+=_d) {
-                size_t l;
-                size_t e;
-                int    idx;
-                l=dim[X]*(x[0][Y]+dim[Y]*x[0][Z]);
-                e=12*step[X]*(x[0][Y]/_d);
-                if (x[0][Y]+_d<dim[Y]) {
-                    o[Y]=dx[Y];
-                    x[1][Y]=x[0][Y]+_d;
+            idx = 0;
+            if (data[l + o[Z]] < _v) idx |= 0x01;
+            if (data[l + o[Y] + o[Z]] < _v) idx |= 0x02;
+            if (data[l + o[Y]] < _v) idx |= 0x04;
+            if (data[l] < _v) idx |= 0x08;
+            for (x[0][X] = 0; x[0][X] < dim[X]; x[0][X] += _d) {
+                int   isect;
+                const int  *tris;
+                int   b;
+                long  cv[12];
+                if (x[0][X] + _d < dim[X]) {
+                    o[X] = dx[X];
+                    x[1][X] = x[0][X] + _d;
                 } else {
-                    o[Y]=-x[0][Y]*off[Y];
-                    x[1][Y]=0;
+                    o[X] = -x[0][X]/**off[X]*/;
+                    x[1][X] = 0;
                 }
-                idx=0;
-                if (data[l+o[Z]]<_v)idx|=0x01;
-                if (data[l+o[Y]+o[Z]]<_v)idx|=0x02;
-                if (data[l+o[Y]]<_v)idx|=0x04;
-                if (data[l]<_v)idx|=0x08;
-                for (x[0][X]=0; x[0][X]<dim[X]; x[0][X]+=_d) {
-                    int   isect;
-                    const int  *tris;
-                    int   b;
-                    long  cv[12];
-                    if (x[0][X]+_d<dim[X]) {
-                        o[X]=dx[X];
-                        x[1][X]=x[0][X]+_d;
-                    } else {
-                        o[X]=-x[0][X]/**off[X]*/;
-                        x[1][X]=0;
-                    }
-                    if (data[l+o[X]+o[Z]]<_v)idx|=0x10;
-                    if (data[l+o[X]+o[Y]+o[Z]]<_v)idx|=0x20;
-                    if (data[l+o[X]+o[Y]]<_v)idx|=0x40;
-                    if (data[l+o[X]]<_v)idx|=0x80;
-                    /*Find out which edges are intersected:*/
-                    isect=EDGE_TABLE[idx];
-                    for (b=0; b<12; b++) {
-                        if (isect&1<<b) {
-                            if (edges[e+b]==DS3V_NO_EDGE) {        /*Compute the edge intersection:*/
-                                static const int F[3][12]= {
-                                    {0,0,0,0,1,1,1,1,0,0,0,0},
-                                    {0,1,0,0,0,1,0,0,0,1,1,0},
-                                    {1,0,0,0,1,0,0,0,1,1,0,0}
-                                };
-                                static const int T[3][12]= {
-                                    {0,0,0,0,1,1,1,1,1,1,1,1},
-                                    {1,1,1,0,1,1,1,0,0,1,1,0},
-                                    {1,1,0,1,1,1,0,1,1,1,0,0}
-                                };
-                                long          vf;
-                                long          vt;
-                                long          fx[3];
-                                double        d;
-                                this->verts.resize(this->verts.size() + 1);
-                                for (vf=vt=l,i=0; i<3; i++) {
-                                    if (F[i][b]) {
-                                        vf+=o[i];
-                                        fx[i]=x[1][i]?x[1][i]:dim[i];
-                                    } else fx[i]=x[0][i];
-                                    if (T[i][b])vt+=o[i];
+                if (data[l + o[X] + o[Z]] < _v) idx |= 0x10;
+                if (data[l + o[X] + o[Y] + o[Z]] < _v) idx |= 0x20;
+                if (data[l + o[X] + o[Y]] < _v) idx |= 0x40;
+                if (data[l + o[X]] < _v) idx |= 0x80;
+                /*Find out which edges are intersected:*/
+                isect = EDGE_TABLE[idx];
+                for (b = 0; b < 12; b++) {
+                    if (isect&1<<b) {
+                        if (edges[e + b] == DS3V_NO_EDGE) {
+                            /*Compute the edge intersection:*/
+                            static const int F[3][12] = {
+                                {0,0,0,0,1,1,1,1,0,0,0,0},
+                                {0,1,0,0,0,1,0,0,0,1,1,0},
+                                {1,0,0,0,1,0,0,0,1,1,0,0}
+                            };
+                            static const int T[3][12] = {
+                                {0,0,0,0,1,1,1,1,1,1,1,1},
+                                {1,1,1,0,1,1,1,0,0,1,1,0},
+                                {1,1,0,1,1,1,0,1,1,1,0,0}
+                            };
+                            long          vf;
+                            long          vt;
+                            long          fx[3];
+                            double        d;
+                            this->verts.resize(this->verts.size() + 1);
+                            for (vf = vt = l, i = 0; i < 3; i++) {
+                                if (F[i][b]) {
+                                    vf += o[i];
+                                    fx[i] = x[1][i] ? x[1][i] : dim[i];
+                                } else fx[i] = x[0][i];
+                                if (T[i][b]) vt +=o [i];
+                            }
+                            d = (data[vf] - _v) / (data[vf] - data[vt]);
+                            if (d < 0) d = 0;
+                            else if (d > 1) d = 1;
+                            DS3IsoVertex& vert =
+                                this->verts[this->verts.size() - 1];
+                            for (i = 0; i < 3; i++) {
+                                double nf;
+                                double nt;
+                                vert.vert[i] = fx[i];
+                                if (F[i][b] != T[i][b]) {
+                                    vert.vert[i] += d 
+                                        * ((T[i][b] ? (x[1][i] ? x[1][i] 
+                                                       : dim[i]) 
+                                            : x[0][i]) - fx[i]);
                                 }
-                                d=(data[vf]-_v)/(data[vf]-data[vt]);
-                                if (d<0)d=0;
-                                else if (d>1)d=1;
-                                DS3IsoVertex& vert =
-                                    this->verts[this->verts.size() - 1];
-                                for (i=0; i<3; i++) {
-                                    double nf;
-                                    double nt;
-                                    vert.vert[i]=fx[i];
-                                    if (F[i][b]!=T[i][b]) {
-                                        vert.vert[i]+=d*((T[i][b]?(x[1][i]?x[1][i]:dim[i]):x[0][i])-
-                                                                 fx[i]);
-                                    }
-                                    vert.vert[i]/=dim[i];
-                                    nf=0.5*(data[vf+(x[F[i][b]][i]+_d<dim[i]?dx[i]:-x[F[i][b]][i]*off[i])]-
-                                            data[vf+(x[F[i][b]][i]>=_d?-dx[i]:(step[i]-1)*dx[i])]);
-                                    nt=0.5*(data[vt+(x[T[i][b]][i]+_d<dim[i]?dx[i]:-x[T[i][b]][i]*off[i])]-
-                                            data[vt+(x[T[i][b]][i]>=_d?-dx[i]:(step[i]-1)*dx[i])]);
-                                    vert.norm[i]=(nf+d*(nt-nf))/dim[i];
-                                }
-                                edges[e+b] = cv[b]
-                                             = (long)(this->verts.size() - 1);
-                            } else cv[b]=edges[e+b];
-                        }                  /*Reuse old edge intersections*/
-                        else cv[b]=DS3V_NO_EDGE;
-                    }
-                    if (x[1][0]) {                    /*Propagate edge intersections forward:*/
-                        e+=12;
-                        edges[e+0]=cv[4];
-                        edges[e+1]=cv[5];
-                        edges[e+2]=cv[6];
-                        edges[e+3]=cv[7];
-                        e-=12;
-                    }
-                    if (x[1][1]) {                   /*Propagate edge intersections sideways:*/
-                        e+=12*step[0];
-                        edges[e+3]=cv[1];
-                        edges[e+8]=cv[9];
-                        edges[e+7]=cv[5];
-                        edges[e+11]=cv[10];
-                        e-=12*step[0];
-                    }
-                    /*Draw the triangles for the current edge intersections:*/
-                    tris=TRI_TABLE[idx];
-                    if (tris[0] >= 0 && !this->addTris(x[0],cv,tris)) {
-                        this->clear();
-                        return 0;
-                    }
-                    l+=dx[0];
-                    e+=12;
-                    idx>>=4;
+                                vert.vert[i] /= dim[i];
+                                nf = 0.5 * (data[vf + (x[F[i][b]][i] + _d 
+                                                       < dim[i] ? dx[i] 
+                                                       : -x[F[i][b]][i] 
+                                                       * off[i])]
+                                            - data[vf + (x[F[i][b]][i] >= _d 
+                                                       ? -dx[i] 
+                                                       : (step[i] - 1) 
+                                                       * dx[i])]);
+                                nt = 0.5 * (data[vt + (x[T[i][b]][i] + _d 
+                                                       < dim[i] ? dx[i] 
+                                                       : -x[T[i][b]][i] 
+                                                       * off[i])] 
+                                            - data[vt + (x[T[i][b]][i] >= _d
+                                                         ? -dx[i] 
+                                                         : (step[i] - 1)
+                                                         * dx[i])]);
+                                vert.norm[i] = (nf + d* (nt - nf)) / dim[i];
+                            }
+                            edges[e + b] = cv[b]
+                                = (long)(this->verts.size() - 1);
+                        } else cv[b] = edges[e + b];
+                    }                  /*Reuse old edge intersections*/
+                    else cv[b] = DS3V_NO_EDGE;
                 }
-            }
-            if (x[1][2]) {                           /*Propagate edge intersections up:*/
-                size_t e;
-                size_t m;
-                m=12*step[0]*step[1];
-                for (e=0; e<m; e+=12) {
-                    edges[e+11]=edges[e+8];
-                    edges[e+10]=edges[e+9];
-                    edges[e+9]=DS3V_NO_EDGE;
-                    edges[e+8]=DS3V_NO_EDGE;
-                    edges[e+7]=DS3V_NO_EDGE;
-                    edges[e+6]=edges[e+4];
-                    edges[e+5]=DS3V_NO_EDGE;
-                    edges[e+4]=DS3V_NO_EDGE;
-                    edges[e+3]=DS3V_NO_EDGE;
-                    edges[e+2]=edges[e+0];
-                    edges[e+1]=DS3V_NO_EDGE;
-                    edges[e+0]=DS3V_NO_EDGE;
+                if (x[1][0]) {  /*Propagate edge intersections forward:*/
+                    e += 12;
+                    edges[e + 0] = cv[4];
+                    edges[e + 1] = cv[5];
+                    edges[e + 2] = cv[6];
+                    edges[e + 3] = cv[7];
+                    e -= 12;
                 }
+                if (x[1][1]) {  /*Propagate edge intersections sideways:*/
+                    e += 12 * step[0];
+                    edges[e + 3] = cv[1];
+                    edges[e + 8] = cv[9];
+                    edges[e + 7] = cv[5];
+                    edges[e + 11] = cv[10];
+                    e -= 12 * step[0];
+                }
+                /*Draw the triangles for the current edge intersections:*/
+                tris = TRI_TABLE[idx];
+                if (tris[0] >= 0 && !this->addTris(x[0], cv, tris)) {
+                    this->clear();
+                    return 0;
+                }
+                l += dx[0];
+                e += 12;
+                idx>>=4;
             }
         }
-        this->xForm(_ds3);
-        return 1;
+        if (x[1][2]) {  /*Propagate edge intersections up:*/
+            size_t e;
+            size_t m;
+            m = 12 * step[0] * step[1];
+            for (e = 0; e < m; e += 12) {
+                edges[e + 11] = edges[e + 8];
+                edges[e + 10] = edges[e + 9];
+                edges[e + 9] = DS3V_NO_EDGE;
+                edges[e + 8] = DS3V_NO_EDGE;
+                edges[e + 7] = DS3V_NO_EDGE;
+                edges[e + 6] = edges[e + 4];
+                edges[e + 5] = DS3V_NO_EDGE;
+                edges[e + 4] = DS3V_NO_EDGE;
+                edges[e + 3] = DS3V_NO_EDGE;
+                edges[e + 2] = edges[e + 0];
+                edges[e + 1] = DS3V_NO_EDGE;
+                edges[e + 0] = DS3V_NO_EDGE;
+            }
+        }
+    }
+    this->xForm(_ds3);
+    return 1;
 }
