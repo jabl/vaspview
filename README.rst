@@ -55,7 +55,10 @@ TODO
   important. http://home.comcast.net/~tom_forsyth/papers/fast_vert_cache_opt.html
 
 - Remove old EXT_paletted_textures code path, as no current hardware
-  supports paletted textures.
+  supports paletted
+  textures. http://www.opengl.org/registry/specs/EXT/paletted_texture.txt
+  . NVIDIA hardware as of the NV4x generation (2004) does not support
+  this, ATI/AMD and Intel never really supported it.
 
 - Instead of paletted textures, implement compressed textures.
 
