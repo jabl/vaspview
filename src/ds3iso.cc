@@ -860,7 +860,7 @@ int DS3IsoSurface::isoMake(DataSet3D *_ds3,double _v,int _d)
     long           off[3];
     long           step[3];
     double        *data;
-    long          *edges;
+    std::vector<long>          edges;
     size_t         sz;
     for (i=0; i<3; i++) {
         dim[i]=(long)_ds3->density[i];
@@ -870,10 +870,10 @@ int DS3IsoSurface::isoMake(DataSet3D *_ds3,double _v,int _d)
     for (off[0]=1,i=1; i<3; i++)off[i]=off[i-1]*dim[i-1];
     for (i=0; i<3; i++)step[i]=(dim[i]+_d-1)/_d;
     sz=(size_t)(step[0]*step[1])*12*sizeof(long);
-    edges=(long *)malloc(sz);
-    if (edges!=NULL) {
+    long def;
+    memset(&def, 0xFF/*DS3V_NO_EDGE*/, sizeof(long));
+    edges.resize(sz, def);
         this->reset(_d);
-        memset(edges,0xFF/*DS3V_NO_EDGE*/,sz);
         data = &_ds3->data[0];
         for (x[0][Z]=0; x[0][Z]<dim[Z]; x[0][Z]+=_d) {
             long o[3];
@@ -990,7 +990,6 @@ int DS3IsoSurface::isoMake(DataSet3D *_ds3,double _v,int _d)
                     /*Draw the triangles for the current edge intersections:*/
                     tris=TRI_TABLE[idx];
                     if (tris[0] >= 0 && !this->addTris(x[0],cv,tris)) {
-                        free(edges);
                         this->clear();
                         return 0;
                     }
@@ -1020,8 +1019,5 @@ int DS3IsoSurface::isoMake(DataSet3D *_ds3,double _v,int _d)
             }
         }
         this->xForm(_ds3);
-        free(edges);
         return 1;
-    }
-    return 0;
 }
