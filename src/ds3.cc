@@ -415,8 +415,9 @@ int main(int _argc,char **_argv)
                    rr.c_str());
             limit_texture3D_mipmap_level = 0;
         } else if (rr.find("Mesa") != std::string::npos
-                   && rr.find("R300") != std::string::npos) {
-            printf("Limiting mipmap levels to 7 on renderer: %s\n",
+                   && (rr.find("R200") != std::string::npos 
+                       || rr.find("R300") != std::string::npos)) {
+            printf("Limiting 3D texture mipmap levels to 7 on renderer: %s\n",
                    rr.c_str());
             printf("See https://bugs.freedesktop.org/show_bug.cgi?id=28284\n");
             limit_texture3D_mipmap_level = 7;
