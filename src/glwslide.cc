@@ -958,25 +958,10 @@ int glwSliderAddLabel(GLWSlider *_this,int _val,const char *_label)
     else {
         _this->labels.erase(_val);
         _this->labels.insert(std::pair<int, std::string>(_val, _label));
-        // size_t   len;
-        // char    *lbl;
-        // char   **lblp;
-        // len=strlen(_label)+1;
-        // lbl=(char *)malloc(len*sizeof(char));
-        // lblp=static_cast<char**>(htGet(&_this->labels,&_val));
-        // if (lblp!=NULL)
-        // {
-        //     free(*lblp);
-        //     *lblp=lbl;
-        // }
-        // else if (htIns(&_this->labels,&_val,&lbl)==NULL)
-        // {
-        //     free(lbl);
-        //     return 0;
-        // }
-        if (_this->labels.size() == 1||_this->label_lo>_val)_this->label_lo=_val;
-        if (_this->labels.size() == 1||_this->label_hi<_val)_this->label_hi=_val;
-        //memcpy(lbl,_label,len);
+        if (_this->labels.size() == 1 || _this->label_lo > _val)
+	    _this->label_lo = _val;
+        if (_this->labels.size() == 1 || _this->label_hi < _val)
+	    _this->label_hi = _val;
         glwCompRevalidate(&_this->super);
         return 1;
     }
