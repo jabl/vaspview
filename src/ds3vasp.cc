@@ -128,8 +128,13 @@ DS3VaspReader::DS3VaspReader(const char* file_name, const char* mode)
     return;
 err:
     delete ds3;
+    ds3 = NULL;
     if (!errno)errno=EINVAL;
     throw "Error initializing vasp reader\n";
+}
+
+DS3VaspReader::~DS3VaspReader() {
+    delete ds3;
 }
 
 /*Reads a block of data from the VASP file*/
@@ -152,8 +157,8 @@ int DS3VaspReader::read()
     }
     for (k=this->k; k<s; k++) {
         if (fscanf(this->file.f, "%lf", &val) < 1) {
-            if (!errno)errno=ENOMEM;
             delete ds3;
+	    ds3 = NULL;
             ret=0;
             break;
         }
@@ -171,10 +176,13 @@ int DS3VaspReader::cancel()
 {
     fprintf(stderr, "Canceling chgcar read\n");
     delete ds3;
+    ds3 = NULL;
     return 1;
 }
 
 DataSet3D* DS3VaspReader::release_ds3()
 {
-    return ds3;
+    DataSet3D* tmp = ds3;
+    ds3 = NULL;
+    return tmp;
 }

@@ -29,6 +29,7 @@
 class DS3VaspReader {
 public:
     DS3VaspReader(const char* file_name, const char* mode);
+    ~DS3VaspReader();
 
     // Reads a block of data from the VASP file
     int read();
