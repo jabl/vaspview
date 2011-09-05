@@ -119,7 +119,7 @@ public:
 # if defined(__DS3_ADD_BONDS__)&&defined(__DS3_SAVE_BONDS__)
     std::string       bond_name;
 # endif
-    char             *read_name;
+    std::string       read_name;
     DS3VaspReader*    reader;
     int               read_prog;
     int               read_id;

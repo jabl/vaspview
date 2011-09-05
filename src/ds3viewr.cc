@@ -864,7 +864,7 @@ static void ds3ViewerFinishRead(DS3Viewer *_this)
         glwLabelSetLabel(_this->lb_data_set,"Data Set: ");
         glwLabelAddLabel(_this->lb_data_set,_this->ds3->name.c_str());
         glwLabelSetLabel(_this->lb_status,"\"");
-        glwLabelAddLabel(_this->lb_status,_this->read_name);
+        glwLabelAddLabel(_this->lb_status, _this->read_name.c_str());
         glwLabelAddLabel(_this->lb_status,"\" Loaded.");
 # if defined(__DS3_ADD_BONDS__)&&defined(__DS3_SAVE_BONDS__)
 	_this->bond_name = _this->read_name;
@@ -887,18 +887,18 @@ static void ds3ViewerAsyncRead(DS3Viewer *_this,GLWComponent *_c)
         if (!ret) {
             if (!errno)errno=ENOMEM;
             glwLabelSetLabel(_this->lb_status,"Error reading \"");
-            glwLabelAddLabel(_this->lb_status,_this->read_name);
+            glwLabelAddLabel(_this->lb_status, _this->read_name.c_str());
             glwLabelAddLabel(_this->lb_status,"\": ");
             glwLabelAddLabel(_this->lb_status,strerror(errno));
         } else ds3ViewerFinishRead(_this);
-        free(_this->read_name);
+	_this->read_name.clear();
         delete _this->reader;
     } else if (_this->read_prog!=--ret) {
         char text[32];
         _this->read_prog=ret;
         sprintf(text,"%i%%",ret);
         glwLabelSetLabel(_this->lb_status,"Loading \"");
-        glwLabelAddLabel(_this->lb_status,_this->read_name);
+        glwLabelAddLabel(_this->lb_status, _this->read_name.c_str());
         glwLabelAddLabel(_this->lb_status,"\"... ");
         glwLabelAddLabel(_this->lb_status,text);
     }
@@ -2470,7 +2470,7 @@ void ds3ViewerOpenFile(DS3Viewer *_this,const char *_file)
         glwCompDelIdler(&_this->frame->super,_this->read_id);
         _this->read_id=0;
         _this->reader->cancel();
-        free(_this->read_name);
+	_this->read_name.clear();
         delete _this->reader;
     }
     if (_file==NULL||_file[0]=='\0') {
@@ -2480,10 +2480,6 @@ void ds3ViewerOpenFile(DS3Viewer *_this,const char *_file)
         int    ret = 1;
         size_t name_sz;
         name_sz = (strlen(_file)+1)*sizeof(char);
-        if ((_this->read_name=(char *)malloc(name_sz))==NULL) {
-            ret=0;
-            errno=ENOMEM;
-        }
         glwTextFieldSetText(_this->tf_file,_file);
         _this->reader = new DS3VaspReader(_file, "r");
         if (_this->reader->file.f == NULL) {
@@ -2493,7 +2489,7 @@ void ds3ViewerOpenFile(DS3Viewer *_this,const char *_file)
             glwLabelAddLabel(_this->lb_status,strerror(errno));
         } else {
             _this->read_prog = 0;
-            memcpy(_this->read_name,_file,name_sz);
+	    _this->read_name = _file;
             _this->read_id=glwCompAddIdler(&_this->frame->super,
                                            (GLWActionFunc)ds3ViewerAsyncRead,_this);
             if (!_this->read_id) {
@@ -2510,7 +2506,7 @@ void ds3ViewerOpenFile(DS3Viewer *_this,const char *_file)
                 glwLabelAddLabel(_this->lb_status,"\": ");
                 glwLabelAddLabel(_this->lb_status,strerror(errno));
             } else ds3ViewerFinishRead(_this);
-            free(_this->read_name);
+	    _this->read_name.clear();
             delete _this->reader;
         }
     }
