@@ -1,6 +1,7 @@
 /*VASP Data Viewer - Views 3d data sets of molecular charge distribution
   Copyright (C) 1999-2001 Timothy B. Terriberry
   (mailto:tterribe@users.sourceforge.net)
+  2011 Janne Blomqvist
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -21,426 +22,14 @@
 
 extern int limit_texture3D_mipmap_level;
 
-/*NOTE: The 2D slice extraction is the only operation that prevents the
-  data set from being repeated an arbitrary amount in each direction. If we
-  could rely on 3D texturing being present, the only limitation would be
-  framerate (which can get quite low with detailed iso-surfaces). All other
-  code assumes the bounds of the clip box may be anything*/
+/*NOTE: No operation prevents the data set from being repeated an
+  arbitrary amount in each direction. As we can rely on 3D texturing
+  being present, the only limitation is the be framerate (which can
+  get quite low with detailed iso-surfaces). All code assumes the
+  bounds of the clip box may be anything*/
 
-/*This creates a palette for the data set using the current color scale. The
-  palette is used by the color table 2D textures are constructed from, and
-  by the 3D texture if our version of OpenGL supports paletted textures*/
-static void ds3SlicePalette(DS3Slice *_this,DS3View *_view)
-{
-    int i;
-    for (i=0; i<=UCHAR_MAX; i++) {
-        GLWcolor c;
-        c=dsColorScale(_view->cs,i/(double)UCHAR_MAX);
-        _this->ctable[i][0]=(GLubyte)(c&0xFF);
-        _this->ctable[i][1]=(GLubyte)(c>>8&0xFF);
-        _this->ctable[i][2]=(GLubyte)(c>>16&0xFF);
-        _this->ctable[i][3]=(GLubyte)(c>>24&0xFF);
-    }
-}
 
-/*This creates a color table from the data set. The color table is a 3D array
-  of indices into a 256 palette, one for each value in the data set. The data
-  is mapped into integers between 0 and 255 inclusive using the current data
-  scaling function*/
-static int ds3SliceColor(DS3Slice *_this,DS3View *_view)
-{
-    if (!_view->c_valid) {
-        double        *data;
-        unsigned char *cdata;
-        size_t         size;
-        size_t         i;
-        size=_view->ds3->density[X]*_view->ds3->density[Y]*_view->ds3->density[Z];
-        if (_this->cdata==NULL) {
-            cdata=(unsigned char *)malloc(size*sizeof(unsigned char));
-            if (cdata==NULL)return 0;
-            _this->cdata=cdata;
-        } else cdata=_this->cdata;
-        data = &_view->ds3->data[0];
-        for (i=0; i<size; i++) {
-            int c;
-            c=(int)(dsScale(_view->ds,data[i])*(UCHAR_MAX+1));
-            if (c>UCHAR_MAX)cdata[i]=UCHAR_MAX;
-            else cdata[i]=(unsigned char)c;
-        }
-        ds3SlicePalette(_this,_view);
-        _view->c_valid=1;
-    }
-    return 1;
-}
-
-/*This routine extracts a 2D slice from the 3D texture (since we have to use
-  OpenGL 1.1 which does not support 3D texturing), and applies it to a square
-  passing through the data cube*/
-static int ds3SliceMake(DS3Slice *_this,DS3View *_view)
-{
-    typedef GLubyte gl_ubyte_4[4];
-    GLubyte       *txtr;
-    gl_ubyte_4    *ctbl;
-    unsigned char *cdat;
-    double         d;
-    int            x0i;
-    unsigned       x0f;
-    int            y0i;
-    unsigned       y0f;
-    int            z0i;
-    unsigned       z0f;
-    int            dixi;
-    unsigned       dixf;
-    int            diyi;
-    unsigned       diyf;
-    int            dizi;
-    unsigned       dizf;
-    int            djxi;
-    unsigned       djxf;
-    int            djyi;
-    unsigned       djyf;
-    int            djzi;
-    unsigned       djzf;
-    int            xi;
-    unsigned       xf;
-    int            yi;
-    unsigned       yf;
-    int            zi;
-    unsigned       zf;
-    long           xdim;
-    long           ydim;
-    long           zdim;
-    long           zoff;
-    long           toff;
-    int            i;
-    int            j;
-    int            k;
-    if (!ds3SliceColor(_this,_view))return 0;
-    if (_this->txtr==NULL) {
-        _this->txtr=(GLubyte *)malloc(_this->t_sz*_this->t_sz*4*sizeof(GLubyte));
-        if (_this->txtr==NULL)return 0;
-    }
-    xdim=_view->ds3->density[X];
-    ydim=_view->ds3->density[Y];
-    zdim=_view->ds3->density[Z];
-    d=xdim*(_view->strans[X][W]-3*(_view->strans[X][X]+_view->strans[X][Y]));
-    x0i=(int)d;
-    if (x0i>d)x0i--;
-    x0f=(unsigned)((d-x0i)*UINT_MAX);
-    d=ydim*(_view->strans[Y][W]-3*(_view->strans[Y][X]+_view->strans[Y][Y]));
-    y0i=(int)d;
-    if (y0i>d)y0i--;
-    y0f=(unsigned)((d-y0i)*UINT_MAX);
-    d=zdim*(_view->strans[Z][W]-3*(_view->strans[Z][X]+_view->strans[Z][Y]));
-    z0i=(int)d;
-    if (z0i>d)z0i--;
-    z0f=(unsigned)((d-z0i)*UINT_MAX);
-    d=xdim*_view->strans[X][Y]*6/(_this->t_sz-1);
-    dixi=(int)d;
-    if (dixi>d)dixi--;
-    dixf=(unsigned)((d-dixi)*UINT_MAX);
-    d=ydim*_view->strans[Y][Y]*6/(_this->t_sz-1);
-    diyi=(int)d;
-    if (diyi>d)diyi--;
-    diyf=(unsigned)((d-diyi)*UINT_MAX);
-    d=zdim*_view->strans[Z][Y]*6/(_this->t_sz-1);
-    dizi=(int)d;
-    if (dizi>d)dizi--;
-    dizf=(unsigned)((d-dizi)*UINT_MAX);
-    d=xdim*_view->strans[X][X]*6/(_this->t_sz-1);
-    djxi=(int)d;
-    if (djxi>d)djxi--;
-    djxf=(unsigned)((d-djxi)*UINT_MAX);
-    d=ydim*_view->strans[Y][X]*6/(_this->t_sz-1);
-    djyi=(int)d;
-    if (djyi>d)djyi--;
-    djyf=(unsigned)((d-djyi)*UINT_MAX);
-    d=zdim*_view->strans[Z][X]*6/(_this->t_sz-1);
-    djzi=(int)d;
-    if (djzi>d)djzi--;
-    djzf=(unsigned)((d-djzi)*UINT_MAX);
-    zoff=xdim*ydim;
-    toff=zoff*zdim;
-    txtr=_this->txtr;
-    ctbl=_this->ctable;
-    cdat=_this->cdata;
-    for (k=0,i=_this->t_sz;;) {
-        xi=x0i;
-        xf=x0f;
-        yi=y0i;
-        yf=y0f;
-        zi=z0i;
-        zf=z0f;
-        for (j=_this->t_sz;;) {
-            int  x;
-            int  y;
-            int  z;
-            int  m;
-            long l;
-            long o[3][2];
-            int  c[8];
-            int  xm;
-            int  ym;
-            int  zm;
-            /*Clamp the values in range, so mip-maps work properly*/
-            /*x=xi<-1?-1:xi>=xdim?xdim-1:xi;
-            y=yi<-1?-1:yi>=ydim?ydim-1:yi;
-            z=zi<-1?-1:zi>=zdim?zdim-1:zi;
-            o[0][0]=x>=0?0:1;
-            o[0][1]=x<xdim-1?1:0;
-            o[1][0]=y>=0?0:xdim;
-            o[1][1]=y<ydim-1?xdim:0;
-            o[2][0]=z>=0?0:zoff;
-            o[2][1]=z<zdim-1?zoff:0;*/
-            /*Wrap values around, so wrapping clip-box works properly*/
-            if (xi<0) {
-                x=-xi%xdim;
-                if (x)x=xdim-x;
-            } else x=xi%xdim;
-            if (yi<0) {
-                y=-yi%ydim;
-                if (y)y=ydim-y;
-            } else y=yi%ydim;
-            if (zi<0) {
-                z=-zi%zdim;
-                if (z)z=zdim-z;
-            } else z=zi%zdim;
-            o[0][0]=0;
-            o[0][1]=x<xdim-1?1:1-xdim;
-            o[1][0]=0;
-            o[1][1]=y<ydim-1?xdim:xdim-zoff;
-            o[2][0]=0;
-            o[2][1]=z<zdim-1?zoff:zoff-toff;
-            l=x+xdim*(y+ydim*z);
-            for (m=0; m<8; m++)c[m]=cdat[l+o[0][m&1]+o[1][(m&2)>>1]+o[2][(m&4)>>2]];
-            xm=((xf>>8)+1)>>1;
-            ym=((yf>>8)+1)>>1;
-            zm=((zf>>8)+1)>>1;
-            for (m=0; m<4; m++) {
-                int d[4];
-# define DS3V_PREC_SHIFT (sizeof(unsigned)*CHAR_BIT-9)
-                d[0]=ctbl[c[0]][m]+(zm*(ctbl[c[4]][m]-ctbl[c[0]][m])>>DS3V_PREC_SHIFT);
-                d[1]=ctbl[c[1]][m]+(zm*(ctbl[c[5]][m]-ctbl[c[1]][m])>>DS3V_PREC_SHIFT);
-                d[2]=ctbl[c[2]][m]+(zm*(ctbl[c[6]][m]-ctbl[c[2]][m])>>DS3V_PREC_SHIFT);
-                d[3]=ctbl[c[3]][m]+(zm*(ctbl[c[7]][m]-ctbl[c[3]][m])>>DS3V_PREC_SHIFT);
-                d[0]=d[0]+(ym*(d[2]-d[0])>>DS3V_PREC_SHIFT);
-                d[1]=d[1]+(ym*(d[3]-d[1])>>DS3V_PREC_SHIFT);
-                txtr[k++]=d[0]+(xm*(d[1]-d[0])>>DS3V_PREC_SHIFT);
-            }
-# undef DS3V_PREC_SHIFT
-            if (--j<=0)break;
-            xi+=djxi;
-            xf+=djxf;
-            if (xf<djxf)xi++;
-            yi+=djyi;
-            yf+=djyf;
-            if (yf<djyf)yi++;
-            zi+=djzi;
-            zf+=djzf;
-            if (zf<djzf)zi++;
-        }
-        if (--i<=0)break;
-        x0i+=dixi;
-        x0f+=dixf;
-        if (x0f<dixf)x0i++;
-        y0i+=diyi;
-        y0f+=diyf;
-        if (y0f<diyf)y0i++;
-        z0i+=dizi;
-        z0f+=dizf;
-        if (z0f<dizf)z0i++;
-    }
-    if (!_this->t_id)glGenTextures(1,&_this->t_id);
-    glBindTexture(GL_TEXTURE_2D,_this->t_id);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-    gluBuild2DMipmaps(GL_TEXTURE_2D,GL_RGBA,_this->t_sz,_this->t_sz,
-                      GL_RGBA,GL_UNSIGNED_BYTE,txtr);
-    /*glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,_this->t_sz,_this->t_sz,
-                   0,GL_RGBA,GL_UNSIGNED_BYTE,txtr);*/
-    /*WORKAROUND: In MesaGL 3.0: glPushAttrib()/glPopAttrib() does not save the
-      current texture's reference count, so if you change it, you'll screw it up.
-      This causes problems in our display function, if we leave it set here, or
-      in ds3SliceMakeFast(). Technically 0 may not have been the current texture,
-      but it will be for us.*/
-    glBindTexture(GL_TEXTURE_2D,0);
-    _view->t_valid=1;
-    if (_this->i_id) {
-        glwCompDelTimer(&_view->super,_this->i_id);
-        _this->i_id=0;
-        glwCompRepaint(&_view->super,0);
-    }
-    return 1;
-}
-
-/*The above routine is somewhat slow, espcially since for average datasets we
-  can be generating a meg of texture or more, so we use this version, which
-  creates a texture at least one-fourth the size and without any sub-texeling
-  or mip-maps, and schedule the above function to run when we're idle. That
-  way, scrolling the slice around is not so slow, but we still get all the
-  detail of the above function when we're done*/
-static int ds3SliceMakeFast(DS3Slice *_this,DS3View *_view)
-{
-    typedef GLubyte gl_ubyte_4[4];
-    GLubyte       *txtr;
-    gl_ubyte_4    *ctbl;
-    unsigned char *cdat;
-    double         d;
-    int            x0i;
-    unsigned       x0f;
-    int            y0i;
-    unsigned       y0f;
-    int            z0i;
-    unsigned       z0f;
-    int            dixi;
-    unsigned       dixf;
-    int            diyi;
-    unsigned       diyf;
-    int            dizi;
-    unsigned       dizf;
-    int            djxi;
-    unsigned       djxf;
-    int            djyi;
-    unsigned       djyf;
-    int            djzi;
-    unsigned       djzf;
-    int            xi;
-    unsigned       xf;
-    int            yi;
-    unsigned       yf;
-    int            zi;
-    unsigned       zf;
-    long           xdim;
-    long           ydim;
-    long           zdim;
-    long           zoff;
-    long           toff;
-    int            i;
-    int            j;
-    int            k;
-    int            scale;
-    if (!ds3SliceColor(_this,_view))return 0;
-    if (_this->txtr==NULL) {
-        _this->txtr=(GLubyte *)malloc(_this->t_sz*_this->t_sz*4*sizeof(GLubyte));
-        if (_this->txtr==NULL)return 0;
-    }
-    d=sqrt(_view->super.bounds.w*_view->super.bounds.h)*_view->offs;
-    if (_view->zoom>1E-16)d/=_view->zoom;
-    for (scale=_this->t_sz>>1; scale>>1>d; scale>>=1);
-    xdim=_view->ds3->density[X];
-    ydim=_view->ds3->density[Y];
-    zdim=_view->ds3->density[Z];
-    d=xdim*(_view->strans[X][W]-3*(_view->strans[X][X]+_view->strans[X][Y]))+0.5;
-    x0i=(int)d;
-    if (x0i>d)x0i--;
-    x0f=(unsigned)((d-x0i)*UINT_MAX);
-    d=ydim*(_view->strans[Y][W]-3*(_view->strans[Y][X]+_view->strans[Y][Y]))+0.5;
-    y0i=(int)d;
-    if (y0i>d)y0i--;
-    y0f=(unsigned)((d-y0i)*UINT_MAX);
-    d=zdim*(_view->strans[Z][W]-3*(_view->strans[Z][X]+_view->strans[Z][Y]))+0.5;
-    z0i=(int)d;
-    if (z0i>d)z0i--;
-    z0f=(unsigned)((d-z0i)*UINT_MAX);
-    d=xdim*_view->strans[X][Y]*6/(scale-1);
-    dixi=(int)d;
-    if (dixi>d)dixi--;
-    dixf=(unsigned)((d-dixi)*UINT_MAX);
-    d=ydim*_view->strans[Y][Y]*6/(scale-1);
-    diyi=(int)d;
-    if (diyi>d)diyi--;
-    diyf=(unsigned)((d-diyi)*UINT_MAX);
-    d=zdim*_view->strans[Z][Y]*6/(scale-1);
-    dizi=(int)d;
-    if (dizi>d)dizi--;
-    dizf=(unsigned)((d-dizi)*UINT_MAX);
-    d=xdim*_view->strans[X][X]*6/(scale-1);
-    djxi=(int)d;
-    if (djxi>d)djxi--;
-    djxf=(unsigned)((d-djxi)*UINT_MAX);
-    d=ydim*_view->strans[Y][X]*6/(scale-1);
-    djyi=(int)d;
-    if (djyi>d)djyi--;
-    djyf=(unsigned)((d-djyi)*UINT_MAX);
-    d=zdim*_view->strans[Z][X]*6/(scale-1);
-    djzi=(int)d;
-    if (djzi>d)djzi--;
-    djzf=(unsigned)((d-djzi)*UINT_MAX);
-    zoff=xdim*ydim;
-    toff=zoff*zdim;
-    txtr=_this->txtr;
-    ctbl=_this->ctable;
-    cdat=_this->cdata;
-    for (k=0,i=scale;;) {
-        xi=x0i;
-        xf=x0f;
-        yi=y0i;
-        yf=y0f;
-        zi=z0i;
-        zf=z0f;
-        for (j=scale;;) {
-            int      x;
-            int      y;
-            int      z;
-            GLubyte *c;
-            /*Wrap values around, so wrapping clip-box works properly*/
-            if (xi<0) {
-                x=-xi%xdim;
-                if (x)x=xdim-x;
-            } else x=xi%xdim;
-            if (yi<0) {
-                y=-yi%ydim;
-                if (y)y=ydim-y;
-            } else y=yi%ydim;
-            if (zi<0) {
-                z=-zi%zdim;
-                if (z)z=zdim-z;
-            } else z=zi%zdim;
-            c=ctbl[cdat[x+xdim*(y+ydim*z)]];
-            txtr[k++]=c[0];
-            txtr[k++]=c[1];
-            txtr[k++]=c[2];
-            txtr[k++]=c[3];
-            if (--j<=0)break;
-            xi+=djxi;
-            xf+=djxf;
-            if (xf<djxf)xi++;
-            yi+=djyi;
-            yf+=djyf;
-            if (yf<djyf)yi++;
-            zi+=djzi;
-            zf+=djzf;
-            if (zf<djzf)zi++;
-        }
-        if (--i<=0)break;
-        x0i+=dixi;
-        x0f+=dixf;
-        if (x0f<dixf)x0i++;
-        y0i+=diyi;
-        y0f+=diyf;
-        if (y0f<diyf)y0i++;
-        z0i+=dizi;
-        z0f+=dizf;
-        if (z0f<dizf)z0i++;
-    }
-    if (!_this->t_id)glGenTextures(1,&_this->t_id);
-    glBindTexture(GL_TEXTURE_2D,_this->t_id);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,scale,scale,
-                 0,GL_RGBA,GL_UNSIGNED_BYTE,txtr);
-    /*gluBuild2DMipmaps(GL_TEXTURE_2D,4,scale,scale,
-                      GL_RGBA,GL_UNSIGNED_BYTE,txtr);*/
-    glBindTexture(GL_TEXTURE_2D,0);
-    if (_this->i_id)glwCompDelTimer(&_view->super,_this->i_id);
-    _this->i_id=glwCompAddTimer(&_view->super,
-                                (GLWActionFunc)ds3SliceMake,_this,1000);
-    _view->t_valid=1;
-    return 1;
-}
-
-/*Creates a 3D texture, if our version of OpenGL supports it (1.2 or
-  later, or one that supports EXT_texture3D).  This is much more
+/*Creates a 3D texture (requires OpenGL 1.2).  This is much more
   advantageous than a 2D texture, since we do not have to create a 2D
   texture in software every time the slice moves (expensive, since the
   texture is nine times the size required to fill a unit box to
@@ -662,90 +251,36 @@ static void ds3ViewSlicePeerDisplay(DS3ViewComp *_this,
 {
     DS3View       *view;
     view=_this->ds3view;
-    /*If we can, use a 3D texture for the slice*/
-    if (GLEW_VERSION_1_2) {
-        if (view->t_valid||ds3SliceTexture3D(&view->slice,view)) {
-            DS3SliceVertex slice[16];
-            int            nverts;
-            int            i;
-            nverts=ds3ViewSliceClip(view,slice);
-            if (nverts) {
-                glPushAttrib(GL_TEXTURE_BIT|GL_ENABLE_BIT);
-                glPushMatrix();
-                glMultMatrixd(view->basis);
-                if (glwCompIsFocused(&_this->super)) {
-                    glLineWidth(2);
-                    glwColor(glwColorBlend(view->super.forec,DS3V_FOCUS_COLOR));
-                    glBegin(GL_LINE_LOOP);
-                    for (i=0; i<nverts; i++)glVertex3dv(slice[i].p);
-                    glEnd();
-                    glLineWidth(1);
-                }
-                glBindTexture(GL_TEXTURE_3D,view->slice.t_id);
-                glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_REPLACE);
-                glEnable(GL_TEXTURE_3D);
-                glBegin(GL_POLYGON);
-                for (i=0; i<nverts; i++) {
-                    glTexCoord3dv(slice[i].p);
-                    glVertex3dv(slice[i].p);
-                }
-                glEnd();
-                glBindTexture(GL_TEXTURE_3D,0);
-                glPopMatrix();
-                glPopAttrib();
-            }
-        }
-    } else
-        /*If we can't use 3D texturing, fall back on extracting 2D textures (slow)*/
-    {
-        if (view->t_valid||ds3SliceMakeFast(&view->slice,view)) {
-            int i;
-            glPushAttrib(GL_TEXTURE_BIT|GL_ENABLE_BIT);
-            glPushMatrix();
-            glMultMatrixd(view->basis);
-            glBindTexture(GL_TEXTURE_2D,view->slice.t_id);
-            glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_REPLACE);
-            if (glwCompIsFocused(&_this->super)) {
-                DS3SliceVertex slice[16];
-                int            nverts;
-                nverts=ds3ViewSliceClip(view,slice);
-                if (nverts) {
-                    glLineWidth(2);
-                    glwColor(glwColorBlend(view->super.forec,DS3V_FOCUS_COLOR));
-                    glBegin(GL_LINE_LOOP);
-                    for (i=0; i<nverts; i++)glVertex3dv(slice[i].p);
-                    glEnd();
-                    glLineWidth(1);
-                    glEnable(GL_TEXTURE_2D);
-                    glBegin(GL_POLYGON);
-                    for (i=0; i<nverts; i++) {
-                        glTexCoord2d(slice[i].tx,slice[i].ty);
-                        glVertex3dv(slice[i].p);
-                    }
-                    glEnd();
-                }
-            } else {
-                for (i=0; i<6; i++)glEnable(GL_CLIP_PLANE0+i);
-                glTranslated(0.5,0.5,0.5);
-                glRotated(view->slice_p,1,0,0);
-                glRotated(view->slice_t,0,1,0);
-                glTranslated(0,0,view->slice_d);
-                glEnable(GL_TEXTURE_2D);
-                glBegin(GL_QUADS);
-                glTexCoord2i(0,0);
-                glVertex2i(-3,-3);
-                glTexCoord2i(0,1);
-                glVertex2i(-3,3);
-                glTexCoord2i(1,1);
-                glVertex2i(3,3);
-                glTexCoord2i(1,0);
-                glVertex2i(3,-3);
-                glEnd();
-            }
-            glBindTexture(GL_TEXTURE_2D,0);
-            glPopMatrix();
-            glPopAttrib();
-        }
+    if (view->t_valid || ds3SliceTexture3D(&view->slice, view)) {
+	DS3SliceVertex slice[16];
+	int            nverts;
+	int            i;
+	nverts = ds3ViewSliceClip(view, slice);
+	if (nverts) {
+	    glPushAttrib(GL_TEXTURE_BIT|GL_ENABLE_BIT);
+	    glPushMatrix();
+	    glMultMatrixd(view->basis);
+	    if (glwCompIsFocused(&_this->super)) {
+		glLineWidth(2);
+		glwColor(glwColorBlend(view->super.forec, DS3V_FOCUS_COLOR));
+		glBegin(GL_LINE_LOOP);
+		for (i = 0; i < nverts; i++) glVertex3dv(slice[i].p);
+		glEnd();
+		glLineWidth(1);
+	    }
+	    glBindTexture(GL_TEXTURE_3D, view->slice.t_id);
+	    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+	    glEnable(GL_TEXTURE_3D);
+	    glBegin(GL_POLYGON);
+	    for (i = 0; i < nverts; i++) {
+		glTexCoord3dv(slice[i].p);
+		glVertex3dv(slice[i].p);
+	    }
+	    glEnd();
+	    glBindTexture(GL_TEXTURE_3D, 0);
+	    glPopMatrix();
+	    glPopAttrib();
+	}
     }
 }
 
@@ -1043,36 +578,18 @@ const GLWCallbacks DS3_VIEW_SLICE_CALLBACKS= {
 void ds3SliceInit(DS3Slice *_this,size_t _dens[3])
 {
     int    s;
-    GLint  m;
     double d;
     if (_dens!=NULL) {
         for (s=0,d=0; s<3; s++)d+=_dens[s]*_dens[s];
         d=sqrt(d);
     } else d=sqrt(3);
     d*=6;
-    glGetIntegerv(GL_MAX_TEXTURE_SIZE,&m);
-    m>>=1;
-    if (m<=d)s=m;
-    else for (s=8; s<d; s<<=1);
-    _this->t_sz=s;
-    _this->i_id=0;
     _this->t_id=0;
-    _this->txtr=NULL;
-    _this->cdata=NULL;
 }
 
-/*Destroys the current slice, freeing any memory for cached data
-  view: The view component to remove a callback timer from, if necessary*/
+/*Destroys the current slice, freeing texture memory on the GPU.  */
 void ds3SliceDstr(DS3Slice *_this,DS3View *_view)
 {
-    if (_this->i_id) {
-        glwCompDelTimer(&_view->super,_this->i_id);
-        _this->i_id=0;
-    }
     if (_this->t_id)glDeleteTextures(1,&_this->t_id);
     _this->t_id=0;
-    free(_this->txtr);
-    _this->txtr=NULL;
-    free(_this->cdata);
-    _this->cdata=NULL;
 }

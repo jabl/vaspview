@@ -399,22 +399,22 @@ int main(int _argc,char **_argv)
     fprintf(stdout, "Status: Using GLEW %s\n", glewGetString(GLEW_VERSION));
 #endif
     if (!GLEW_VERSION_1_2) {
-        printf("OpenGL 1.2 not available. Slice rendering will be excruciatingly slow!\n");
-    } else {
-        std::string rr = (const char*) glGetString(GL_RENDERER);
-        if (rr.find("Mesa") != std::string::npos &&
-                rr.find("Intel") != std::string::npos) {
-            printf("Disabling 3D texture mipmapping on renderer: %s\n",
-                   rr.c_str());
-            limit_texture3D_mipmap_level = 0;
-        } else if (rr.find("Mesa") != std::string::npos
-                   && (rr.find("R200") != std::string::npos 
-                       || rr.find("R300") != std::string::npos)) {
-            printf("Limiting 3D texture mipmap levels to 7 on renderer: %s\n",
-                   rr.c_str());
-            printf("See https://bugs.freedesktop.org/show_bug.cgi?id=28284\n");
-            limit_texture3D_mipmap_level = 7;
-        }
+        printf("Sorry, OpenGL 1.2 is the minimum required version, and it appears you don't have it. Bye!\n");
+	return 1;
+    }
+    std::string rr = (const char*) glGetString(GL_RENDERER);
+    if (rr.find("Mesa") != std::string::npos &&
+	rr.find("Intel") != std::string::npos) {
+	printf("Disabling 3D texture mipmapping on renderer: %s\n",
+	       rr.c_str());
+	limit_texture3D_mipmap_level = 0;
+    } else if (rr.find("Mesa") != std::string::npos
+	       && (rr.find("R200") != std::string::npos 
+		   || rr.find("R300") != std::string::npos)) {
+	printf("Limiting 3D texture mipmap levels to 7 on renderer: %s\n",
+	       rr.c_str());
+	printf("See https://bugs.freedesktop.org/show_bug.cgi?id=28284\n");
+	limit_texture3D_mipmap_level = 7;
     }
     if (GLEW_ARB_vertex_buffer_object) {
         printf("ARB_vertex_buffer_object extension available, will use VBO's for rendering isosurfaces.\n");

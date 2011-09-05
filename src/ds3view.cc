@@ -1411,8 +1411,6 @@ void ds3ViewSetSlice(DS3View *_this,double _t,double _p,double _d) {
         _this->slice_t=_t;
         _this->slice_p=_p;
         _this->slice_d=_d;
-        if (!GLEW_VERSION_1_2)
-            _this->t_valid=0;
         _this->strans[X][X]=ct;
         _this->strans[X][Y]=0;
         _this->strans[X][Z]=n[X];

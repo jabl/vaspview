@@ -57,6 +57,12 @@ DONE
   either, maybe a bug in the codepath, or a bug in the driver; in any
   case it doesn't matter as the codepath is now removed.
 
+- Removed old 2D slice texture generation-on-CPU codepath, as all
+  current hardware supports EXT_texture3D (part of OpenGL 1.2 core),
+  and the fallback is unusably slow and buggy. Tested on GeForce 2MX
+  and Radeon 9200, both ~10 year old HW in 2011, and both support 3D
+  textures.
+
 
 TODO
 ====
@@ -67,9 +73,6 @@ TODO
   guy, I think). OTOH rendering in vertex buffer ordering seems more
   important. http://home.comcast.net/~tom_forsyth/papers/fast_vert_cache_opt.html
 
-- Remove old 2D slice texture generation-on-CPU codepath, as all
-  current hardware supports EXT_texture3D (part of OpenGL 1.2 core),
-  and the fallback is unusably slow.
 
 - CUDA experiment: Move the marching cubes algorithm to the GPU. CUDA
   SDK has an example implementing marching cubes, integrate that?
