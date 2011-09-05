@@ -1030,7 +1030,7 @@ static int ds3ViewPeerPassiveMotion(DS3View *_this,const GLWCallbacks *_cb,
 static void ds3ViewPeerDispose(DS3View *_this,const GLWCallbacks *_cb) {
     _this->ds3=NULL;
 # if defined(__DS3_ADD_BONDS__)
-    ds3BondsDstr(&_this->bonds);
+    ds3BondsReset(&_this->bonds, 0);
 # endif
     ds3SliceDstr(&_this->slice,_this);
     _this->iso.clear();
@@ -1116,7 +1116,6 @@ DS3View::DS3View() : cm_axes(this),
 # endif
         ds3SliceInit(&this->slice,NULL);
 # if defined(__DS3_ADD_BONDS__)
-        ds3BondsInit(&this->bonds);
         this->track_mbf = 0;
 # endif
         this->zoom=0;

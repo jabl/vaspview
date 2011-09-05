@@ -26,6 +26,8 @@ typedef struct DS3Bonds DS3Bonds;
 
 
 struct DS3Bonds {
+    DS3Bonds();
+    ~DS3Bonds();
     double *bonds;
     long    natoms;
     long    nbonds;
@@ -34,9 +36,6 @@ struct DS3Bonds {
 
 # define _DSBondIdx(_i,_j,_n)                                                 \
  ((_i)*(_n)-((_i)*((_i)+1)>>1)+(_j)-(_i)-1)
-
-void   ds3BondsInit(DS3Bonds *_this);
-void   ds3BondsDstr(DS3Bonds *_this);
 
 int    ds3BondsReset(DS3Bonds *_this,DataSet3D *_ds3);
 void   ds3BondsSet(DS3Bonds *_this,long _from,long _to,double _sz);

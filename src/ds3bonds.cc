@@ -20,18 +20,18 @@
 #include "ds3bonds.hh"
 
 /*Initializes the bonds structure*/
-void ds3BondsInit(DS3Bonds *_this)
+DS3Bonds::DS3Bonds()
 {
-    _this->natoms=0;
-    _this->nbonds=0;
-    _this->bonds=NULL;
+    this->natoms=0;
+    this->nbonds=0;
+    this->bonds=NULL;
 }
 
 /*Frees the memory used by the bonds structure*/
-void ds3BondsDstr(DS3Bonds *_this)
+DS3Bonds::~DS3Bonds()
 {
-    free(_this->bonds);
-    _this->bonds=NULL;
+    free(this->bonds);
+    this->bonds=NULL;
 }
 
 /*Removes any existing bonds, and sets up the structure for adding bonds to
