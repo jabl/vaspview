@@ -680,9 +680,7 @@ void glwCompDelAll(GLWComponent *_this)
 void glwCompSetLayout(GLWComponent *_this,GLWLayoutManager *_layout)
 {
     if (_this->layout!=_layout) {
-        if (_this->layout != NULL) {
-            delete _this->layout;
-        }
+	delete _this->layout;
         _this->layout=_layout;
     }
     glwCompInvalidate(_this);
