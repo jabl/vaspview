@@ -110,7 +110,10 @@ const GLWCallbacks GLW_LABEL_CALLBACKS= {
 
 GLWLabel::GLWLabel(const char* label)
 {
-    glwLabelSetLabel(this, label);
+    if (label)
+	glwLabelSetLabel(this, label);
+    else
+	glwLabelSetLabel(this, "");
     this->super.callbacks=&GLW_LABEL_CALLBACKS;
     glwCompSetAlignX(&this->super,0);
     glwCompSetLayout(&this->super,&glw_label_layout);
@@ -122,12 +125,9 @@ const char *glwLabelGetLabel(GLWLabel *_this)
     return _this->label.c_str();
 }
 
-int glwLabelSetLabel(GLWLabel *_this, const char* label)
+int glwLabelSetLabel(GLWLabel *_this, const std::string& label)
 {
-    if (label == NULL)
-        _this->label.clear();
-    else
-        _this->label = label;
+    _this->label = label;
     glwCompRevalidate(&_this->super);
     return 1;
 }

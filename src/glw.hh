@@ -401,7 +401,7 @@ private:
 extern const GLWCallbacks GLW_LABEL_CALLBACKS;
 
 const char     *glwLabelGetLabel(GLWLabel *_this);
-int       glwLabelSetLabel(GLWLabel *_this,const char *_label);
+int       glwLabelSetLabel(GLWLabel *_this, const std::string&);
 int       glwLabelAddLabel(GLWLabel *_this,const char *_label);
 
 

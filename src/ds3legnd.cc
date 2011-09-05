@@ -77,14 +77,14 @@ DSColorLegend::DSColorLegend() : lb_min("0"), lb_max("1"), lb_label(NULL)
 int dsColorLegendSetDataSet(DSColorLegend *_this,DataSet3D *_ds3)
 {
     dsColorLegendSetRange(_this,_ds3->min,_ds3->max);
-    if (_ds3->label[3]!=NULL&&_ds3->label[3][0]!='\0') {
-        if (_ds3->units[3]!=NULL&&_ds3->units[3][0]!='\0') {
+    if (!_ds3->label[3].empty()) {
+        if (!_ds3->units[3].empty()) {
             std::string label;
             label += _ds3->label[3];
             label += " (";
             label += _ds3->units[3];
             label += ")";
-            return dsColorLegendSetLabel(_this, label.c_str());
+            return dsColorLegendSetLabel(_this, label);
         } else return dsColorLegendSetLabel(_this,_ds3->label[3]);
     } else return dsColorLegendSetLabel(_this,_ds3->units[3]);
 }
@@ -122,9 +122,9 @@ int dsColorLegendSetRange(DSColorLegend *_this,double _min,double _max)
 
 /*Sets the label for data values
   label: The new label for data values*/
-int dsColorLegendSetLabel(DSColorLegend *_this,const char *_label)
+int dsColorLegendSetLabel(DSColorLegend *_this, const std::string& label)
 {
-    return glwLabelSetLabel(&_this->lb_label,_label);
+    return glwLabelSetLabel(&_this->lb_label, label);
 }
 
 /*Adds to the label for data values

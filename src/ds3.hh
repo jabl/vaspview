@@ -79,7 +79,6 @@ struct DSPoint3D {
 class DataSet3D {
 public:
     DataSet3D();
-    ~DataSet3D();
 
     // C++11 version of making private copy constructor and
     // assignment operator.
@@ -87,8 +86,8 @@ public:
     //DataSet3D(const DataSet3D&) = delete;
 
     std::string name;               /*Name of the data set*/
-    char           *label[4];       /*Label of three axes and data*/
-    char           *units[4];       /*Units for three axes and data*/
+    std::string label[4];           /*Label of three axes and data*/
+    std::string units[4];           /*Units for three axes and data*/
     Vect3d          basis[3];       /*Basis vectors for lattice*/
     Vect3d          center;         /*Center of the lattice*/
     size_t          npoints;        /*Number of points*/

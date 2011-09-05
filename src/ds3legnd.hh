@@ -43,7 +43,7 @@ void           dsColorLegendSetColorScale(DSColorLegend *_this,
         const DSColorScale *_cs);
 int            dsColorLegendSetRange(DSColorLegend *_this,double _min,
                                      double _max);
-int            dsColorLegendSetLabel(DSColorLegend *_this,const char *_label);
+int            dsColorLegendSetLabel(DSColorLegend *_this, const std::string&);
 int            dsColorLegendAddLabel(DSColorLegend *_this,const char *_label);
 
 #endif                                                           /*_ds3legnd_H*/
