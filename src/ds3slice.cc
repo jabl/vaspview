@@ -598,24 +598,8 @@ static int ds3SliceTexture3D(DS3Slice *_this,DS3View *_view)
                 }
             }
 	    GLint format = GL_RGBA;
-	    if (GLEW_VERSION_1_3)
-		format = GL_COMPRESSED_RGBA;
             glTexImage3D(GL_TEXTURE_3D, 0, format, w[X], w[Y], w[Z],
                          0,GL_RGBA,GL_UNSIGNED_BYTE,txtr);
-	    if (GLEW_VERSION_1_3) {
-                GLint isc;
-                glGetTexLevelParameteriv(GL_TEXTURE_3D, 0,
-                                         GL_TEXTURE_COMPRESSED, &isc);
-                if (isc) {
-                    GLint csz;
-                    glGetTexLevelParameteriv(GL_TEXTURE_3D, 0, 
-                                             GL_TEXTURE_COMPRESSED_IMAGE_SIZE, 
-                                             &csz);
-                    GLfloat sz = 4*sizeof(GLubyte)*w[X]*w[Y]*w[Z];
-                    printf("Compressing texture changed size by factor of %g, %d, %g\n", 
-                           csz / sz, csz, sz);
-                }
-	    }
 	    /*Create mip-maps*/
 	    for (lod=1; (ws[X]||ws[Y]||ws[Z])
 		     && lod <= limit_texture3D_mipmap_level; lod++) {

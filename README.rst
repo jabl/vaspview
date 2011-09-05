@@ -45,6 +45,10 @@ DONE
 
 - Use CMAKE for building.
 
+- Enable support for compressed 3D textures. Tried to do this, but
+  image quality was bad so it had to be removed.
+
+
 TODO
 ====
 
@@ -59,8 +63,6 @@ TODO
   textures. http://www.opengl.org/registry/specs/EXT/paletted_texture.txt
   . NVIDIA hardware as of the NV4x generation (2004) does not support
   this, ATI/AMD and Intel never really supported it.
-
-- Instead of paletted textures, implement compressed textures.
 
 - Remove old 2D slice texture generation-on-CPU codepath, as all
   current hardware supports EXT_texture3D (part of OpenGL 1.2 core),
