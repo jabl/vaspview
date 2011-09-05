@@ -24,14 +24,6 @@ DS3Bonds::DS3Bonds()
 {
     this->natoms=0;
     this->nbonds=0;
-    this->bonds=NULL;
-}
-
-/*Frees the memory used by the bonds structure*/
-DS3Bonds::~DS3Bonds()
-{
-    free(this->bonds);
-    this->bonds=NULL;
 }
 
 /*Removes any existing bonds, and sets up the structure for adding bonds to
@@ -40,17 +32,13 @@ DS3Bonds::~DS3Bonds()
 int ds3BondsReset(DS3Bonds *_this,DataSet3D *_ds3)
 {
     long    natoms;
-    double *bonds;
     natoms=_ds3!=NULL?(long)_ds3->npoints:0;
-    if (natoms<2)bonds=NULL;
-    else {
-        bonds=(double *)calloc((_ds3->npoints-1)*(_ds3->npoints-2),sizeof(double));
-        if (bonds==NULL)return 0;
-    }
-    free(_this->bonds);
+    if (natoms < 2)
+	_this->bonds.clear();
+    else
+	_this->bonds.resize((natoms - 1) * (natoms - 2));
     _this->nbonds=0;
     _this->natoms=natoms;
-    _this->bonds=bonds;
     return 1;
 }
 

@@ -27,8 +27,7 @@ typedef struct DS3Bonds DS3Bonds;
 
 struct DS3Bonds {
     DS3Bonds();
-    ~DS3Bonds();
-    double *bonds;
+    std::vector<double> bonds;
     long    natoms;
     long    nbonds;
 };
