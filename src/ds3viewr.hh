@@ -35,7 +35,7 @@ public:
 
     GLWFrame*         frame;
     DS3View*          ds3view;
-    GLWButton        *bn_open;
+    GLWButton         bn_open;
     GLWTextField     *tf_file;
     GLWLabel         *lb_data_set;
     GLWTabbedPane    *tp_ctrl;
