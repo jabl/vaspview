@@ -1,6 +1,7 @@
 /*GL Widget Set - simple, portable OpenGL/GLUT widget set
   Copyright (C) 1999-2001 Timothy B. Terriberry
   (mailto:tterribe@users.sourceforge.net)
+  2011 Janne Blomqvist
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -24,24 +25,15 @@
 
 static void glwGBLInvalidate(GLWGridBagLayout *_this,GLWComponent *_comp)
 {
-    free(_this->cache);
-    _this->cache=NULL;
-    free(_this->min_w);
-    _this->min_w=NULL;
-    free(_this->min_h);
-    _this->min_h=NULL;
-    free(_this->pre_w);
-    _this->pre_w=NULL;
-    free(_this->pre_h);
-    _this->pre_h=NULL;
-    free(_this->weight_x);
-    _this->weight_x=NULL;
-    free(_this->weight_y);
-    _this->weight_y=NULL;
-    free(_this->adj_w);
-    _this->adj_w=NULL;
-    free(_this->adj_h);
-    _this->adj_h=NULL;
+    _this->cache.clear();
+    _this->min_w.clear();
+    _this->min_h.clear();
+    _this->pre_w.clear();
+    _this->pre_h.clear();
+    _this->weight_x.clear();
+    _this->weight_y.clear();
+    _this->adj_w.clear();
+    _this->adj_h.clear();
     _this->comp=_comp;
     _this->valid=0;
 }
@@ -60,8 +52,7 @@ static int glwGBLCalcLayout(GLWGridBagLayout *_this,GLWComponent *_comp)
         int           *xs_h;
         int            next;
         _this->validating=1;
-        _this->cache=(GLWGBLCInfo *)malloc(_comp->comps.size() * sizeof(GLWGBLCInfo));
-        if (_this->cache==NULL)goto fail;
+        _this->cache.resize(_comp->comps.size());
         _this->w=_this->h=0;
         cur_r=cur_c=-1;
         /*Pass 1: figure out dimensions of the layout grid*/
@@ -219,18 +210,12 @@ static int glwGBLCalcLayout(GLWGridBagLayout *_this,GLWComponent *_comp)
                 _this->cache[i].w=cur_w;
                 _this->cache[i].h=cur_h;
             }
-        _this->min_w=(int *)calloc(_this->w,sizeof(int));
-        if (_this->min_w==NULL)goto fail;
-        _this->min_h=(int *)calloc(_this->h,sizeof(int));
-        if (_this->min_h==NULL)goto fail;
-        _this->pre_w=(int *)calloc(_this->w,sizeof(int));
-        if (_this->pre_w==NULL)goto fail;
-        _this->pre_h=(int *)calloc(_this->h,sizeof(int));
-        if (_this->pre_h==NULL)goto fail;
-        _this->weight_x=(double *)calloc(_this->w,sizeof(double));
-        if (_this->weight_x==NULL)goto fail;
-        _this->weight_y=(double *)calloc(_this->h,sizeof(double));
-        if (_this->weight_y==NULL)goto fail;
+        _this->min_w.resize(_this->w);
+        _this->min_h.resize(_this->h);
+        _this->pre_w.resize(_this->w);
+        _this->pre_h.resize(_this->h);
+        _this->weight_x.resize(_this->w);
+        _this->weight_y.resize(_this->h);
         /*Pass 3: distribute weights*/
         next=INT_MAX;
         for (i=1; i!=INT_MAX; i=(size_t)next,next=INT_MAX) {
@@ -467,23 +452,6 @@ static int glwGBLCalcLayout(GLWGridBagLayout *_this,GLWComponent *_comp)
         _this->validating=0;
         _this->valid=1;
         return 1;
-fail:
-        free(_this->cache);
-        _this->cache=NULL;
-        free(_this->min_w);
-        _this->min_w=NULL;
-        free(_this->min_h);
-        _this->min_h=NULL;
-        free(_this->pre_w);
-        _this->pre_w=NULL;
-        free(_this->pre_h);
-        _this->pre_h=NULL;
-        free(_this->weight_x);
-        _this->weight_x=NULL;
-        free(_this->weight_y);
-        _this->weight_y=NULL;
-        _this->validating=0;
-        return 0;
     }
     return 1;
 }
@@ -561,8 +529,8 @@ static void glwGBLLayout(GLWGridBagLayout *_this,GLWComponent *_comp)
         int            h;
         int            dw;
         int            dh;
-        int           *min_w;
-        int           *min_h;
+	std::vector<int> min_w;
+	std::vector<int> min_h;
         glwGBLPreSize(_this,_comp,&w,&h);
         if (w>_comp->bounds.w||h>_comp->bounds.h) {
             glwGBLMinSize(_this,_comp,&w,&h);
@@ -575,9 +543,8 @@ static void glwGBLLayout(GLWGridBagLayout *_this,GLWComponent *_comp)
         dw=_comp->bounds.w-w;
         if (dw) {
             double weight;
-            if (_this->adj_w==NULL) {
-                _this->adj_w=(int *)calloc(_this->w,sizeof(int));
-                if (_this->adj_w==NULL)return;
+            if (_this->adj_w.empty()) {
+                _this->adj_w.resize(_this->w);
             }
             weight=0;
             for (i=0; i<_this->w; i++)weight+=_this->weight_x[i];
@@ -601,9 +568,8 @@ static void glwGBLLayout(GLWGridBagLayout *_this,GLWComponent *_comp)
         dh=_comp->bounds.h-h;
         if (dh) {
             double weight;
-            if (_this->adj_h==NULL) {
-                _this->adj_h=(int *)calloc(_this->h,sizeof(int));
-                if (_this->adj_h==NULL)return;
+            if (_this->adj_h.empty()) {
+                _this->adj_h.resize(_this->h);
             }
             weight=0;
             for (i=0; i<_this->h; i++)weight+=_this->weight_y[i];
@@ -635,22 +601,22 @@ static void glwGBLLayout(GLWGridBagLayout *_this,GLWComponent *_comp)
                 cx=_this->start_x;
                 for (j=0; j<_this->cache[i].x; j++) {
                     cx+=min_w[j];
-                    if (_this->adj_w!=NULL)cx+=_this->adj_w[j];
+                    if (!_this->adj_w.empty()) cx += _this->adj_w[j];
                 }
                 cy=_this->start_y;
                 for (j=0; j<_this->cache[i].y; j++) {
                     cy-=min_h[j];
-                    if (_this->adj_h!=NULL)cy-=_this->adj_h[j];
+                    if (!_this->adj_h.empty()) cy -= _this->adj_h[j];
                 }
                 cw=0;
                 for (j=_this->cache[i].x; j<_this->cache[i].x+_this->cache[i].w; j++) {
                     cw+=min_w[j];
-                    if (_this->adj_w!=NULL)cw+=_this->adj_w[j];
+                    if (!_this->adj_w.empty()) cw += _this->adj_w[j];
                 }
                 ch=0;
                 for (j=_this->cache[i].y; j<_this->cache[i].y+_this->cache[i].h; j++) {
                     ch+=min_h[j];
-                    if (_this->adj_h!=NULL)ch+=_this->adj_h[j];
+                    if (!_this->adj_h.empty()) ch += _this->adj_h[j];
                 }
                 cy-=ch;
                 glwGBLAdjust(_this,_comp,i,&cx,&cy,&cw,&ch);
@@ -668,15 +634,6 @@ GLWGridBagLayout::GLWGridBagLayout()
     this->super.min_size = (GLWLayoutSizeFunc)glwGBLMinSize;
     this->super.pre_size = (GLWLayoutSizeFunc)glwGBLPreSize;
     this->super.max_size = NULL;
-    this->min_w = NULL;
-    this->min_h = NULL;
-    this->pre_w = NULL;
-    this->pre_h = NULL;
-    this->adj_w = NULL;
-    this->adj_h = NULL;
-    this->weight_x = NULL;
-    this->weight_y = NULL;
-    this->cache = NULL;
     this->comp = NULL;
     this->valid = 0;
     this->validating = 0;
