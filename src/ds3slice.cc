@@ -55,7 +55,7 @@ static int ds3SliceTexture3D(DS3Slice *_this,DS3View *_view)
         size_t    l;
         size_t    n;
         GLint     lod;
-        GLubyte  *txtr;
+	std::vector<GLubyte>  txtr;
         double    x[3];
         double    xm[3];
         double    dx[3];
@@ -70,8 +70,7 @@ static int ds3SliceTexture3D(DS3Slice *_this,DS3View *_view)
 #ifndef NDEBUG
         printf("calculated texture size: x=%d, y=%d, z=%d\n", w[X], w[Y], w[Z]);
 #endif
-	txtr = (GLubyte *)malloc(4 * sizeof(GLubyte) * w[X] * w[Y] * w[Z]);
-        if (txtr==NULL)return 0;
+	txtr.reserve(4 * w[X] * w[Y] * w[Z]);
         data = &_view->ds3->data[0];
         if (!_this->t_id)glGenTextures(1,&_this->t_id);
         glBindTexture(GL_TEXTURE_3D,_this->t_id);
@@ -108,15 +107,16 @@ static int ds3SliceTexture3D(DS3Slice *_this,DS3View *_view)
 		    c = dsColorScale(_view->cs, 
 				     dsScale(_view->ds, v[0] 
 					     + xm[X] * (v[1] - v[0])));
-		    txtr[n++] = (GLubyte)(c&0xFF);
-		    txtr[n++] = (GLubyte)(c>>8&0xFF);
-		    txtr[n++] = (GLubyte)(c>>16&0xFF);
-		    txtr[n++] = (GLubyte)(c>>24&0xFF);
+		    txtr.push_back((GLubyte)(c&0xFF));
+		    txtr.push_back((GLubyte)(c>>8&0xFF));
+		    txtr.push_back((GLubyte)(c>>16&0xFF));
+		    txtr.push_back((GLubyte)(c>>24&0xFF));
+		    n += 4;
 		}
 	    }
 	}
 	glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA, w[X], w[Y], w[Z],
-		     0, GL_RGBA, GL_UNSIGNED_BYTE, txtr);
+		     0, GL_RGBA, GL_UNSIGNED_BYTE, &txtr[0]);
 	/*Create mip-maps*/
 	for (lod = 1; (ws[X] || ws[Y] || ws[Z])
 		 && lod <= limit_texture3D_mipmap_level; lod++) {
@@ -157,10 +157,9 @@ static int ds3SliceTexture3D(DS3Slice *_this,DS3View *_view)
 	    printf("creating mipmap level %d with size: x=%d, y=%d, z=%d\n", lod, w[X], w[Y], w[Z]);
 #endif
 	    glTexImage3D(GL_TEXTURE_3D, lod, GL_RGBA, w[X], w[Y], w[Z],
-			 0, GL_RGBA, GL_UNSIGNED_BYTE, txtr);
+			 0, GL_RGBA, GL_UNSIGNED_BYTE, &txtr[0]);
 	}
 	glBindTexture(GL_TEXTURE_3D, 0);
-	free(txtr);
 	_view->t_valid = 1;
     }
     return 1;
