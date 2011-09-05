@@ -48,6 +48,15 @@ DONE
 - Enable support for compressed 3D textures. Tried to do this, but
   image quality was bad so it had to be removed.
 
+- Removed old EXT_paletted_textures code path, as no current hardware
+  supports paletted textures:
+  http://www.opengl.org/registry/specs/EXT/paletted_texture.txt
+  . NVIDIA hardware as of the NV4x generation (2004) does not support
+  this, ATI/AMD and Intel never really supported it. Managed to test
+  this code path on an old Geforce 2MX, but it didn't work there
+  either, maybe a bug in the codepath, or a bug in the driver; in any
+  case it doesn't matter as the codepath is now removed.
+
 
 TODO
 ====
@@ -57,12 +66,6 @@ TODO
   http://home.comcast.net/~tom_forsyth/blog.wiki.html#Strippers (same
   guy, I think). OTOH rendering in vertex buffer ordering seems more
   important. http://home.comcast.net/~tom_forsyth/papers/fast_vert_cache_opt.html
-
-- Remove old EXT_paletted_textures code path, as no current hardware
-  supports paletted
-  textures. http://www.opengl.org/registry/specs/EXT/paletted_texture.txt
-  . NVIDIA hardware as of the NV4x generation (2004) does not support
-  this, ATI/AMD and Intel never really supported it.
 
 - Remove old 2D slice texture generation-on-CPU codepath, as all
   current hardware supports EXT_texture3D (part of OpenGL 1.2 core),

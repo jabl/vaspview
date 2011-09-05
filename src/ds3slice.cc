@@ -439,15 +439,14 @@ static int ds3SliceMakeFast(DS3Slice *_this,DS3View *_view)
     return 1;
 }
 
-/*Creates a 3D texture, if our version of OpenGL supports it (1.2 or later, or
-  one that supports EXT_texture3D). Also, 256 colors is deemed to be enough,
-  so paletted textures are used if supported (1.2 or later, or
-  EXT_paletted_texture) to save on memory and processing time. This is much
-  more advantageous than a 2D texture, since we do not have to create a 2D
+/*Creates a 3D texture, if our version of OpenGL supports it (1.2 or
+  later, or one that supports EXT_texture3D).  This is much more
+  advantageous than a 2D texture, since we do not have to create a 2D
   texture in software every time the slice moves (expensive, since the
-  texture is nine times the size required to fill a unit box to account for
-  repeating, and must be even larger to account for the power of two texture
-  sizes required by OpenGL), and the 3D texturing may be hardware accelerated.*/
+  texture is nine times the size required to fill a unit box to
+  account for repeating, and must be even larger to account for the
+  power of two texture sizes required by OpenGL), and the 3D texturing
+  may be hardware accelerated.*/
 static int ds3SliceTexture3D(DS3Slice *_this,DS3View *_view)
 {
     GLint m;
@@ -482,10 +481,7 @@ static int ds3SliceTexture3D(DS3Slice *_this,DS3View *_view)
 #ifndef NDEBUG
         printf("calculated texture size: x=%d, y=%d, z=%d\n", w[X], w[Y], w[Z]);
 #endif
-        if (GLEW_EXT_paletted_texture) {
-            txtr=(GLubyte *)malloc(sizeof(GLubyte)*w[X]*w[Y]*w[Z]);
-        } else
-            txtr=(GLubyte *)malloc(4*sizeof(GLubyte)*w[X]*w[Y]*w[Z]);
+	txtr = (GLubyte *)malloc(4 * sizeof(GLubyte) * w[X] * w[Y] * w[Z]);
         if (txtr==NULL)return 0;
         data = &_view->ds3->data[0];
         if (!_this->t_id)glGenTextures(1,&_this->t_id);
@@ -496,156 +492,88 @@ static int ds3SliceTexture3D(DS3Slice *_this,DS3View *_view)
         glTexParameteri(GL_TEXTURE_3D,GL_TEXTURE_WRAP_S,GL_REPEAT);
         glTexParameteri(GL_TEXTURE_3D,GL_TEXTURE_WRAP_T,GL_REPEAT);
         glTexParameteri(GL_TEXTURE_3D,GL_TEXTURE_WRAP_R,GL_REPEAT);
-        /*If we have paletted textures available, use those to reduce memory and
-          CPU consumption to 1/4 of that for an RGBA texture*/
-        if (GLEW_EXT_paletted_texture) {
-            if (!_view->c_valid) {
-                ds3SlicePalette(_this,_view);
-                _view->c_valid=1;
-            }
-            glColorTableEXT(GL_TEXTURE_3D,4,UCHAR_MAX+1,GL_RGBA,
-                            GL_UNSIGNED_BYTE,_this->ctable);
-            /*Create the full-sized texture*/
-            for (n=0,j[Z]=0,x[Z]=0; j[Z]<w[Z]; j[Z]++,x[Z]+=dx[Z]) {
-                k[Z]=(GLsizei)x[Z];
-                o[Z]=(k[Z]+1>=d[Z]?-(GLint)k[Z]:1)*d[X]*d[Y];
-                xm[Z]=x[Z]-k[Z];
-                for (j[Y]=0,x[Y]=0; j[Y]<w[Y]; j[Y]++,x[Y]+=dx[Y]) {
-                    k[Y]=(GLsizei)x[Y];
-                    o[Y]=(k[Y]+1>=d[Y]?-(GLint)k[Y]:1)*d[X];
-                    xm[Y]=x[Y]-k[Y];
-                    for (j[X]=0,x[X]=0; j[X]<w[X]; j[X]++,x[X]+=dx[X],n++) {
-                        k[X]=(GLsizei)x[X];
-                        o[X]=k[X]+1>=d[X]?-(GLint)k[X]:1;
-                        xm[X]=x[X]-k[X];
-                        l=k[X]+d[X]*(k[Y]+d[Y]*k[Z]);
-                        v[0]=data[l]+xm[Z]*(data[l+o[Z]]-data[l]);
-                        v[1]=data[l+o[X]]+xm[Z]*(data[l+o[X]+o[Z]]-data[l+o[X]]);
-                        v[2]=data[l+o[Y]]+xm[Z]*(data[l+o[Y]+o[Z]]-data[l+o[Y]]);
-                        v[3]=data[l+o[X]+o[Y]]+xm[Z]*(data[l+o[X]+o[Y]+o[Z]]-data[l+o[X]+o[Y]]);
-                        v[0]+=xm[Y]*(v[2]-v[0]);
-                        v[1]+=xm[Y]*(v[3]-v[1]);
-                        c=(int)(dsScale(_view->ds,v[0]+xm[X]*(v[1]-v[0]))*256);
-                        if (c>255)txtr[n]=255;
-                        else txtr[n]=(GLubyte)c;
-                    }
-                }
-            }
-            glTexImage3D(GL_TEXTURE_3D,0,GL_COLOR_INDEX8_EXT,w[X],w[Y],w[Z],
-                         0,GL_COLOR_INDEX,GL_UNSIGNED_BYTE,txtr);
-            /*Create mip-maps*/
-            for (lod=1; ws[X]||ws[Y]||ws[Z]; lod++) {
-                o[X]=ws[X]?1:0;
-                o[Y]=ws[Y]?w[X]:0;
-                o[Z]=ws[Z]?w[X]<<ws[Y]:0;
-                for (i=0; i<3; i++) {
-                    if (ws[i]) {
-                        ws[i]--;
-                        w[i]>>=1;
-                        j[i]=1;
-                    } else j[i]=0;
-                }
-                for (k[Z]=0; k[Z]<w[Z]; k[Z]++) {
-                    for (k[Y]=0; k[Y]<w[Y]; k[Y]++) {
-                        for (k[X]=0; k[X]<w[X]; k[X]++) {
-                            int c;
-                            l = (k[X] + ((k[Y] + (k[Z] << (ws[Y] + j[Z])))
-                                         << (ws[X] + j[Y]))) << j[X];
-                            c=txtr[l];
-                            c+=txtr[l+o[X]];
-                            c+=txtr[l+o[Y]];
-                            c+=txtr[l+o[Y]+o[X]];
-                            c+=txtr[l+o[Z]];
-                            c+=txtr[l+o[Z]+o[X]];
-                            c+=txtr[l+o[Z]+o[Y]];
-                            c+=txtr[l+o[Z]+o[Y]+o[X]];
-                            txtr[k[X] + ((k[Y] + (k[Z] << ws[Y])) << ws[X])]
-                            = (GLubyte)(c>>3);
-                        }
-                    }
-                }
-                glTexImage3D(GL_TEXTURE_3D,lod,GL_COLOR_INDEX8_EXT,w[X],w[Y],w[Z],
-                             0,GL_COLOR_INDEX,GL_UNSIGNED_BYTE,txtr);
-            }
-        } else
-            /*Create the full-sized texture*/
-        {
-            for (n=0,j[Z]=0,x[Z]=0; j[Z]<w[Z]; j[Z]++,x[Z]+=dx[Z]) {
-                k[Z]=(GLsizei)x[Z];
-                o[Z]=(k[Z]+1>=d[Z]?-(GLint)k[Z]:1)*d[X]*d[Y];
-                xm[Z]=x[Z]-k[Z];
-                for (j[Y]=0,x[Y]=0; j[Y]<w[Y]; j[Y]++,x[Y]+=dx[Y]) {
-                    k[Y]=(GLsizei)x[Y];
-                    o[Y]=(k[Y]+1>=d[Y]?-(GLint)k[Y]:1)*d[X];
-                    xm[Y]=x[Y]-k[Y];
-                    for (j[X]=0,x[X]=0; j[X]<w[X]; j[X]++,x[X]+=dx[X]) {
-                        k[X]=(GLsizei)x[X];
-                        o[X]=k[X]+1>=d[X]?-(GLint)k[X]:1;
-                        xm[X]=x[X]-k[X];
-                        l=k[X]+d[X]*(k[Y]+d[Y]*k[Z]);
-                        v[0]=data[l]+xm[Z]*(data[l+o[Z]]-data[l]);
-                        v[1]=data[l+o[X]]+xm[Z]*(data[l+o[X]+o[Z]]-data[l+o[X]]);
-                        v[2]=data[l+o[Y]]+xm[Z]*(data[l+o[Y]+o[Z]]-data[l+o[Y]]);
-                        v[3]=data[l+o[X]+o[Y]]+xm[Z]*(data[l+o[X]+o[Y]+o[Z]]-data[l+o[X]+o[Y]]);
-                        v[0]+=xm[Y]*(v[2]-v[0]);
-                        v[1]+=xm[Y]*(v[3]-v[1]);
-                        c=dsColorScale(_view->cs,dsScale(_view->ds,v[0]+xm[X]*(v[1]-v[0])));
-                        txtr[n++]=(GLubyte)(c&0xFF);
-                        txtr[n++]=(GLubyte)(c>>8&0xFF);
-                        txtr[n++]=(GLubyte)(c>>16&0xFF);
-                        txtr[n++]=(GLubyte)(c>>24&0xFF);
-                    }
-                }
-            }
-	    GLint format = GL_RGBA;
-            glTexImage3D(GL_TEXTURE_3D, 0, format, w[X], w[Y], w[Z],
-                         0,GL_RGBA,GL_UNSIGNED_BYTE,txtr);
-	    /*Create mip-maps*/
-	    for (lod=1; (ws[X]||ws[Y]||ws[Z])
-		     && lod <= limit_texture3D_mipmap_level; lod++) {
-		o[X]=ws[X]?4:0;
-		o[Y] = ws[Y] ? (w[X] << 2) : 0;
-		o[Z] = ws[Z] ? w[X] << (ws[Y] + 2) : 0;
-		for (i=0; i<3; i++) {
-		    if (ws[i]) {
-			ws[i]--;
-			w[i]>>=1;
-			j[i]=1;
-		    } else j[i]=0;
+	/*Create the full-sized texture*/
+	for (n = 0,j[Z] = 0,x[Z] = 0; j[Z] < w[Z]; j[Z]++, x[Z] += dx[Z]) {
+	    k[Z] = (GLsizei)x[Z];
+	    o[Z] = (k[Z] + 1 >= d[Z] ? -(GLint)k[Z] : 1) * d[X] * d[Y];
+	    xm[Z] = x[Z] - k[Z];
+	    for (j[Y] = 0, x[Y] = 0; j[Y] < w[Y]; j[Y]++, x[Y] += dx[Y]) {
+		k[Y] = (GLsizei)x[Y];
+		o[Y] = (k[Y] + 1 >= d[Y] ? -(GLint)k[Y] : 1) * d[X];
+		xm[Y] = x[Y] - k[Y];
+		for (j[X] = 0, x[X] = 0; j[X] < w[X]; j[X]++, x[X] += dx[X]) {
+		    k[X] = (GLsizei)x[X];
+		    o[X] = k[X] + 1 >= d[X] ? -(GLint)k[X] : 1;
+		    xm[X] = x[X] - k[X];
+		    l = k[X] + d[X] * (k[Y] + d[Y] * k[Z]);
+		    v[0] = data[l] + xm[Z] * (data[l + o[Z]] - data[l]);
+		    v[1] = data[l + o[X]] + xm[Z] * (data[l + o[X] + o[Z]] 
+						     - data[l + o[X]]);
+		    v[2] = data[l + o[Y]] + xm[Z] * (data[l + o[Y] + o[Z]] 
+						     - data[l + o[Y]]);
+		    v[3] = data[l + o[X] + o[Y]] + xm[Z] 
+			* (data[l + o[X] + o[Y] + o[Z]] 
+			   - data[l + o[X] + o[Y]]);
+		    v[0] += xm[Y] * (v[2] - v[0]);
+		    v[1] += xm[Y] * (v[3] - v[1]);
+		    c = dsColorScale(_view->cs, 
+				     dsScale(_view->ds, v[0] 
+					     + xm[X] * (v[1] - v[0])));
+		    txtr[n++] = (GLubyte)(c&0xFF);
+		    txtr[n++] = (GLubyte)(c>>8&0xFF);
+		    txtr[n++] = (GLubyte)(c>>16&0xFF);
+		    txtr[n++] = (GLubyte)(c>>24&0xFF);
 		}
-		for (k[Z]=0; k[Z]<w[Z]; k[Z]++) {
-		    for (k[Y]=0; k[Y]<w[Y]; k[Y]++) {
-			for (k[X]=0; k[X]<w[X]; k[X]++) {
-			    int c[4];
-			    l = (k[X] + ((k[Y] + (k[Z] << (ws[Y] + j[Z])))
-					 << (ws[X] + j[Y]))) << (j[X] + 2);
-			    for (i=0; i<4; i++) {
-				c[i]=txtr[l+i];
-				c[i]+=txtr[l+o[X]];
-				c[i]+=txtr[l+o[Y]+i];
-				c[i]+=txtr[l+o[Y]+o[X]+i];
-				c[i]+=txtr[l+o[Z]+i];
-				c[i]+=txtr[l+o[Z]+o[X]+i];
-				c[i]+=txtr[l+o[Z]+o[Y]+i];
-				c[i]+=txtr[l+o[Z]+o[Y]+o[X]+i];
-			    }
-			    l = (k[X] + ((k[Y] + (k[Z] << ws[Y])) << ws[X]))
-				<< 2;
-			    for (i=0; i<4; i++)txtr[l+i]=(GLubyte)(c[i]>>3);
+	    }
+	}
+	glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA, w[X], w[Y], w[Z],
+		     0, GL_RGBA, GL_UNSIGNED_BYTE, txtr);
+	/*Create mip-maps*/
+	for (lod = 1; (ws[X] || ws[Y] || ws[Z])
+		 && lod <= limit_texture3D_mipmap_level; lod++) {
+	    o[X] = ws[X] ? 4 : 0;
+	    o[Y] = ws[Y] ? (w[X] << 2) : 0;
+	    o[Z] = ws[Z] ? w[X] << (ws[Y] + 2) : 0;
+	    for (i = 0; i < 3; i++) {
+		if (ws[i]) {
+		    ws[i]--;
+		    w[i]>>=1;
+		    j[i] = 1;
+		} else j[i] = 0;
+	    }
+	    for (k[Z] = 0; k[Z] < w[Z]; k[Z]++) {
+		for (k[Y] = 0; k[Y] < w[Y]; k[Y]++) {
+		    for (k[X] = 0; k[X] < w[X]; k[X]++) {
+			int c[4];
+			l = (k[X] + ((k[Y] + (k[Z] << (ws[Y] + j[Z])))
+				     << (ws[X] + j[Y]))) << (j[X] + 2);
+			for (i = 0; i<4; i++) {
+			    c[i] = txtr[l + i];
+			    c[i] += txtr[l + o[X]];
+			    c[i] += txtr[l + o[Y] + i];
+			    c[i] += txtr[l + o[Y] + o[X] + i];
+			    c[i] += txtr[l + o[Z] + i];
+			    c[i] += txtr[l + o[Z] + o[X] + i];
+			    c[i] += txtr[l + o[Z] + o[Y] + i];
+			    c[i] += txtr[l + o[Z] + o[Y] + o[X] + i];
 			}
+			l = (k[X] + ((k[Y] + (k[Z] << ws[Y])) << ws[X]))
+			    << 2;
+			for (i = 0; i < 4; i++) 
+			    txtr[l + i] = (GLubyte)(c[i]>>3);
 		    }
 		}
-#ifndef NDEBUG
-		printf("creating mipmap level %d with size: x=%d, y=%d, z=%d\n", lod, w[X], w[Y], w[Z]);
-#endif
-		glTexImage3D(GL_TEXTURE_3D, lod, format, w[X], w[Y], w[Z],
-			     0, GL_RGBA, GL_UNSIGNED_BYTE, txtr);
 	    }
-        }
-        glBindTexture(GL_TEXTURE_3D,0);
-        free(txtr);
+#ifndef NDEBUG
+	    printf("creating mipmap level %d with size: x=%d, y=%d, z=%d\n", lod, w[X], w[Y], w[Z]);
+#endif
+	    glTexImage3D(GL_TEXTURE_3D, lod, GL_RGBA, w[X], w[Y], w[Z],
+			 0, GL_RGBA, GL_UNSIGNED_BYTE, txtr);
+	}
+	glBindTexture(GL_TEXTURE_3D, 0);
+	free(txtr);
+	_view->t_valid = 1;
     }
-    _view->t_valid=1;
     return 1;
 }
 

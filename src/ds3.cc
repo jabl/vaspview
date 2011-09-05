@@ -389,10 +389,6 @@ int main(int _argc,char **_argv)
     /*At this point, we've created a window, and so should have a current
       rendering context: test for GL extensions*/
 
-    // With this one can enable paletted textures at least on R300,
-    // i915, and Quadro NVS 295, but it doesn't actually work on any
-    // of them.
-    //glewExperimental = GL_TRUE;
     GLenum err = glewInit();
     if (GLEW_OK != err) {
         /* Problem: glewInit failed, something is seriously wrong. */
@@ -402,9 +398,6 @@ int main(int _argc,char **_argv)
 #ifndef NDEBUG
     fprintf(stdout, "Status: Using GLEW %s\n", glewGetString(GLEW_VERSION));
 #endif
-    if (GLEW_EXT_paletted_texture)
-        printf("EXT_paletted_texture available.\n");
-
     if (!GLEW_VERSION_1_2) {
         printf("OpenGL 1.2 not available. Slice rendering will be excruciatingly slow!\n");
     } else {
