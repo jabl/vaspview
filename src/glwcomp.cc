@@ -281,7 +281,7 @@ GLWComponent::GLWComponent()
 
 GLWComponent::~GLWComponent()
 {
-    delete this->parent;
+//    delete this->parent;  // crashes?
 // The Components should be owned by their parents and be destroyed
 // when going out of scope. this->comps is just a list of pointers to
 // components without ownership.
