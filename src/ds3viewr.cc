@@ -186,10 +186,10 @@ static void ds3ViewerViewBondChanged(DS3Viewer *_this,GLWComponent *_c)
 #  if defined(__DS3_SAVE_BONDS__)
 static void ds3ViewerSaveBonds(DS3Viewer *_this)
 {
-    if (_this->bond_name!=NULL) {
+    if (!_this->bond_name.empty()) {
         FILE *file;
         int   err;
-        file=fopen(_this->bond_name,"w");
+        file=fopen(_this->bond_name.c_str(),"w");
         err=1;
         if (file!=NULL) {
             long bf;
@@ -212,7 +212,7 @@ static void ds3ViewerSaveBonds(DS3Viewer *_this)
         if (err) {
             glwLabelSetLabel(_this->lb_status,
                              "Error writing bond information to \"");
-            glwLabelAddLabel(_this->lb_status,_this->bond_name);
+            glwLabelAddLabel(_this->lb_status, _this->bond_name.c_str());
             glwLabelAddLabel(_this->lb_status,"\": ");
             glwLabelAddLabel(_this->lb_status,strerror(errno));
         }
@@ -221,8 +221,8 @@ static void ds3ViewerSaveBonds(DS3Viewer *_this)
 
 static void ds3ViewerLoadBonds(DS3Viewer *_this)
 {
-    if (_this->bond_name!=NULL) {
-        File file(_this->bond_name, "r");
+    if (!_this->bond_name.empty()) {
+        File file(_this->bond_name.c_str(), "r");
         int   err;
         err=1;
         if (file.f != NULL) {
@@ -254,7 +254,7 @@ static void ds3ViewerLoadBonds(DS3Viewer *_this)
         if (err) {
             glwLabelSetLabel(_this->lb_status,
                              "Error reading bond information from \"");
-            glwLabelAddLabel(_this->lb_status,_this->bond_name);
+            glwLabelAddLabel(_this->lb_status, _this->bond_name.c_str());
             glwLabelAddLabel(_this->lb_status,"\": ");
             glwLabelAddLabel(_this->lb_status,strerror(errno));
         }
@@ -867,15 +867,9 @@ static void ds3ViewerFinishRead(DS3Viewer *_this)
         glwLabelAddLabel(_this->lb_status,_this->read_name);
         glwLabelAddLabel(_this->lb_status,"\" Loaded.");
 # if defined(__DS3_ADD_BONDS__)&&defined(__DS3_SAVE_BONDS__)
-        size_t name_sz;
-        free(_this->bond_name);
-        name_sz=strlen(_this->read_name)+5;
-        _this->bond_name=(char *)malloc(name_sz);
-        if (_this->bond_name!=NULL) {
-            memcpy(_this->bond_name,_this->read_name,name_sz-5);
-            memcpy(_this->bond_name+name_sz-5,".aux",5);
-            ds3ViewerLoadBonds(_this);
-        }
+	_this->bond_name = _this->read_name;
+	_this->bond_name.append(".aux");
+	ds3ViewerLoadBonds(_this);
 #endif
     } else {
         ds3ViewSetDataSet(_this->ds3view,NULL);
@@ -1138,9 +1132,6 @@ DS3Viewer::DS3Viewer() :
             lb_backc!=NULL&&_this->cb_backc_black!=NULL&&_this->cb_backc_white!=NULL&&
             lb_projt!=NULL&&_this->cb_projt_persp!=NULL&&_this->cb_projt_ortho!=NULL) {
         int i;
-# if defined(__DS3_ADD_BONDS__)&&defined(__DS3_SAVE_BONDS__)
-        _this->bond_name=NULL;
-# endif
         ds3ViewSetDataScale(_this->ds3view,&_this->scale_linear.super);
         glwButtonSetPressedFunc(_this->bn_open,(GLWActionFunc)ds3ViewerOpen);
         glwButtonSetPressedCtx(_this->bn_open,_this);
