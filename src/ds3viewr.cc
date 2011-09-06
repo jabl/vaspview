@@ -553,33 +553,33 @@ static void ds3ViewerBoxTextChanged(DS3Viewer *_this,GLWComponent *_c)
     double  maxz;
     int     i;
     i=0;
-    ds3ViewerTextSet(_this,&_this->tf_minx->super);
-    text=glwTextFieldGetText(_this->tf_minx);
+    ds3ViewerTextSet(_this, &_this->tf_minx.super);
+    text = glwTextFieldGetText(&_this->tf_minx);
     minx=strtod(text,&e);
     if (e==text||e[0]!='\0')minx=_this->ds3view->box[0][X];
     else i=1;
-    ds3ViewerTextSet(_this,&_this->tf_miny->super);
-    text=glwTextFieldGetText(_this->tf_miny);
+    ds3ViewerTextSet(_this, &_this->tf_miny.super);
+    text = glwTextFieldGetText(&_this->tf_miny);
     miny=strtod(text,&e);
     if (e==text||e[0]!='\0')miny=_this->ds3view->box[0][Y];
     else i=1;
-    ds3ViewerTextSet(_this,&_this->tf_minz->super);
-    text=glwTextFieldGetText(_this->tf_minz);
+    ds3ViewerTextSet(_this, &_this->tf_minz.super);
+    text = glwTextFieldGetText(&_this->tf_minz);
     minz=strtod(text,&e);
     if (e==text||e[0]!='\0')minz=_this->ds3view->box[0][Z];
     else i=1;
-    ds3ViewerTextSet(_this,&_this->tf_maxx->super);
-    text=glwTextFieldGetText(_this->tf_maxx);
+    ds3ViewerTextSet(_this, &_this->tf_maxx.super);
+    text = glwTextFieldGetText(&_this->tf_maxx);
     maxx=strtod(text,&e);
     if (e==text||e[0]!='\0')maxx=_this->ds3view->box[1][X];
     else i=1;
-    ds3ViewerTextSet(_this,&_this->tf_maxy->super);
-    text=glwTextFieldGetText(_this->tf_maxy);
+    ds3ViewerTextSet(_this, &_this->tf_maxy.super);
+    text = glwTextFieldGetText(&_this->tf_maxy);
     maxy=strtod(text,&e);
     if (e==text||e[0]!='\0')maxy=_this->ds3view->box[1][Y];
     else i=1;
-    ds3ViewerTextSet(_this,&_this->tf_maxz->super);
-    text=glwTextFieldGetText(_this->tf_maxz);
+    ds3ViewerTextSet(_this, &_this->tf_maxz.super);
+    text = glwTextFieldGetText(&_this->tf_maxz);
     maxz=strtod(text,&e);
     if (e==text||e[0]!='\0')maxz=_this->ds3view->box[1][Z];
     else i=1;
@@ -944,7 +944,12 @@ DS3Viewer::DS3Viewer() :
         bn_bond_a("Add Bond"),
         bn_bond_d("Delete Bond"),
 #endif
-        tf_minx(new GLWTextField("", 5)),
+        tf_minx("", 5),
+	tf_maxx("", 5),
+	tf_miny("", 5),
+	tf_maxy("", 5),
+	tf_minz("", 5),
+	tf_maxz("", 5),
 	cb_projt_ortho("Orthographic", 0, &this->cg_projt)
 {
     GLWLabel     *lb_file;
@@ -1033,19 +1038,14 @@ DS3Viewer::DS3Viewer() :
     lb_minx = new GLWLabel("Minimum X:");
     _this->sl_minx= new GLWSlider(-100,200,0,0);
     lb_maxx = new GLWLabel("Maximum X:");
-    _this->tf_maxx = new GLWTextField("", 5);
     _this->sl_maxx= new GLWSlider(-100,200,100,0);
     lb_miny= new GLWLabel("Minimum Y:");
-    _this->tf_miny = new GLWTextField("", 5);
     _this->sl_miny= new GLWSlider(-100,200,0,0);
     lb_maxy = new GLWLabel("Maximum Y:");
-    _this->tf_maxy = new GLWTextField("", 5);
     _this->sl_maxy= new GLWSlider(-100,200,100,0);
     lb_minz = new GLWLabel("Minimum Z:");
-    _this->tf_minz = new GLWTextField("", 5);
     _this->sl_minz= new GLWSlider(-100,200,0,0);
     lb_maxz = new GLWLabel("Maximum Z:");
-    _this->tf_maxz = new GLWTextField("", 5);
     _this->sl_maxz= new GLWSlider(-100,200,100,0);
     _this->cb_draw_coords = new GLWCheckBox("Draw Coordinate System",1,NULL);
     lb_zoom = new GLWLabel("Zoom:");
@@ -1104,12 +1104,12 @@ DS3Viewer::DS3Viewer() :
             lb_bond_f!=NULL&&lb_bond_t!=NULL&&
             lb_bond_s!=NULL&&
 # endif
-            lb_minx!=NULL&&_this->tf_minx!=NULL&&_this->sl_minx!=NULL&&lb_maxx!=NULL&&
-            _this->tf_maxx!=NULL&&_this->sl_maxx!=NULL&&lb_miny!=NULL&&
-            _this->tf_miny!=NULL&&_this->sl_miny!=NULL&&lb_maxy!=NULL&&
-            _this->tf_maxy!=NULL&&_this->sl_maxy!=NULL&&lb_minz!=NULL&&
-            _this->tf_minz!=NULL&&_this->sl_minz!=NULL&&lb_maxz!=NULL&&
-            _this->tf_maxz!=NULL&&_this->sl_maxz!=NULL&&_this->cb_draw_coords!=NULL&&
+            lb_minx!=NULL && _this->sl_minx!=NULL&&lb_maxx!=NULL&&
+            _this->sl_maxx!=NULL&&lb_miny!=NULL&&
+            _this->sl_miny!=NULL&&lb_maxy!=NULL&&
+            _this->sl_maxy!=NULL&&lb_minz!=NULL&&
+	    _this->sl_minz!=NULL&&lb_maxz!=NULL&&
+            _this->sl_maxz!=NULL&&_this->cb_draw_coords!=NULL&&
             lb_zoom!=NULL&&_this->tf_zoom!=NULL&&_this->sl_zoom!=NULL&&
             lb_ornt!=NULL&&lb_ornt_y!=NULL&&_this->tf_ornt_y!=NULL&&
             _this->sl_ornt_y!=NULL&&lb_ornt_p!=NULL&&_this->tf_ornt_p!=NULL&&
@@ -1273,42 +1273,42 @@ DS3Viewer::DS3Viewer() :
                                    (GLWActionFunc)ds3ViewerTextChanged);
         glwTextFieldSetChangedCtx(&_this->tf_bond_s, _this);
 # endif
-        glwTextFieldSetActionFunc(_this->tf_minx,
+        glwTextFieldSetActionFunc(&_this->tf_minx,
                                   (GLWActionFunc)ds3ViewerBoxTextChanged);
-        glwTextFieldSetActionCtx(_this->tf_minx,_this);
-        glwTextFieldSetChangedFunc(_this->tf_minx,
+        glwTextFieldSetActionCtx(&_this->tf_minx, _this);
+        glwTextFieldSetChangedFunc(&_this->tf_minx,
                                    (GLWActionFunc)ds3ViewerTextChanged);
-        glwTextFieldSetChangedCtx(_this->tf_minx,_this);
-        glwTextFieldSetActionFunc(_this->tf_miny,
+        glwTextFieldSetChangedCtx(&_this->tf_minx, _this);
+        glwTextFieldSetActionFunc(&_this->tf_miny,
                                   (GLWActionFunc)ds3ViewerBoxTextChanged);
-        glwTextFieldSetActionCtx(_this->tf_miny,_this);
-        glwTextFieldSetChangedFunc(_this->tf_miny,
+        glwTextFieldSetActionCtx(&_this->tf_miny, _this);
+        glwTextFieldSetChangedFunc(&_this->tf_miny,
                                    (GLWActionFunc)ds3ViewerTextChanged);
-        glwTextFieldSetChangedCtx(_this->tf_miny,_this);
-        glwTextFieldSetActionFunc(_this->tf_minz,
+        glwTextFieldSetChangedCtx(&_this->tf_miny, _this);
+        glwTextFieldSetActionFunc(&_this->tf_minz,
                                   (GLWActionFunc)ds3ViewerBoxTextChanged);
-        glwTextFieldSetActionCtx(_this->tf_minz,_this);
-        glwTextFieldSetChangedFunc(_this->tf_minz,
+        glwTextFieldSetActionCtx(&_this->tf_minz, _this);
+        glwTextFieldSetChangedFunc(&_this->tf_minz,
                                    (GLWActionFunc)ds3ViewerTextChanged);
-        glwTextFieldSetChangedCtx(_this->tf_minz,_this);
-        glwTextFieldSetActionFunc(_this->tf_maxx,
+        glwTextFieldSetChangedCtx(&_this->tf_minz, _this);
+        glwTextFieldSetActionFunc(&_this->tf_maxx,
                                   (GLWActionFunc)ds3ViewerBoxTextChanged);
-        glwTextFieldSetActionCtx(_this->tf_maxx,_this);
-        glwTextFieldSetChangedFunc(_this->tf_maxx,
+        glwTextFieldSetActionCtx(&_this->tf_maxx, _this);
+        glwTextFieldSetChangedFunc(&_this->tf_maxx,
                                    (GLWActionFunc)ds3ViewerTextChanged);
-        glwTextFieldSetChangedCtx(_this->tf_maxx,_this);
-        glwTextFieldSetActionFunc(_this->tf_maxy,
+        glwTextFieldSetChangedCtx(&_this->tf_maxx, _this);
+        glwTextFieldSetActionFunc(&_this->tf_maxy,
                                   (GLWActionFunc)ds3ViewerBoxTextChanged);
-        glwTextFieldSetActionCtx(_this->tf_maxy,_this);
-        glwTextFieldSetChangedFunc(_this->tf_maxy,
+        glwTextFieldSetActionCtx(&_this->tf_maxy, _this);
+        glwTextFieldSetChangedFunc(&_this->tf_maxy,
                                    (GLWActionFunc)ds3ViewerTextChanged);
-        glwTextFieldSetChangedCtx(_this->tf_maxy,_this);
-        glwTextFieldSetActionFunc(_this->tf_maxz,
+        glwTextFieldSetChangedCtx(&_this->tf_maxy, _this);
+        glwTextFieldSetActionFunc(&_this->tf_maxz,
                                   (GLWActionFunc)ds3ViewerBoxTextChanged);
-        glwTextFieldSetActionCtx(_this->tf_maxz,_this);
-        glwTextFieldSetChangedFunc(_this->tf_maxz,
+        glwTextFieldSetActionCtx(&_this->tf_maxz, _this);
+        glwTextFieldSetChangedFunc(&_this->tf_maxz,
                                    (GLWActionFunc)ds3ViewerTextChanged);
-        glwTextFieldSetChangedCtx(_this->tf_maxz,_this);
+        glwTextFieldSetChangedCtx(&_this->tf_maxz, _this);
         glwTextFieldSetActionFunc(_this->tf_zoom,
                                   (GLWActionFunc)ds3ViewerZoomTextChanged);
         glwTextFieldSetActionCtx(_this->tf_zoom,_this);
@@ -1729,69 +1729,69 @@ DS3Viewer::DS3Viewer() :
         glwCompSetLayout(cm_bnds,&(new GLWGridBagLayout())->super);
         glwCompSetInsets(&lb_minx->super,0,0,2,2);
         glwCompSetWeightX(&lb_minx->super,1);
-        glwCompSetInsets(&_this->tf_minx->super,0,0,2,2);
-        glwCompSetGridWidth(&_this->tf_minx->super,GLWC_REMAINDER);
-        glwCompSetAlignX(&_this->tf_minx->super,1);
+        glwCompSetInsets(&_this->tf_minx.super, 0, 0, 2, 2);
+        glwCompSetGridWidth(&_this->tf_minx.super, GLWC_REMAINDER);
+        glwCompSetAlignX(&_this->tf_minx.super, 1);
         glwCompSetInsets(&_this->sl_minx->super,0,0,10,2);
         glwCompSetGridWidth(&_this->sl_minx->super,GLWC_REMAINDER);
         glwCompSetFill(&_this->sl_minx->super,GLWC_HORIZONTAL);
         glwCompSetInsets(&lb_miny->super,0,0,2,2);
         glwCompSetWeightX(&lb_miny->super,1);
-        glwCompSetInsets(&_this->tf_miny->super,0,0,2,2);
-        glwCompSetGridWidth(&_this->tf_miny->super,GLWC_REMAINDER);
-        glwCompSetAlignX(&_this->tf_miny->super,1);
+        glwCompSetInsets(&_this->tf_miny.super, 0, 0, 2, 2);
+        glwCompSetGridWidth(&_this->tf_miny.super, GLWC_REMAINDER);
+        glwCompSetAlignX(&_this->tf_miny.super, 1);
         glwCompSetInsets(&_this->sl_miny->super,0,0,10,2);
         glwCompSetGridWidth(&_this->sl_miny->super,GLWC_REMAINDER);
         glwCompSetFill(&_this->sl_miny->super,GLWC_HORIZONTAL);
         glwCompSetInsets(&lb_minz->super,0,0,2,2);
         glwCompSetWeightX(&lb_minz->super,1);
-        glwCompSetInsets(&_this->tf_minz->super,0,0,2,2);
-        glwCompSetGridWidth(&_this->tf_minz->super,GLWC_REMAINDER);
-        glwCompSetAlignX(&_this->tf_minz->super,1);
+        glwCompSetInsets(&_this->tf_minz.super, 0, 0, 2, 2);
+        glwCompSetGridWidth(&_this->tf_minz.super, GLWC_REMAINDER);
+        glwCompSetAlignX(&_this->tf_minz.super, 1);
         glwCompSetInsets(&_this->sl_minz->super,0,0,10,2);
         glwCompSetGridWidth(&_this->sl_minz->super,GLWC_REMAINDER);
         glwCompSetFill(&_this->sl_minz->super,GLWC_HORIZONTAL);
         glwCompSetInsets(&lb_maxx->super,0,0,2,2);
         glwCompSetWeightX(&lb_maxx->super,1);
-        glwCompSetInsets(&_this->tf_maxx->super,0,0,2,2);
-        glwCompSetGridWidth(&_this->tf_maxx->super,GLWC_REMAINDER);
-        glwCompSetAlignX(&_this->tf_maxx->super,1);
+        glwCompSetInsets(&_this->tf_maxx.super, 0, 0, 2, 2);
+        glwCompSetGridWidth(&_this->tf_maxx.super, GLWC_REMAINDER);
+        glwCompSetAlignX(&_this->tf_maxx.super, 1);
         glwCompSetInsets(&_this->sl_maxx->super,0,0,10,2);
         glwCompSetGridWidth(&_this->sl_maxx->super,GLWC_REMAINDER);
         glwCompSetFill(&_this->sl_maxx->super,GLWC_HORIZONTAL);
         glwCompSetInsets(&lb_maxy->super,0,0,2,2);
         glwCompSetWeightX(&lb_maxy->super,1);
-        glwCompSetInsets(&_this->tf_maxy->super,0,0,2,2);
-        glwCompSetGridWidth(&_this->tf_maxy->super,GLWC_REMAINDER);
-        glwCompSetAlignX(&_this->tf_maxy->super,1);
+        glwCompSetInsets(&_this->tf_maxy.super, 0, 0, 2, 2);
+        glwCompSetGridWidth(&_this->tf_maxy.super, GLWC_REMAINDER);
+        glwCompSetAlignX(&_this->tf_maxy.super, 1);
         glwCompSetInsets(&_this->sl_maxy->super,0,0,10,2);
         glwCompSetGridWidth(&_this->sl_maxy->super,GLWC_REMAINDER);
         glwCompSetFill(&_this->sl_maxy->super,GLWC_HORIZONTAL);
         glwCompSetInsets(&lb_maxz->super,0,0,2,2);
         glwCompSetWeightX(&lb_maxz->super,1);
-        glwCompSetInsets(&_this->tf_maxz->super,0,0,2,2);
-        glwCompSetGridWidth(&_this->tf_maxz->super,GLWC_REMAINDER);
-        glwCompSetAlignX(&_this->tf_maxz->super,1);
+        glwCompSetInsets(&_this->tf_maxz.super, 0, 0, 2, 2);
+        glwCompSetGridWidth(&_this->tf_maxz.super, GLWC_REMAINDER);
+        glwCompSetAlignX(&_this->tf_maxz.super, 1);
         glwCompSetInsets(&_this->sl_maxz->super,0,0,10,2);
         glwCompSetGridWidth(&_this->sl_maxz->super,GLWC_REMAINDER);
         glwCompSetFill(&_this->sl_maxz->super,GLWC_HORIZONTAL);
         glwCompAdd(cm_bnds,&lb_minx->super,-1);
-        glwCompAdd(cm_bnds,&_this->tf_minx->super,-1);
+        glwCompAdd(cm_bnds,&_this->tf_minx.super, -1);
         glwCompAdd(cm_bnds,&_this->sl_minx->super,-1);
         glwCompAdd(cm_bnds,&lb_miny->super,-1);
-        glwCompAdd(cm_bnds,&_this->tf_miny->super,-1);
+        glwCompAdd(cm_bnds,&_this->tf_miny.super, -1);
         glwCompAdd(cm_bnds,&_this->sl_miny->super,-1);
         glwCompAdd(cm_bnds,&lb_minz->super,-1);
-        glwCompAdd(cm_bnds,&_this->tf_minz->super,-1);
+        glwCompAdd(cm_bnds,&_this->tf_minz.super, -1);
         glwCompAdd(cm_bnds,&_this->sl_minz->super,-1);
         glwCompAdd(cm_bnds,&lb_maxx->super,-1);
-        glwCompAdd(cm_bnds,&_this->tf_maxx->super,-1);
+        glwCompAdd(cm_bnds,&_this->tf_maxx.super, -1);
         glwCompAdd(cm_bnds,&_this->sl_maxx->super,-1);
         glwCompAdd(cm_bnds,&lb_maxy->super,-1);
-        glwCompAdd(cm_bnds,&_this->tf_maxy->super,-1);
+        glwCompAdd(cm_bnds,&_this->tf_maxy.super, -1);
         glwCompAdd(cm_bnds,&_this->sl_maxy->super,-1);
         glwCompAdd(cm_bnds,&lb_maxz->super,-1);
-        glwCompAdd(cm_bnds,&_this->tf_maxz->super,-1);
+        glwCompAdd(cm_bnds,&_this->tf_maxz.super, -1);
         glwCompAdd(cm_bnds,&_this->sl_maxz->super,-1);
         glwCompSetLayout(cm_view,&(new GLWGridBagLayout())->super);
         glwCompSetInsets(&_this->cb_draw_coords->super,0,0,2,2);
@@ -1989,22 +1989,16 @@ DS3Viewer::~DS3Viewer()
 //    delete (lb_zoom);
     delete (_this->cb_draw_coords);
     delete _this->sl_maxz;
-    delete (_this->tf_maxz);
 //    delete (lb_maxz);
     delete _this->sl_minz;
-    delete (_this->tf_minz);
 //    delete (lb_minz);
     delete _this->sl_maxy;
-    delete (_this->tf_maxy);
 //    delete (lb_maxy);
     delete _this->sl_miny;
-    delete (_this->tf_miny);
 //    delete (lb_miny);
     delete _this->sl_maxx;
-    delete (_this->tf_maxx);
 //    delete (lb_maxx);
     delete _this->sl_minx;
-    delete (_this->tf_minx);
 //    delete (lb_minx);
     delete _this->sl_point_r;
     delete _this->sl_iso_d;
@@ -2276,54 +2270,60 @@ void ds3ViewerSetBox(DS3Viewer *_this,double _minx,double _miny,double _minz,
     _maxy=_this->ds3view->box[1][Y];
     _maxz=_this->ds3view->box[1][Z];
     sprintf(text,"%0.3g",_minx);
-    glwTextFieldSetChangedFunc(_this->tf_minx,(GLWActionFunc)ds3ViewerTextSet);
-    glwTextFieldSetText(_this->tf_minx,text);
-    glwTextFieldSetChangedFunc(_this->tf_minx,
+    glwTextFieldSetChangedFunc(&_this->tf_minx,
+			       (GLWActionFunc)ds3ViewerTextSet);
+    glwTextFieldSetText(&_this->tf_minx, text);
+    glwTextFieldSetChangedFunc(&_this->tf_minx,
                                (GLWActionFunc)ds3ViewerTextChanged);
     glwSliderSetChangedFunc(_this->sl_minx,NULL);
     glwSliderSetVal(_this->sl_minx,(int)floor(_minx*100+0.5),0);
     glwSliderSetChangedFunc(_this->sl_minx,
                             (GLWActionFunc)ds3ViewerMinXSliderChanged);
     sprintf(text,"%0.3g",_miny);
-    glwTextFieldSetChangedFunc(_this->tf_miny,(GLWActionFunc)ds3ViewerTextSet);
-    glwTextFieldSetText(_this->tf_miny,text);
-    glwTextFieldSetChangedFunc(_this->tf_miny,
+    glwTextFieldSetChangedFunc(&_this->tf_miny,
+			       (GLWActionFunc)ds3ViewerTextSet);
+    glwTextFieldSetText(&_this->tf_miny, text);
+    glwTextFieldSetChangedFunc(&_this->tf_miny,
                                (GLWActionFunc)ds3ViewerTextChanged);
     glwSliderSetChangedFunc(_this->sl_miny,NULL);
     glwSliderSetVal(_this->sl_miny,(int)floor(_miny*100+0.5),0);
     glwSliderSetChangedFunc(_this->sl_miny,
                             (GLWActionFunc)ds3ViewerMinYSliderChanged);
     sprintf(text,"%0.3g",_minz);
-    glwTextFieldSetChangedFunc(_this->tf_minz,(GLWActionFunc)ds3ViewerTextSet);
-    glwTextFieldSetText(_this->tf_minz,text);
-    glwTextFieldSetChangedFunc(_this->tf_minz,
+    glwTextFieldSetChangedFunc(&_this->tf_minz,
+			       (GLWActionFunc)ds3ViewerTextSet);
+    glwTextFieldSetText(&_this->tf_minz, text);
+    glwTextFieldSetChangedFunc(&_this->tf_minz,
                                (GLWActionFunc)ds3ViewerTextChanged);
     glwSliderSetChangedFunc(_this->sl_minz,NULL);
     glwSliderSetVal(_this->sl_minz,(int)floor(_minz*100+0.5),0);
     glwSliderSetChangedFunc(_this->sl_minz,
                             (GLWActionFunc)ds3ViewerMinZSliderChanged);
     sprintf(text,"%0.3g",_maxx);
-    glwTextFieldSetChangedFunc(_this->tf_maxx,(GLWActionFunc)ds3ViewerTextSet);
-    glwTextFieldSetText(_this->tf_maxx,text);
-    glwTextFieldSetChangedFunc(_this->tf_maxx,
+    glwTextFieldSetChangedFunc(&_this->tf_maxx,
+			       (GLWActionFunc)ds3ViewerTextSet);
+    glwTextFieldSetText(&_this->tf_maxx, text);
+    glwTextFieldSetChangedFunc(&_this->tf_maxx,
                                (GLWActionFunc)ds3ViewerTextChanged);
     glwSliderSetChangedFunc(_this->sl_maxx,NULL);
     glwSliderSetVal(_this->sl_maxx,(int)floor(_maxx*100+0.5),0);
     glwSliderSetChangedFunc(_this->sl_maxx,
                             (GLWActionFunc)ds3ViewerMaxXSliderChanged);
     sprintf(text,"%0.3g",_maxy);
-    glwTextFieldSetChangedFunc(_this->tf_maxy,(GLWActionFunc)ds3ViewerTextSet);
-    glwTextFieldSetText(_this->tf_maxy,text);
-    glwTextFieldSetChangedFunc(_this->tf_maxy,
+    glwTextFieldSetChangedFunc(&_this->tf_maxy,
+			       (GLWActionFunc)ds3ViewerTextSet);
+    glwTextFieldSetText(&_this->tf_maxy, text);
+    glwTextFieldSetChangedFunc(&_this->tf_maxy,
                                (GLWActionFunc)ds3ViewerTextChanged);
     glwSliderSetChangedFunc(_this->sl_maxy,NULL);
     glwSliderSetVal(_this->sl_maxy,(int)floor(_maxy*100+0.5),0);
     glwSliderSetChangedFunc(_this->sl_maxy,
                             (GLWActionFunc)ds3ViewerMaxYSliderChanged);
     sprintf(text,"%0.3g",_maxz);
-    glwTextFieldSetChangedFunc(_this->tf_maxz,(GLWActionFunc)ds3ViewerTextSet);
-    glwTextFieldSetText(_this->tf_maxz,text);
-    glwTextFieldSetChangedFunc(_this->tf_maxz,
+    glwTextFieldSetChangedFunc(&_this->tf_maxz,
+			       (GLWActionFunc)ds3ViewerTextSet);
+    glwTextFieldSetText(&_this->tf_maxz, text);
+    glwTextFieldSetChangedFunc(&_this->tf_maxz,
                                (GLWActionFunc)ds3ViewerTextChanged);
     glwSliderSetChangedFunc(_this->sl_maxz,NULL);
     glwSliderSetVal(_this->sl_maxz,(int)floor(_maxz*100+0.5),0);

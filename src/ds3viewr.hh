@@ -74,17 +74,17 @@ public:
     GLWButton         bn_bond_a;
     GLWButton         bn_bond_d;
 # endif
-    GLWTextField     *tf_minx;
+    GLWTextField     tf_minx;
     GLWSlider        *sl_minx;
-    GLWTextField     *tf_maxx;
+    GLWTextField     tf_maxx;
     GLWSlider        *sl_maxx;
-    GLWTextField     *tf_miny;
+    GLWTextField     tf_miny;
     GLWSlider        *sl_miny;
-    GLWTextField     *tf_maxy;
+    GLWTextField     tf_maxy;
     GLWSlider        *sl_maxy;
-    GLWTextField     *tf_minz;
+    GLWTextField     tf_minz;
     GLWSlider        *sl_minz;
-    GLWTextField     *tf_maxz;
+    GLWTextField     tf_maxz;
     GLWSlider        *sl_maxz;
     GLWTextField     *tf_zoom;
     GLWSlider        *sl_zoom;
