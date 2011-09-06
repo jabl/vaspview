@@ -61,8 +61,8 @@ public:
     GLWTextField      tf_point_r;
     GLWSlider        *sl_point_r;
     GLWTextField      tf_point_s;
-    GLWLabel         *lb_point_t;
-    GLWLabel         *lb_point_l;
+    GLWLabel          lb_point_t;
+    GLWLabel          lb_point_l;
     GLWButton        *bn_point_c;
     GLWButton        *bn_point_v;
     GLWButton        *bn_point_sa;

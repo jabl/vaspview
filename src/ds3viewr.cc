@@ -931,8 +931,8 @@ DS3Viewer::DS3Viewer() :
         cb_draw_points("Draw Atoms",1,NULL),
         tf_point_r("", 5),
         tf_point_s("", 5),
-        lb_point_t(new GLWLabel("Atom type:")),
-        lb_point_l(new GLWLabel("Atom location:")),
+        lb_point_t("Atom type:"),
+        lb_point_l("Atom location:"),
         bn_point_c(new GLWButton("Look at Atom")),
         bn_point_v(new GLWButton("Hide Atom")),
         bn_point_sa(new GLWButton("Show All Atoms")),
@@ -1100,8 +1100,7 @@ DS3Viewer::DS3Viewer() :
             _this->sl_iso_v!=NULL&&lb_iso_d!=NULL&&/*_this->tf_iso_d!=NULL&&*/
             _this->sl_iso_d!=NULL && lb_point_r!=NULL&&
             _this->sl_point_r!=NULL&&lb_point_s!=NULL&&
-            _this->lb_point_t!=NULL&&
-            _this->lb_point_l!=NULL&&_this->bn_point_c!=NULL&&
+	    _this->bn_point_c!=NULL&&
             _this->bn_point_v!=NULL&&_this->bn_point_sa!=NULL&&
 # if defined(__DS3_ADD_BONDS__)
             lb_bond_f!=NULL&&_this->tf_bond_f!=NULL&&lb_bond_t!=NULL&&
@@ -1659,10 +1658,10 @@ DS3Viewer::DS3Viewer() :
         glwCompSetInsets(&_this->tf_point_s.super,0,0,2,2);
         glwCompSetGridWidth(&_this->tf_point_s.super,GLWC_REMAINDER);
         glwCompSetAlignX(&_this->tf_point_s.super,1);
-        glwCompSetInsets(&_this->lb_point_t->super,2,2,10,2);
-        glwCompSetGridWidth(&_this->lb_point_t->super,GLWC_REMAINDER);
-        glwCompSetInsets(&_this->lb_point_l->super,2,2,10,2);
-        glwCompSetGridWidth(&_this->lb_point_l->super,GLWC_REMAINDER);
+        glwCompSetInsets(&_this->lb_point_t.super, 2, 2, 10, 2);
+        glwCompSetGridWidth(&_this->lb_point_t.super, GLWC_REMAINDER);
+        glwCompSetInsets(&_this->lb_point_l.super, 2, 2, 10, 2);
+        glwCompSetGridWidth(&_this->lb_point_l.super, GLWC_REMAINDER);
         glwCompSetInsets(cm_point_btns,2,2,2,2);
         glwCompSetFill(cm_point_btns,GLWC_HORIZONTAL);
         glwCompSetGridWidth(cm_point_btns,GLWC_REMAINDER);
@@ -1694,9 +1693,9 @@ DS3Viewer::DS3Viewer() :
         glwCompAdd(cm_strc,&_this->tf_point_r.super,-1);
         glwCompAdd(cm_strc,&_this->sl_point_r->super,-1);
         glwCompAdd(cm_strc,&lb_point_s->super,-1);
-        glwCompAdd(cm_strc,&_this->tf_point_s.super,-1);
-        glwCompAdd(cm_strc,&_this->lb_point_t->super,-1);
-        glwCompAdd(cm_strc,&_this->lb_point_l->super,-1);
+        glwCompAdd(cm_strc,&_this->tf_point_s.super, -1);
+        glwCompAdd(cm_strc,&_this->lb_point_t.super, -1);
+        glwCompAdd(cm_strc,&_this->lb_point_l.super, -1);
         glwCompAdd(cm_strc,cm_point_btns,-1);
 # if defined(__DS3_ADD_BONDS__)
         glwCompAdd(cm_strc,&lb_bond_f->super,-1);
@@ -2022,11 +2021,7 @@ DS3Viewer::~DS3Viewer()
     delete (_this->bn_point_sa);
     delete (_this->bn_point_v);
     delete (_this->bn_point_c);
-    delete (_this->lb_point_l);
-    delete (_this->lb_point_t);
-//    delete (lb_point_s);
     delete _this->sl_point_r;
-//    delete (lb_point_r);
     delete _this->sl_iso_d;
     /*delete (_this->tf_iso_d);*/
 //    delete (lb_iso_d);
@@ -2367,11 +2362,11 @@ void ds3ViewerSetSelectedPoint(DS3Viewer *_this,long _pt)
         glwTextFieldSetChangedFunc(&_this->tf_point_s,
                                    (GLWActionFunc)ds3ViewerTextChanged);
         sprintf(text,"Atom type: %i",_this->ds3->points[_pt].typ+1);
-        glwLabelSetLabel(_this->lb_point_t,text);
+        glwLabelSetLabel(&_this->lb_point_t,text);
         sprintf(text,"Atom location: <%0.4g,%0.4g,%0.4g>",
                 _this->ds3->points[_pt].pos[X], _this->ds3->points[_pt].pos[Y],
                 _this->ds3->points[_pt].pos[Z]);
-        glwLabelSetLabel(_this->lb_point_l,text);
+        glwLabelSetLabel(&_this->lb_point_l,text);
         ds3ViewerSetPointVisible(_this,
                                  ds3ViewGetPointVisible(_this->ds3view,_pt));
     }
