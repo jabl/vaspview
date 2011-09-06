@@ -38,7 +38,7 @@ public:
     GLWButton         bn_open;
     GLWTextField      tf_file;
     GLWLabel          lb_data_set;
-    GLWTabbedPane    *tp_ctrl;
+    GLWTabbedPane     tp_ctrl;
     DSColorLegend    *legend;
     GLWLabel         *lb_status;
     GLWCheckBox      *cb_draw_slice;

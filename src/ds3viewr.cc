@@ -917,7 +917,6 @@ DS3Viewer::DS3Viewer() :
         bn_open("Open"),
         tf_file(NULL, 20),
         lb_data_set("Data Set: "),
-        tp_ctrl(new GLWTabbedPane()),
         legend(new DSColorLegend()),
         lb_status(new GLWLabel(NULL)),
         cb_draw_slice(new GLWCheckBox("Draw Slice",1,NULL)),
@@ -1094,7 +1093,7 @@ DS3Viewer::DS3Viewer() :
             cm_bond_btns!=NULL&&
 # endif
             cm_bnds!=NULL&&cm_view!=NULL&&cm_view_btns!=NULL&&cm_opts!=NULL&&
-            _this->tp_ctrl!=NULL&&_this->legend!=NULL&&_this->lb_status!=NULL&&
+            _this->legend!=NULL&&_this->lb_status!=NULL&&
             _this->lb_datax!=NULL&&_this->lb_datay!=NULL&&_this->lb_dataz!=NULL&&
             _this->lb_datav!=NULL&&_this->cb_draw_slice!=NULL&&lb_slice_t!=NULL&&
             _this->tf_slice_t!=NULL&&_this->sl_slice_t != NULL&&lb_slice_p!=NULL&&
@@ -1533,10 +1532,10 @@ DS3Viewer::DS3Viewer() :
         glwCompSetInsets(&_this->lb_data_set.super, 0, 0, 2, 2);
         glwCompSetGridWidth(&_this->lb_data_set.super, GLWC_REMAINDER);
         glwCompSetFill(&_this->lb_data_set.super, GLWC_HORIZONTAL);
-        glwCompSetInsets(&_this->tp_ctrl->super,2,2,2,2);
-        glwCompSetGridWidth(&_this->tp_ctrl->super,GLWC_REMAINDER);
-        glwCompSetGridHeight(&_this->tp_ctrl->super,3);
-        glwCompSetFill(&_this->tp_ctrl->super,GLWC_BOTH);
+        glwCompSetInsets(&_this->tp_ctrl.super, 2, 2, 2, 2);
+        glwCompSetGridWidth(&_this->tp_ctrl.super, GLWC_REMAINDER);
+        glwCompSetGridHeight(&_this->tp_ctrl.super, 3);
+        glwCompSetFill(&_this->tp_ctrl.super, GLWC_BOTH);
         glwCompSetInsets(&_this->legend->super,2,2,2,2);
         glwCompSetFill(&_this->legend->super,GLWC_HORIZONTAL);
         glwCompSetGridX(&_this->legend->super,0);
@@ -1553,7 +1552,7 @@ DS3Viewer::DS3Viewer() :
         glwCompAdd(&_this->frame->super, &_this->tf_file.super, -1);
         glwCompAdd(&_this->frame->super, &_this->bn_open.super, -1);
         glwCompAdd(&_this->frame->super, &_this->lb_data_set.super, -1);
-        glwCompAdd(&_this->frame->super,&_this->tp_ctrl->super,-1);
+        glwCompAdd(&_this->frame->super, &_this->tp_ctrl.super, -1);
         glwCompAdd(&_this->frame->super,&_this->legend->super,-1);
         glwCompAdd(&_this->frame->super,cm_vals,-1);
         glwCompAdd(&_this->frame->super,&_this->lb_status->super,-1);
@@ -1580,11 +1579,11 @@ DS3Viewer::DS3Viewer() :
         glwCompSetAlignY(cm_view,1);
         glwCompSetFill(cm_opts,GLWC_HORIZONTAL);
         glwCompSetAlignY(cm_opts,1);
-        glwTabbedPaneAdd(_this->tp_ctrl,cm_data,"Data",-1);
-        glwTabbedPaneAdd(_this->tp_ctrl,cm_strc,"Atoms",-1);
-        glwTabbedPaneAdd(_this->tp_ctrl,cm_bnds,"Bounds",-1);
-        glwTabbedPaneAdd(_this->tp_ctrl,cm_view,"View",-1);
-        glwTabbedPaneAdd(_this->tp_ctrl,cm_opts,"Options",-1);
+        glwTabbedPaneAdd(&_this->tp_ctrl, cm_data, "Data", -1);
+        glwTabbedPaneAdd(&_this->tp_ctrl, cm_strc, "Atoms", -1);
+        glwTabbedPaneAdd(&_this->tp_ctrl, cm_bnds, "Bounds", -1);
+        glwTabbedPaneAdd(&_this->tp_ctrl, cm_view, "View", -1);
+        glwTabbedPaneAdd(&_this->tp_ctrl, cm_opts, "Options", -1);
         glwCompSetLayout(cm_data,&(new GLWGridBagLayout())->super);
         glwCompSetInsets(&_this->cb_draw_slice->super,0,0,2,2);
         glwCompSetGridWidth(&_this->cb_draw_slice->super,GLWC_REMAINDER);
@@ -2057,7 +2056,6 @@ DS3Viewer::~DS3Viewer()
     delete (_this->lb_datax);
     delete (_this->lb_status);
     delete _this->legend;
-    delete _this->tp_ctrl;
 //    glwCompFree(cm_opts);
 //    glwCompFree(cm_view_btns);
 //    glwCompFree(cm_view);
