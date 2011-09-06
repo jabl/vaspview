@@ -277,11 +277,11 @@ static void ds3ViewerDrawSliceChanged(DS3Viewer *_this,GLWComponent *_c)
     b = glwCheckBoxGetState(&_this->cb_draw_slice);
     ds3ViewSetDrawSlice(_this->ds3view,b);
     glwCompEnable(&_this->tf_slice_t.super,b);
-    glwCompEnable(&_this->sl_slice_t->super,b);
+    glwCompEnable(&_this->sl_slice_t.super, b);
     glwCompEnable(&_this->tf_slice_p.super,b);
-    glwCompEnable(&_this->sl_slice_p->super,b);
+    glwCompEnable(&_this->sl_slice_p.super, b);
     glwCompEnable(&_this->tf_slice_d.super,b);
-    glwCompEnable(&_this->sl_slice_d->super,b);
+    glwCompEnable(&_this->sl_slice_d.super, b);
 }
 
 static void ds3ViewerSliceTextChanged(DS3Viewer *_this,GLWComponent *_c)
@@ -314,21 +314,21 @@ static void ds3ViewerSliceTextChanged(DS3Viewer *_this,GLWComponent *_c)
 static void ds3ViewerSliceTSliderChanged(DS3Viewer *_this,GLWComponent *_c)
 {
     int v;
-    v = _this->sl_slice_t->getVal();
+    v = _this->sl_slice_t.getVal();
     ds3ViewerSetSlice(_this,v,_this->ds3view->slice_p,_this->ds3view->slice_d);
 }
 
 static void ds3ViewerSlicePSliderChanged(DS3Viewer *_this,GLWComponent *_c)
 {
     int v;
-    v=glwSliderGetVal(_this->sl_slice_p);
+    v = glwSliderGetVal(&_this->sl_slice_p);
     ds3ViewerSetSlice(_this,_this->ds3view->slice_t,v,_this->ds3view->slice_d);
 }
 
 static void ds3ViewerSliceDSliderChanged(DS3Viewer *_this,GLWComponent *_c)
 {
     int v;
-    v=glwSliderGetVal(_this->sl_slice_d);
+    v=glwSliderGetVal(&_this->sl_slice_d);
     ds3ViewerSetSlice(_this,_this->ds3view->slice_t,_this->ds3view->slice_p,
                       v*0.01);
 }
@@ -339,9 +339,9 @@ static void ds3ViewerDrawIsoChanged(DS3Viewer *_this,GLWComponent *_c)
     b = glwCheckBoxGetState(&_this->cb_draw_iso);
     ds3ViewSetDrawIso(_this->ds3view,b);
     glwCompEnable(&_this->tf_iso_v.super, b);
-    glwCompEnable(&_this->sl_iso_v->super,b);
+    glwCompEnable(&_this->sl_iso_v.super, b);
     /*glwCompEnable(&_this->tf_iso_d->super,b);*/
-    glwCompEnable(&_this->sl_iso_d->super,b);
+    glwCompEnable(&_this->sl_iso_d.super, b);
 }
 
 static void ds3ViewerIsoVTextChanged(DS3Viewer *_this,GLWComponent *_c)
@@ -360,7 +360,7 @@ static void ds3ViewerIsoVTextChanged(DS3Viewer *_this,GLWComponent *_c)
 static void ds3ViewerIsoVSliderChanged(DS3Viewer *_this,GLWComponent *_c)
 {
     int v;
-    v=glwSliderGetVal(_this->sl_iso_v);
+    v=glwSliderGetVal(&_this->sl_iso_v);
     ds3ViewerSetIso(_this,dsUnscale(_this->ds3view->ds,v/(double)DS3V_ISO_V_RES),
                     _this->ds3view->iso_d);
 }
@@ -370,7 +370,7 @@ static void ds3ViewerIsoVSliderChanged(DS3Viewer *_this,GLWComponent *_c)
        char *e;
        long  d;
  ds3ViewerTextSet(_this,_c);
- text=glwTextFieldGetText(_this->tf_iso_d);
+ text=glwTextFieldGetText(&_this->tf_iso_d);
  d=strtol(text,&e,0);
  if(e!=text&&e[0]=='\0'){
   ds3ViewerSetIso(_this,_this->ds3.min+_this->ds3view->iso_v*
@@ -379,7 +379,7 @@ static void ds3ViewerIsoVSliderChanged(DS3Viewer *_this,GLWComponent *_c)
 static void ds3ViewerIsoDSliderChanged(DS3Viewer *_this,GLWComponent *_c)
 {
     int v;
-    v=glwSliderGetVal(_this->sl_iso_d);
+    v=glwSliderGetVal(&_this->sl_iso_d);
     ds3ViewerSetIso(_this,_this->ds3view->iso_v,v);
 }
 
@@ -404,7 +404,7 @@ static void ds3ViewerDrawPointsChanged(DS3Viewer *_this,GLWComponent *_c)
     glwCompEnable(&_this->bn_bond_d.super,b);
 # endif
     glwCompEnable(&_this->tf_point_r.super, b);
-    glwCompEnable(&_this->sl_point_r->super,b);
+    glwCompEnable(&_this->sl_point_r.super, b);
     glwCompEnable(&_this->tf_point_s.super, b);
     glwCompEnable(&_this->bn_point_v.super, b);
     glwCompEnable(&_this->bn_point_sa.super, b);
@@ -425,7 +425,7 @@ static void ds3ViewerPointRTextChanged(DS3Viewer *_this,GLWComponent *_c)
 static void ds3ViewerPointRSliderChanged(DS3Viewer *_this,GLWComponent *_c)
 {
     int v;
-    v=glwSliderGetVal(_this->sl_point_r);
+    v=glwSliderGetVal(&_this->sl_point_r);
     ds3ViewerSetPointR(_this,v*0.001*_this->ds3view->offs);
 }
 
@@ -589,7 +589,7 @@ static void ds3ViewerBoxTextChanged(DS3Viewer *_this,GLWComponent *_c)
 static void ds3ViewerMinXSliderChanged(DS3Viewer *_this,GLWComponent *_c)
 {
     double v;
-    v=glwSliderGetVal(_this->sl_minx)*0.01;
+    v=glwSliderGetVal(&_this->sl_minx)*0.01;
     if (v>_this->ds3view->box[1][X])v=_this->ds3view->box[1][X];
     ds3ViewerSetBox(_this,v,_this->ds3view->box[0][Y],
                     _this->ds3view->box[0][Z],_this->ds3view->box[1][X],
@@ -599,7 +599,7 @@ static void ds3ViewerMinXSliderChanged(DS3Viewer *_this,GLWComponent *_c)
 static void ds3ViewerMinYSliderChanged(DS3Viewer *_this,GLWComponent *_c)
 {
     double v;
-    v=glwSliderGetVal(_this->sl_miny)*0.01;
+    v=glwSliderGetVal(&_this->sl_miny)*0.01;
     if (v>_this->ds3view->box[1][Y])v=_this->ds3view->box[1][Y];
     ds3ViewerSetBox(_this,_this->ds3view->box[0][X],v,
                     _this->ds3view->box[0][Z],_this->ds3view->box[1][X],
@@ -609,7 +609,7 @@ static void ds3ViewerMinYSliderChanged(DS3Viewer *_this,GLWComponent *_c)
 static void ds3ViewerMinZSliderChanged(DS3Viewer *_this,GLWComponent *_c)
 {
     double v;
-    v=glwSliderGetVal(_this->sl_minz)*0.01;
+    v=glwSliderGetVal(&_this->sl_minz)*0.01;
     if (v>_this->ds3view->box[1][Z])v=_this->ds3view->box[1][Z];
     ds3ViewerSetBox(_this,_this->ds3view->box[0][X],_this->ds3view->box[0][Y],
                     v,_this->ds3view->box[1][X],
@@ -619,7 +619,7 @@ static void ds3ViewerMinZSliderChanged(DS3Viewer *_this,GLWComponent *_c)
 static void ds3ViewerMaxXSliderChanged(DS3Viewer *_this,GLWComponent *_c)
 {
     int v;
-    v=glwSliderGetVal(_this->sl_maxx);
+    v=glwSliderGetVal(&_this->sl_maxx);
     ds3ViewerSetBox(_this,_this->ds3view->box[0][X],_this->ds3view->box[0][Y],
                     _this->ds3view->box[0][Z],v*0.01,
                     _this->ds3view->box[1][Y],_this->ds3view->box[1][Z]);
@@ -628,7 +628,7 @@ static void ds3ViewerMaxXSliderChanged(DS3Viewer *_this,GLWComponent *_c)
 static void ds3ViewerMaxYSliderChanged(DS3Viewer *_this,GLWComponent *_c)
 {
     int v;
-    v=glwSliderGetVal(_this->sl_maxy);
+    v=glwSliderGetVal(&_this->sl_maxy);
     ds3ViewerSetBox(_this,_this->ds3view->box[0][X],_this->ds3view->box[0][Y],
                     _this->ds3view->box[0][Z],_this->ds3view->box[1][X],
                     v*0.01,_this->ds3view->box[1][Z]);
@@ -637,7 +637,7 @@ static void ds3ViewerMaxYSliderChanged(DS3Viewer *_this,GLWComponent *_c)
 static void ds3ViewerMaxZSliderChanged(DS3Viewer *_this,GLWComponent *_c)
 {
     int v;
-    v=glwSliderGetVal(_this->sl_maxz);
+    v=glwSliderGetVal(&_this->sl_maxz);
     ds3ViewerSetBox(_this,_this->ds3view->box[0][X],_this->ds3view->box[0][Y],
                     _this->ds3view->box[0][Z],_this->ds3view->box[1][X],
                     _this->ds3view->box[1][Y],v*0.01);
@@ -649,7 +649,7 @@ static void ds3ViewerZoomTextChanged(DS3Viewer *_this,GLWComponent *_c)
     char   *e;
     double  r;
     ds3ViewerTextSet(_this,_c);
-    text=glwTextFieldGetText(_this->tf_zoom);
+    text=glwTextFieldGetText(&_this->tf_zoom);
     r=strtod(text,&e);
     if (e!=text&&e[0]=='\0')ds3ViewerSetZoom(_this,r);
 }
@@ -657,7 +657,7 @@ static void ds3ViewerZoomTextChanged(DS3Viewer *_this,GLWComponent *_c)
 static void ds3ViewerZoomSliderChanged(DS3Viewer *_this,GLWComponent *_c)
 {
     int v;
-    v=glwSliderGetVal(_this->sl_zoom);
+    v=glwSliderGetVal(&_this->sl_zoom);
     ds3ViewerSetZoom(_this,v*0.01);
 }
 
@@ -670,18 +670,18 @@ static void ds3ViewerOrntTextChanged(DS3Viewer *_this,GLWComponent *_c)
     double  r;
     int     i;
     i=0;
-    ds3ViewerTextSet(_this,&_this->tf_ornt_y->super);
-    text=glwTextFieldGetText(_this->tf_ornt_y);
+    ds3ViewerTextSet(_this, &_this->tf_ornt_y.super);
+    text=glwTextFieldGetText(&_this->tf_ornt_y);
     y=strtod(text,&e);
     if (e==text||e[0]!='\0')y=_this->ds3view->yaw;
     else i=1;
-    ds3ViewerTextSet(_this,&_this->tf_ornt_p->super);
-    text=glwTextFieldGetText(_this->tf_ornt_p);
+    ds3ViewerTextSet(_this, &_this->tf_ornt_p.super);
+    text=glwTextFieldGetText(&_this->tf_ornt_p);
     p=strtod(text,&e);
     if (e==text||e[0]!='\0')p=_this->ds3view->pitch;
     else i=1;
-    ds3ViewerTextSet(_this,&_this->tf_ornt_r->super);
-    text=glwTextFieldGetText(_this->tf_ornt_r);
+    ds3ViewerTextSet(_this, &_this->tf_ornt_r.super);
+    text=glwTextFieldGetText(&_this->tf_ornt_r);
     r=strtod(text,&e);
     if (e==text||e[0]!='\0')r=_this->ds3view->roll;
     else i=1;
@@ -691,21 +691,21 @@ static void ds3ViewerOrntTextChanged(DS3Viewer *_this,GLWComponent *_c)
 static void ds3ViewerOrntYSliderChanged(DS3Viewer *_this,GLWComponent *_c)
 {
     int v;
-    v=glwSliderGetVal(_this->sl_ornt_y);
+    v=glwSliderGetVal(&_this->sl_ornt_y);
     ds3ViewerSetOrientation(_this,v,_this->ds3view->pitch,_this->ds3view->roll);
 }
 
 static void ds3ViewerOrntPSliderChanged(DS3Viewer *_this,GLWComponent *_c)
 {
     int v;
-    v=glwSliderGetVal(_this->sl_ornt_p);
+    v=glwSliderGetVal(&_this->sl_ornt_p);
     ds3ViewerSetOrientation(_this,_this->ds3view->yaw,v,_this->ds3view->roll);
 }
 
 static void ds3ViewerOrntRSliderChanged(DS3Viewer *_this,GLWComponent *_c)
 {
     int v;
-    v=glwSliderGetVal(_this->sl_ornt_r);
+    v=glwSliderGetVal(&_this->sl_ornt_r);
     ds3ViewerSetOrientation(_this,_this->ds3view->yaw,_this->ds3view->pitch,v);
 }
 
@@ -718,18 +718,18 @@ static void ds3ViewerCntrTextChanged(DS3Viewer *_this,GLWComponent *_c)
     double  z;
     int     i;
     i=0;
-    ds3ViewerTextSet(_this,&_this->tf_cntr_x->super);
-    text=glwTextFieldGetText(_this->tf_cntr_x);
+    ds3ViewerTextSet(_this, &_this->tf_cntr_x.super);
+    text=glwTextFieldGetText(&_this->tf_cntr_x);
     x=strtod(text,&e);
     if (e==text||e[0]!='\0')x=vectDot3d(_this->ds3view->basinv[X],_this->ds3view->cntr);
     else i=1;
-    ds3ViewerTextSet(_this,&_this->tf_cntr_y->super);
-    text=glwTextFieldGetText(_this->tf_cntr_y);
+    ds3ViewerTextSet(_this, &_this->tf_cntr_y.super);
+    text=glwTextFieldGetText(&_this->tf_cntr_y);
     y=strtod(text,&e);
     if (e==text||e[0]!='\0')y=vectDot3d(_this->ds3view->basinv[Y],_this->ds3view->cntr);
     else i=1;
-    ds3ViewerTextSet(_this,&_this->tf_cntr_z->super);
-    text=glwTextFieldGetText(_this->tf_cntr_z);
+    ds3ViewerTextSet(_this, &_this->tf_cntr_z.super);
+    text=glwTextFieldGetText(&_this->tf_cntr_z);
     z=strtod(text,&e);
     if (e==text||e[0]!='\0')z=vectDot3d(_this->ds3view->basinv[Z],_this->ds3view->cntr);
     else i=1;
@@ -739,7 +739,7 @@ static void ds3ViewerCntrTextChanged(DS3Viewer *_this,GLWComponent *_c)
 static void ds3ViewerCntrXSliderChanged(DS3Viewer *_this,GLWComponent *_c)
 {
     Vect3d cntr;
-    cntr[X]=glwSliderGetVal(_this->sl_cntr_x)*0.01;
+    cntr[X]=glwSliderGetVal(&_this->sl_cntr_x)*0.01;
     cntr[Y]=vectDot3d(_this->ds3view->basinv[Y],_this->ds3view->cntr);
     cntr[Z]=vectDot3d(_this->ds3view->basinv[Z],_this->ds3view->cntr);
     ds3ViewerSetCenter(_this,cntr[X],cntr[Y],cntr[Z]);
@@ -749,7 +749,7 @@ static void ds3ViewerCntrYSliderChanged(DS3Viewer *_this,GLWComponent *_c)
 {
     Vect3d cntr;
     cntr[X]=vectDot3d(_this->ds3view->basinv[X],_this->ds3view->cntr);
-    cntr[Y]=glwSliderGetVal(_this->sl_cntr_y)*0.01;
+    cntr[Y]=glwSliderGetVal(&_this->sl_cntr_y)*0.01;
     cntr[Z]=vectDot3d(_this->ds3view->basinv[Z],_this->ds3view->cntr);
     ds3ViewerSetCenter(_this,cntr[X],cntr[Y],cntr[Z]);
 }
@@ -759,7 +759,7 @@ static void ds3ViewerCntrZSliderChanged(DS3Viewer *_this,GLWComponent *_c)
     Vect3d cntr;
     cntr[X]=vectDot3d(_this->ds3view->basinv[X],_this->ds3view->cntr);
     cntr[Y]=vectDot3d(_this->ds3view->basinv[Y],_this->ds3view->cntr);
-    cntr[Z]=glwSliderGetVal(_this->sl_cntr_z)*0.01;
+    cntr[Z]=glwSliderGetVal(&_this->sl_cntr_z)*0.01;
     ds3ViewerSetCenter(_this,cntr[X],cntr[Y],cntr[Z]);
 }
 
@@ -854,7 +854,7 @@ static void ds3ViewerFinishRead(DS3Viewer *_this)
         ds3ViewerUpdatePointRLabels(_this);
         ds3ViewerUpdateIsoVLabels(_this);
         /*ds3ViewerUpdateZoomLabels(_this);*/
-        ds3ViewerSetPointR(_this,glwSliderGetVal(_this->sl_point_r)*
+        ds3ViewerSetPointR(_this,glwSliderGetVal(&_this->sl_point_r)*
                            0.001*_this->ds3view->offs);
         ds3ViewerSetSlice(_this,_this->ds3view->slice_t,_this->ds3view->slice_p,
                           _this->ds3view->slice_d);
@@ -924,12 +924,18 @@ DS3Viewer::DS3Viewer() :
         lb_dataz(""),
         lb_datav(""),
         tf_slice_t("", 5),
+	sl_slice_t(0, 360, 0, 0),
         tf_slice_p("", 5),
+	sl_slice_p(0, 360, 0, 0),
         tf_slice_d("", 5),
+	sl_slice_d(-260, 260, 0, 0),
         cb_draw_iso("Draw Iso-Surface",1,NULL),
         tf_iso_v("", 5),
+	sl_iso_v(0, DS3V_ISO_V_RES, DS3V_ISO_V_RES>>1, 0),
+	sl_iso_d(4, 1, 2, 0),
         cb_draw_points("Draw Atoms",1,NULL),
         tf_point_r("", 5),
+	sl_point_r(0, 100, 30, 0),
         tf_point_s("", 5),
         lb_point_t("Atom type:"),
         lb_point_l("Atom location:"),
@@ -945,11 +951,31 @@ DS3Viewer::DS3Viewer() :
         bn_bond_d("Delete Bond"),
 #endif
         tf_minx("", 5),
+	sl_minx(-100, 200, 0, 0),
 	tf_maxx("", 5),
+	sl_maxx(-100, 200, 100, 0),
 	tf_miny("", 5),
+	sl_miny(-100, 200, 0, 0),
 	tf_maxy("", 5),
+	sl_maxy(-100, 200, 100, 0),
 	tf_minz("", 5),
+	sl_minz(-100, 200, 0, 0),
 	tf_maxz("", 5),
+	sl_maxz(-100, 200, 100, 0),
+	tf_zoom("", 5),
+	sl_zoom(0, 200, 100, 0),
+	tf_ornt_y("", 5),
+	sl_ornt_y(0, 360, 0, 0),
+	tf_ornt_p("", 5),
+	sl_ornt_p(0, 360, 0, 0),
+	tf_ornt_r("", 5),
+	sl_ornt_r(0, 360, 0, 0),
+	tf_cntr_x("", 5),
+	sl_cntr_x(-100, 200, 50, 0),
+	tf_cntr_y("", 5),
+	sl_cntr_y(-100, 200, 50, 0),
+	tf_cntr_z("", 5),
+	sl_cntr_z(-100, 200, 50, 0),
 	cb_projt_ortho("Orthographic", 0, &this->cg_projt)
 {
     GLWLabel     *lb_file;
@@ -1016,19 +1042,12 @@ DS3Viewer::DS3Viewer() :
     cm_view = new GLWComponent();
     cm_view_btns = new GLWComponent();
     cm_opts = new GLWComponent();
-    _this->sl_slice_t = new GLWSlider(0,360,0,0);
     lb_slice_p = new GLWLabel("Polar slice angle:");
-    _this->sl_slice_p= new GLWSlider(0,360,0,0);
     lb_slice_d = new GLWLabel("Slice offset:");
-    _this->sl_slice_d= new GLWSlider(-260,260,0,0);
     lb_slice_t = new GLWLabel("Azimuthal slice angle:");
     lb_iso_v= new GLWLabel("Iso-surface value:");
-    _this->sl_iso_v= new GLWSlider(0,DS3V_ISO_V_RES,DS3V_ISO_V_RES>>1,0);
     lb_iso_d = new GLWLabel("Iso-surface detail:");
-    /*_this->tf_iso_d=glwTextFieldAlloc(NULL,5);*/
-    _this->sl_iso_d= new GLWSlider(4,1,2,0);
     lb_point_r = new GLWLabel("Atom radius:");
-    _this->sl_point_r= new GLWSlider(0,100,30,0);
     lb_point_s = new GLWLabel("Current Atom:");
 # if defined(__DS3_ADD_BONDS__)
     lb_bond_f = new GLWLabel("Bond from:");
@@ -1036,41 +1055,21 @@ DS3Viewer::DS3Viewer() :
     lb_bond_s = new GLWLabel("Bond size:");
 # endif
     lb_minx = new GLWLabel("Minimum X:");
-    _this->sl_minx= new GLWSlider(-100,200,0,0);
     lb_maxx = new GLWLabel("Maximum X:");
-    _this->sl_maxx= new GLWSlider(-100,200,100,0);
     lb_miny= new GLWLabel("Minimum Y:");
-    _this->sl_miny= new GLWSlider(-100,200,0,0);
     lb_maxy = new GLWLabel("Maximum Y:");
-    _this->sl_maxy= new GLWSlider(-100,200,100,0);
     lb_minz = new GLWLabel("Minimum Z:");
-    _this->sl_minz= new GLWSlider(-100,200,0,0);
     lb_maxz = new GLWLabel("Maximum Z:");
-    _this->sl_maxz= new GLWSlider(-100,200,100,0);
     _this->cb_draw_coords = new GLWCheckBox("Draw Coordinate System",1,NULL);
     lb_zoom = new GLWLabel("Zoom:");
-    _this->tf_zoom = new GLWTextField("", 5);
-    _this->sl_zoom= new GLWSlider(0,200,100,0);
     lb_ornt = new GLWLabel("Orientation:");
     lb_ornt_y = new GLWLabel("Yaw:");
-    _this->tf_ornt_y = new GLWTextField("", 5);
-    _this->sl_ornt_y= new GLWSlider(0,360,0,0);
     lb_ornt_p = new GLWLabel("Pitch:");
-    _this->tf_ornt_p = new GLWTextField("", 5);
-    _this->sl_ornt_p= new GLWSlider(0,360,0,0);
     lb_ornt_r = new GLWLabel("Roll:");
-    _this->tf_ornt_r = new GLWTextField("", 5);
-    _this->sl_ornt_r=new GLWSlider(0,360,0,0);
     lb_cntr = new GLWLabel("Look at:");
     lb_cntr_x = new GLWLabel("X:");
-    _this->tf_cntr_x = new GLWTextField("", 5);
-    _this->sl_cntr_x=new GLWSlider(-100,200,50,0);
     lb_cntr_y = new GLWLabel("Y:");
-    _this->tf_cntr_y = new GLWTextField("", 5);
-    _this->sl_cntr_y=new GLWSlider(-100,200,50,0);
     lb_cntr_z = new GLWLabel("Z:");
-    _this->tf_cntr_z = new GLWTextField("", 5);
-    _this->sl_cntr_z=new GLWSlider(-100,200,50,0);
     bn_ornt = new GLWButton("Reset Orientation");
     bn_cntr = new GLWButton("Reset Position");
     bn_align = new GLWButton("Align to Slice");
@@ -1093,31 +1092,30 @@ DS3Viewer::DS3Viewer() :
 # endif
             cm_bnds!=NULL&&cm_view!=NULL&&cm_view_btns!=NULL&&cm_opts!=NULL&&
             lb_slice_t!=NULL&&
-            _this->sl_slice_t != NULL&&lb_slice_p!=NULL&&
-            _this->sl_slice_p!=NULL&&lb_slice_d!=NULL&&
-            _this->sl_slice_d!=NULL&&
+            lb_slice_p!=NULL&&
+            lb_slice_d!=NULL&&
             lb_iso_v!=NULL&&
-            _this->sl_iso_v!=NULL&&lb_iso_d!=NULL&&/*_this->tf_iso_d!=NULL&&*/
-            _this->sl_iso_d!=NULL && lb_point_r!=NULL&&
-            _this->sl_point_r!=NULL&&lb_point_s!=NULL&&
+            lb_iso_d!=NULL&&
+            lb_point_r!=NULL&&
+            lb_point_s!=NULL&&
 # if defined(__DS3_ADD_BONDS__)
             lb_bond_f!=NULL&&lb_bond_t!=NULL&&
             lb_bond_s!=NULL&&
 # endif
-            lb_minx!=NULL && _this->sl_minx!=NULL&&lb_maxx!=NULL&&
-            _this->sl_maxx!=NULL&&lb_miny!=NULL&&
-            _this->sl_miny!=NULL&&lb_maxy!=NULL&&
-            _this->sl_maxy!=NULL&&lb_minz!=NULL&&
-	    _this->sl_minz!=NULL&&lb_maxz!=NULL&&
-            _this->sl_maxz!=NULL&&_this->cb_draw_coords!=NULL&&
-            lb_zoom!=NULL&&_this->tf_zoom!=NULL&&_this->sl_zoom!=NULL&&
-            lb_ornt!=NULL&&lb_ornt_y!=NULL&&_this->tf_ornt_y!=NULL&&
-            _this->sl_ornt_y!=NULL&&lb_ornt_p!=NULL&&_this->tf_ornt_p!=NULL&&
-            _this->sl_ornt_p!=NULL&&lb_ornt_r!=NULL&&_this->tf_ornt_r!=NULL&&
-            _this->sl_ornt_r!=NULL&&lb_cntr!=NULL&&lb_cntr_x!=NULL&&
-            _this->tf_cntr_x!=NULL&&_this->sl_cntr_x!=NULL&&lb_cntr_y!=NULL&&
-            _this->tf_cntr_y!=NULL&&_this->sl_cntr_y!=NULL&&lb_cntr_z!=NULL&&
-            _this->tf_cntr_z!=NULL&&_this->sl_cntr_z!=NULL&&bn_ornt!=NULL&&
+            lb_minx!=NULL && lb_maxx!=NULL&&
+            lb_miny!=NULL&&
+            lb_maxy!=NULL&&
+            lb_minz!=NULL&&
+	    lb_maxz!=NULL&&
+            _this->cb_draw_coords!=NULL&&
+            lb_zoom!=NULL&&
+            lb_ornt!=NULL&&lb_ornt_y!=NULL&&
+            lb_ornt_p!=NULL&&
+            lb_ornt_r!=NULL&&
+            lb_cntr!=NULL&&lb_cntr_x!=NULL&&
+            lb_cntr_y!=NULL&&
+            lb_cntr_z!=NULL&&
+            bn_ornt!=NULL&&
             bn_cntr!=NULL&&bn_align!=NULL&&lb_scale!=NULL&&
             _this->cb_scale_linear!=NULL&&_this->cb_scale_log!=NULL&&lb_color!=NULL&&
             _this->cb_color_rainbow!=NULL&&_this->cb_color_grayscale!=NULL&&
@@ -1235,12 +1233,12 @@ DS3Viewer::DS3Viewer() :
         glwTextFieldSetChangedFunc(&_this->tf_iso_v,
                                    (GLWActionFunc)ds3ViewerTextChanged);
         glwTextFieldSetChangedCtx(&_this->tf_iso_v, _this);
-        /*glwTextFieldSetActionFunc(_this->tf_iso_d,
+        /*glwTextFieldSetActionFunc(&_this->tf_iso_d,
                                    (GLWActionFunc)ds3ViewerIsoDTextChanged);
-        glwTextFieldSetActionCtx(_this->tf_iso_d,_this);
-        glwTextFieldSetChangedFunc(_this->tf_iso_d,
+        glwTextFieldSetActionCtx(&_this->tf_iso_d,_this);
+        glwTextFieldSetChangedFunc(&_this->tf_iso_d,
                                    (GLWActionFunc)ds3ViewerTextChanged);
-        glwTextFieldSetChangedCtx(_this->tf_iso_d,_this);*/
+        glwTextFieldSetChangedCtx(&_this->tf_iso_d,_this);*/
         glwTextFieldSetActionFunc(&_this->tf_point_r,
                                   (GLWActionFunc)ds3ViewerPointRTextChanged);
         glwTextFieldSetActionCtx(&_this->tf_point_r,_this);
@@ -1309,95 +1307,95 @@ DS3Viewer::DS3Viewer() :
         glwTextFieldSetChangedFunc(&_this->tf_maxz,
                                    (GLWActionFunc)ds3ViewerTextChanged);
         glwTextFieldSetChangedCtx(&_this->tf_maxz, _this);
-        glwTextFieldSetActionFunc(_this->tf_zoom,
+        glwTextFieldSetActionFunc(&_this->tf_zoom,
                                   (GLWActionFunc)ds3ViewerZoomTextChanged);
-        glwTextFieldSetActionCtx(_this->tf_zoom,_this);
-        glwTextFieldSetChangedFunc(_this->tf_zoom,
+        glwTextFieldSetActionCtx(&_this->tf_zoom,_this);
+        glwTextFieldSetChangedFunc(&_this->tf_zoom,
                                    (GLWActionFunc)ds3ViewerTextChanged);
-        glwTextFieldSetChangedCtx(_this->tf_zoom,_this);
-        glwTextFieldSetActionFunc(_this->tf_ornt_y,
+        glwTextFieldSetChangedCtx(&_this->tf_zoom,_this);
+        glwTextFieldSetActionFunc(&_this->tf_ornt_y,
                                   (GLWActionFunc)ds3ViewerOrntTextChanged);
-        glwTextFieldSetActionCtx(_this->tf_ornt_y,_this);
-        glwTextFieldSetChangedFunc(_this->tf_ornt_y,
+        glwTextFieldSetActionCtx(&_this->tf_ornt_y,_this);
+        glwTextFieldSetChangedFunc(&_this->tf_ornt_y,
                                    (GLWActionFunc)ds3ViewerTextChanged);
-        glwTextFieldSetChangedCtx(_this->tf_ornt_y,_this);
-        glwTextFieldSetActionFunc(_this->tf_ornt_p,
+        glwTextFieldSetChangedCtx(&_this->tf_ornt_y,_this);
+        glwTextFieldSetActionFunc(&_this->tf_ornt_p,
                                   (GLWActionFunc)ds3ViewerOrntTextChanged);
-        glwTextFieldSetActionCtx(_this->tf_ornt_p,_this);
-        glwTextFieldSetChangedFunc(_this->tf_ornt_p,
+        glwTextFieldSetActionCtx(&_this->tf_ornt_p,_this);
+        glwTextFieldSetChangedFunc(&_this->tf_ornt_p,
                                    (GLWActionFunc)ds3ViewerTextChanged);
-        glwTextFieldSetChangedCtx(_this->tf_ornt_p,_this);
-        glwTextFieldSetActionFunc(_this->tf_ornt_r,
+        glwTextFieldSetChangedCtx(&_this->tf_ornt_p,_this);
+        glwTextFieldSetActionFunc(&_this->tf_ornt_r,
                                   (GLWActionFunc)ds3ViewerOrntTextChanged);
-        glwTextFieldSetActionCtx(_this->tf_ornt_r,_this);
-        glwTextFieldSetChangedFunc(_this->tf_ornt_r,
+        glwTextFieldSetActionCtx(&_this->tf_ornt_r,_this);
+        glwTextFieldSetChangedFunc(&_this->tf_ornt_r,
                                    (GLWActionFunc)ds3ViewerTextChanged);
-        glwTextFieldSetChangedCtx(_this->tf_ornt_r,_this);
-        glwTextFieldSetActionFunc(_this->tf_cntr_x,
+        glwTextFieldSetChangedCtx(&_this->tf_ornt_r,_this);
+        glwTextFieldSetActionFunc(&_this->tf_cntr_x,
                                   (GLWActionFunc)ds3ViewerCntrTextChanged);
-        glwTextFieldSetActionCtx(_this->tf_cntr_x,_this);
-        glwTextFieldSetChangedFunc(_this->tf_cntr_x,
+        glwTextFieldSetActionCtx(&_this->tf_cntr_x,_this);
+        glwTextFieldSetChangedFunc(&_this->tf_cntr_x,
                                    (GLWActionFunc)ds3ViewerTextChanged);
-        glwTextFieldSetChangedCtx(_this->tf_cntr_x,_this);
-        glwTextFieldSetActionFunc(_this->tf_cntr_y,
+        glwTextFieldSetChangedCtx(&_this->tf_cntr_x,_this);
+        glwTextFieldSetActionFunc(&_this->tf_cntr_y,
                                   (GLWActionFunc)ds3ViewerCntrTextChanged);
-        glwTextFieldSetActionCtx(_this->tf_cntr_y,_this);
-        glwTextFieldSetChangedFunc(_this->tf_cntr_y,
+        glwTextFieldSetActionCtx(&_this->tf_cntr_y,_this);
+        glwTextFieldSetChangedFunc(&_this->tf_cntr_y,
                                    (GLWActionFunc)ds3ViewerTextChanged);
-        glwTextFieldSetChangedCtx(_this->tf_cntr_y,_this);
-        glwTextFieldSetActionFunc(_this->tf_cntr_z,
+        glwTextFieldSetChangedCtx(&_this->tf_cntr_y,_this);
+        glwTextFieldSetActionFunc(&_this->tf_cntr_z,
                                   (GLWActionFunc)ds3ViewerCntrTextChanged);
-        glwTextFieldSetActionCtx(_this->tf_cntr_z,_this);
-        glwTextFieldSetChangedFunc(_this->tf_cntr_z,
+        glwTextFieldSetActionCtx(&_this->tf_cntr_z,_this);
+        glwTextFieldSetChangedFunc(&_this->tf_cntr_z,
                                    (GLWActionFunc)ds3ViewerTextChanged);
-        glwTextFieldSetChangedCtx(_this->tf_cntr_z,_this);
-        glwSliderSetChangedFunc(_this->sl_point_r,
+        glwTextFieldSetChangedCtx(&_this->tf_cntr_z,_this);
+        glwSliderSetChangedFunc(&_this->sl_point_r,
                                 (GLWActionFunc)ds3ViewerPointRSliderChanged);
-        glwSliderSetChangedCtx(_this->sl_point_r,_this);
-        glwSliderSetMajorTickSpacing(_this->sl_point_r,10);
-        glwSliderSetMinorTickSpacing(_this->sl_point_r,5);
+        glwSliderSetChangedCtx(&_this->sl_point_r,_this);
+        glwSliderSetMajorTickSpacing(&_this->sl_point_r,10);
+        glwSliderSetMinorTickSpacing(&_this->sl_point_r,5);
         ds3ViewerUpdatePointRLabels(_this);
-        glwSliderSetSnap(_this->sl_point_r,1);
-        _this->sl_slice_t->setChangedFunc((GLWActionFunc)ds3ViewerSliceTSliderChanged);
-        _this->sl_slice_t->setChangedCtx(_this);
-        _this->sl_slice_t->setMajorTickSpacing(90);
-        _this->sl_slice_t->setMinorTickSpacing(15);
-        _this->sl_slice_t->makeLabels(0, 90);
-        _this->sl_slice_t->setSnap(1);
-        glwSliderSetChangedFunc(_this->sl_slice_p,
+        glwSliderSetSnap(&_this->sl_point_r,1);
+        _this->sl_slice_t.setChangedFunc((GLWActionFunc)ds3ViewerSliceTSliderChanged);
+        _this->sl_slice_t.setChangedCtx(_this);
+        _this->sl_slice_t.setMajorTickSpacing(90);
+        _this->sl_slice_t.setMinorTickSpacing(15);
+        _this->sl_slice_t.makeLabels(0, 90);
+        _this->sl_slice_t.setSnap(1);
+        glwSliderSetChangedFunc(&_this->sl_slice_p,
                                 (GLWActionFunc)ds3ViewerSlicePSliderChanged);
-        glwSliderSetChangedCtx(_this->sl_slice_p,_this);
-        glwSliderSetMajorTickSpacing(_this->sl_slice_p,90);
-        glwSliderSetMinorTickSpacing(_this->sl_slice_p,15);
-        glwSliderMakeLabels(_this->sl_slice_p,0,90);
-        glwSliderSetSnap(_this->sl_slice_p,1);
-        glwSliderSetChangedFunc(_this->sl_slice_d,
+        glwSliderSetChangedCtx(&_this->sl_slice_p,_this);
+        glwSliderSetMajorTickSpacing(&_this->sl_slice_p,90);
+        glwSliderSetMinorTickSpacing(&_this->sl_slice_p,15);
+        glwSliderMakeLabels(&_this->sl_slice_p,0,90);
+        glwSliderSetSnap(&_this->sl_slice_p,1);
+        glwSliderSetChangedFunc(&_this->sl_slice_d,
                                 (GLWActionFunc)ds3ViewerSliceDSliderChanged);
-        glwSliderSetChangedCtx(_this->sl_slice_d,_this);
-        glwSliderSetMajorTickSpacing(_this->sl_slice_d,100);
-        glwSliderSetMajorTickOffset(_this->sl_slice_d,60);
-        glwSliderSetMinorTickSpacing(_this->sl_slice_d,25);
-        glwSliderSetMinorTickOffset(_this->sl_slice_d,10);
+        glwSliderSetChangedCtx(&_this->sl_slice_d,_this);
+        glwSliderSetMajorTickSpacing(&_this->sl_slice_d,100);
+        glwSliderSetMajorTickOffset(&_this->sl_slice_d,60);
+        glwSliderSetMinorTickSpacing(&_this->sl_slice_d,25);
+        glwSliderSetMinorTickOffset(&_this->sl_slice_d,10);
         for (i=-2; i<=2; i++) {
             char text[32];
             sprintf(text,"%i",i);
-            glwSliderAddLabel(_this->sl_slice_d,i*100,text);
+            glwSliderAddLabel(&_this->sl_slice_d,i*100,text);
         }
-        glwSliderSetSnap(_this->sl_slice_d,1);
-        glwSliderSetChangedFunc(_this->sl_iso_v,
+        glwSliderSetSnap(&_this->sl_slice_d,1);
+        glwSliderSetChangedFunc(&_this->sl_iso_v,
                                 (GLWActionFunc)ds3ViewerIsoVSliderChanged);
-        glwSliderSetChangedCtx(_this->sl_iso_v,_this);
-        glwSliderSetMajorTickSpacing(_this->sl_iso_v,DS3V_ISO_V_RES/10);
-        glwSliderSetMinorTickSpacing(_this->sl_iso_v,DS3V_ISO_V_RES/40);
+        glwSliderSetChangedCtx(&_this->sl_iso_v,_this);
+        glwSliderSetMajorTickSpacing(&_this->sl_iso_v,DS3V_ISO_V_RES/10);
+        glwSliderSetMinorTickSpacing(&_this->sl_iso_v,DS3V_ISO_V_RES/40);
         ds3ViewerUpdateIsoVLabels(_this);
-        glwSliderSetSnap(_this->sl_slice_p,1);
-        glwSliderSetChangedFunc(_this->sl_iso_d,
+        glwSliderSetSnap(&_this->sl_slice_p,1);
+        glwSliderSetChangedFunc(&_this->sl_iso_d,
                                 (GLWActionFunc)ds3ViewerIsoDSliderChanged);
-        glwSliderSetChangedCtx(_this->sl_iso_d,_this);
-        glwSliderSetMajorTickSpacing(_this->sl_iso_d,1);
-        glwSliderAddLabel(_this->sl_iso_d,1,"High");
-        glwSliderAddLabel(_this->sl_iso_d,4,"Low");
-        glwSliderSetSnap(_this->sl_iso_d,GLWC_SNAP_ALWAYS);
+        glwSliderSetChangedCtx(&_this->sl_iso_d,_this);
+        glwSliderSetMajorTickSpacing(&_this->sl_iso_d,1);
+        glwSliderAddLabel(&_this->sl_iso_d,1,"High");
+        glwSliderAddLabel(&_this->sl_iso_d,4,"Low");
+        glwSliderSetSnap(&_this->sl_iso_d,GLWC_SNAP_ALWAYS);
 # if defined(__DS3_ADD_BONDS__)
         glwSliderSetChangedFunc(&_this->sl_bond_s,
                                 (GLWActionFunc)ds3ViewerBondSSliderChanged);
@@ -1406,110 +1404,110 @@ DS3Viewer::DS3Viewer() :
         glwSliderMakeLabels(&_this->sl_bond_s, 1, 1);
         glwSliderSetSnap(&_this->sl_bond_s, GLWC_SNAP_ALWAYS);
 # endif
-        glwSliderSetChangedFunc(_this->sl_minx,
+        glwSliderSetChangedFunc(&_this->sl_minx,
                                 (GLWActionFunc)ds3ViewerMinXSliderChanged);
-        glwSliderSetChangedCtx(_this->sl_minx,_this);
-        glwSliderSetMajorTickSpacing(_this->sl_minx,50);
-        glwSliderSetMinorTickSpacing(_this->sl_minx,10);
-        glwSliderSetSnap(_this->sl_minx,1);
-        glwSliderSetChangedFunc(_this->sl_miny,
+        glwSliderSetChangedCtx(&_this->sl_minx,_this);
+        glwSliderSetMajorTickSpacing(&_this->sl_minx,50);
+        glwSliderSetMinorTickSpacing(&_this->sl_minx,10);
+        glwSliderSetSnap(&_this->sl_minx,1);
+        glwSliderSetChangedFunc(&_this->sl_miny,
                                 (GLWActionFunc)ds3ViewerMinYSliderChanged);
-        glwSliderSetChangedCtx(_this->sl_miny,_this);
-        glwSliderSetMajorTickSpacing(_this->sl_miny,50);
-        glwSliderSetMinorTickSpacing(_this->sl_miny,10);
-        glwSliderSetSnap(_this->sl_miny,1);
-        glwSliderSetChangedFunc(_this->sl_minz,
+        glwSliderSetChangedCtx(&_this->sl_miny,_this);
+        glwSliderSetMajorTickSpacing(&_this->sl_miny,50);
+        glwSliderSetMinorTickSpacing(&_this->sl_miny,10);
+        glwSliderSetSnap(&_this->sl_miny,1);
+        glwSliderSetChangedFunc(&_this->sl_minz,
                                 (GLWActionFunc)ds3ViewerMinZSliderChanged);
-        glwSliderSetChangedCtx(_this->sl_minz,_this);
-        glwSliderSetMajorTickSpacing(_this->sl_minz,50);
-        glwSliderSetMinorTickSpacing(_this->sl_minz,10);
-        glwSliderSetSnap(_this->sl_minz,1);
-        glwSliderSetChangedFunc(_this->sl_maxx,
+        glwSliderSetChangedCtx(&_this->sl_minz,_this);
+        glwSliderSetMajorTickSpacing(&_this->sl_minz,50);
+        glwSliderSetMinorTickSpacing(&_this->sl_minz,10);
+        glwSliderSetSnap(&_this->sl_minz,1);
+        glwSliderSetChangedFunc(&_this->sl_maxx,
                                 (GLWActionFunc)ds3ViewerMaxXSliderChanged);
-        glwSliderSetChangedCtx(_this->sl_maxx,_this);
-        glwSliderSetMajorTickSpacing(_this->sl_maxx,50);
-        glwSliderSetMinorTickSpacing(_this->sl_maxx,10);
-        glwSliderSetSnap(_this->sl_maxx,1);
-        glwSliderSetChangedFunc(_this->sl_maxy,
+        glwSliderSetChangedCtx(&_this->sl_maxx,_this);
+        glwSliderSetMajorTickSpacing(&_this->sl_maxx,50);
+        glwSliderSetMinorTickSpacing(&_this->sl_maxx,10);
+        glwSliderSetSnap(&_this->sl_maxx,1);
+        glwSliderSetChangedFunc(&_this->sl_maxy,
                                 (GLWActionFunc)ds3ViewerMaxYSliderChanged);
-        glwSliderSetChangedCtx(_this->sl_maxy,_this);
-        glwSliderSetMajorTickSpacing(_this->sl_maxy,50);
-        glwSliderSetMinorTickSpacing(_this->sl_maxy,10);
-        glwSliderSetSnap(_this->sl_maxy,1);
-        glwSliderSetChangedFunc(_this->sl_maxz,
+        glwSliderSetChangedCtx(&_this->sl_maxy,_this);
+        glwSliderSetMajorTickSpacing(&_this->sl_maxy,50);
+        glwSliderSetMinorTickSpacing(&_this->sl_maxy,10);
+        glwSliderSetSnap(&_this->sl_maxy,1);
+        glwSliderSetChangedFunc(&_this->sl_maxz,
                                 (GLWActionFunc)ds3ViewerMaxZSliderChanged);
-        glwSliderSetChangedCtx(_this->sl_maxz,_this);
-        glwSliderSetMajorTickSpacing(_this->sl_maxz,50);
-        glwSliderSetMinorTickSpacing(_this->sl_maxz,10);
-        glwSliderSetSnap(_this->sl_maxz,1);
+        glwSliderSetChangedCtx(&_this->sl_maxz,_this);
+        glwSliderSetMajorTickSpacing(&_this->sl_maxz,50);
+        glwSliderSetMinorTickSpacing(&_this->sl_maxz,10);
+        glwSliderSetSnap(&_this->sl_maxz,1);
         for (i=-1; i<=2; i++) {
             char text[32];
             sprintf(text,"%i",i);
-            glwSliderAddLabel(_this->sl_minx,i*100,text);
-            glwSliderAddLabel(_this->sl_miny,i*100,text);
-            glwSliderAddLabel(_this->sl_minz,i*100,text);
-            glwSliderAddLabel(_this->sl_maxx,i*100,text);
-            glwSliderAddLabel(_this->sl_maxy,i*100,text);
-            glwSliderAddLabel(_this->sl_maxz,i*100,text);
+            glwSliderAddLabel(&_this->sl_minx,i*100,text);
+            glwSliderAddLabel(&_this->sl_miny,i*100,text);
+            glwSliderAddLabel(&_this->sl_minz,i*100,text);
+            glwSliderAddLabel(&_this->sl_maxx,i*100,text);
+            glwSliderAddLabel(&_this->sl_maxy,i*100,text);
+            glwSliderAddLabel(&_this->sl_maxz,i*100,text);
         }
-        glwSliderSetChangedFunc(_this->sl_zoom,
+        glwSliderSetChangedFunc(&_this->sl_zoom,
                                 (GLWActionFunc)ds3ViewerZoomSliderChanged);
-        glwSliderSetChangedCtx(_this->sl_zoom,_this);
-        glwSliderSetMajorTickSpacing(_this->sl_zoom,50);
-        glwSliderSetMinorTickSpacing(_this->sl_zoom,10);
+        glwSliderSetChangedCtx(&_this->sl_zoom,_this);
+        glwSliderSetMajorTickSpacing(&_this->sl_zoom,50);
+        glwSliderSetMinorTickSpacing(&_this->sl_zoom,10);
         /*ds3ViewerUpdateZoomLabels(_this);*/
         for (i=0; i<=2; i++) {
             char text[32];
             sprintf(text,"%i",i);
-            glwSliderAddLabel(_this->sl_zoom,i*100,text);
+            glwSliderAddLabel(&_this->sl_zoom,i*100,text);
         }
-        glwSliderSetSnap(_this->sl_zoom,1);
-        glwSliderSetChangedFunc(_this->sl_ornt_y,
+        glwSliderSetSnap(&_this->sl_zoom,1);
+        glwSliderSetChangedFunc(&_this->sl_ornt_y,
                                 (GLWActionFunc)ds3ViewerOrntYSliderChanged);
-        glwSliderSetChangedCtx(_this->sl_ornt_y,_this);
-        glwSliderMakeLabels(_this->sl_ornt_y,0,360);
-        glwSliderSetMajorTickSpacing(_this->sl_ornt_y,180);
-        glwSliderSetMinorTickSpacing(_this->sl_ornt_y,30);
-        glwSliderSetSnap(_this->sl_ornt_y,1);
-        glwSliderSetChangedFunc(_this->sl_ornt_p,
+        glwSliderSetChangedCtx(&_this->sl_ornt_y,_this);
+        glwSliderMakeLabels(&_this->sl_ornt_y,0,360);
+        glwSliderSetMajorTickSpacing(&_this->sl_ornt_y,180);
+        glwSliderSetMinorTickSpacing(&_this->sl_ornt_y,30);
+        glwSliderSetSnap(&_this->sl_ornt_y,1);
+        glwSliderSetChangedFunc(&_this->sl_ornt_p,
                                 (GLWActionFunc)ds3ViewerOrntPSliderChanged);
-        glwSliderSetChangedCtx(_this->sl_ornt_p,_this);
-        glwSliderMakeLabels(_this->sl_ornt_p,0,360);
-        glwSliderSetMajorTickSpacing(_this->sl_ornt_p,180);
-        glwSliderSetMinorTickSpacing(_this->sl_ornt_p,30);
-        glwSliderSetSnap(_this->sl_ornt_p,1);
-        glwSliderSetChangedFunc(_this->sl_ornt_r,
+        glwSliderSetChangedCtx(&_this->sl_ornt_p,_this);
+        glwSliderMakeLabels(&_this->sl_ornt_p,0,360);
+        glwSliderSetMajorTickSpacing(&_this->sl_ornt_p,180);
+        glwSliderSetMinorTickSpacing(&_this->sl_ornt_p,30);
+        glwSliderSetSnap(&_this->sl_ornt_p,1);
+        glwSliderSetChangedFunc(&_this->sl_ornt_r,
                                 (GLWActionFunc)ds3ViewerOrntRSliderChanged);
-        glwSliderSetChangedCtx(_this->sl_ornt_r,_this);
-        glwSliderMakeLabels(_this->sl_ornt_r,0,360);
-        glwSliderSetMajorTickSpacing(_this->sl_ornt_r,180);
-        glwSliderSetMinorTickSpacing(_this->sl_ornt_r,30);
-        glwSliderSetSnap(_this->sl_ornt_r,1);
+        glwSliderSetChangedCtx(&_this->sl_ornt_r,_this);
+        glwSliderMakeLabels(&_this->sl_ornt_r,0,360);
+        glwSliderSetMajorTickSpacing(&_this->sl_ornt_r,180);
+        glwSliderSetMinorTickSpacing(&_this->sl_ornt_r,30);
+        glwSliderSetSnap(&_this->sl_ornt_r,1);
         for (i=-1; i<=2; i++) {
             char text[32];
             sprintf(text,"%i",i);
-            glwSliderAddLabel(_this->sl_cntr_x,i*100,text);
-            glwSliderAddLabel(_this->sl_cntr_y,i*100,text);
-            glwSliderAddLabel(_this->sl_cntr_z,i*100,text);
+            glwSliderAddLabel(&_this->sl_cntr_x,i*100,text);
+            glwSliderAddLabel(&_this->sl_cntr_y,i*100,text);
+            glwSliderAddLabel(&_this->sl_cntr_z,i*100,text);
         }
-        glwSliderSetChangedFunc(_this->sl_cntr_x,
+        glwSliderSetChangedFunc(&_this->sl_cntr_x,
                                 (GLWActionFunc)ds3ViewerCntrXSliderChanged);
-        glwSliderSetChangedCtx(_this->sl_cntr_x,_this);
-        glwSliderSetMajorTickSpacing(_this->sl_cntr_x,100);
-        glwSliderSetMinorTickSpacing(_this->sl_cntr_x,25);
-        glwSliderSetSnap(_this->sl_cntr_x,1);
-        glwSliderSetChangedFunc(_this->sl_cntr_y,
+        glwSliderSetChangedCtx(&_this->sl_cntr_x,_this);
+        glwSliderSetMajorTickSpacing(&_this->sl_cntr_x,100);
+        glwSliderSetMinorTickSpacing(&_this->sl_cntr_x,25);
+        glwSliderSetSnap(&_this->sl_cntr_x,1);
+        glwSliderSetChangedFunc(&_this->sl_cntr_y,
                                 (GLWActionFunc)ds3ViewerCntrYSliderChanged);
-        glwSliderSetChangedCtx(_this->sl_cntr_y,_this);
-        glwSliderSetMajorTickSpacing(_this->sl_cntr_y,100);
-        glwSliderSetMinorTickSpacing(_this->sl_cntr_y,25);
-        glwSliderSetSnap(_this->sl_cntr_y,1);
-        glwSliderSetChangedFunc(_this->sl_cntr_z,
+        glwSliderSetChangedCtx(&_this->sl_cntr_y,_this);
+        glwSliderSetMajorTickSpacing(&_this->sl_cntr_y,100);
+        glwSliderSetMinorTickSpacing(&_this->sl_cntr_y,25);
+        glwSliderSetSnap(&_this->sl_cntr_y,1);
+        glwSliderSetChangedFunc(&_this->sl_cntr_z,
                                 (GLWActionFunc)ds3ViewerCntrZSliderChanged);
-        glwSliderSetChangedCtx(_this->sl_cntr_z,_this);
-        glwSliderSetMajorTickSpacing(_this->sl_cntr_z,100);
-        glwSliderSetMinorTickSpacing(_this->sl_cntr_z,25);
-        glwSliderSetSnap(_this->sl_cntr_z,1);
+        glwSliderSetChangedCtx(&_this->sl_cntr_z,_this);
+        glwSliderSetMajorTickSpacing(&_this->sl_cntr_z,100);
+        glwSliderSetMinorTickSpacing(&_this->sl_cntr_z,25);
+        glwSliderSetSnap(&_this->sl_cntr_z,1);
         glwCompSetLayout(&_this->frame.super, &(new GLWGridBagLayout())->super);
         glwCompSetMinWidth(&_this->ds3view->super,360);
         glwCompSetMinHeight(&_this->ds3view->super,360);
@@ -1587,25 +1585,25 @@ DS3Viewer::DS3Viewer() :
         glwCompSetInsets(&_this->tf_slice_t.super,0,0,2,2);
         glwCompSetGridWidth(&_this->tf_slice_t.super,GLWC_REMAINDER);
         glwCompSetAlignX(&_this->tf_slice_t.super,1);
-        glwCompSetInsets(&_this->sl_slice_t->super,0,0,10,2);
-        glwCompSetGridWidth(&_this->sl_slice_t->super,GLWC_REMAINDER);
-        glwCompSetFill(&_this->sl_slice_t->super,GLWC_HORIZONTAL);
+        glwCompSetInsets(&_this->sl_slice_t.super,0,0,10,2);
+        glwCompSetGridWidth(&_this->sl_slice_t.super,GLWC_REMAINDER);
+        glwCompSetFill(&_this->sl_slice_t.super,GLWC_HORIZONTAL);
         glwCompSetInsets(&lb_slice_p->super,0,0,10,2);
         glwCompSetWeightX(&lb_slice_p->super,1);
         glwCompSetInsets(&_this->tf_slice_p.super,0,0,2,2);
         glwCompSetGridWidth(&_this->tf_slice_p.super,GLWC_REMAINDER);
         glwCompSetAlignX(&_this->tf_slice_p.super,1);
-        glwCompSetInsets(&_this->sl_slice_p->super,0,0,10,2);
-        glwCompSetGridWidth(&_this->sl_slice_p->super,GLWC_REMAINDER);
-        glwCompSetFill(&_this->sl_slice_p->super,GLWC_HORIZONTAL);
+        glwCompSetInsets(&_this->sl_slice_p.super, 0, 0, 10, 2);
+        glwCompSetGridWidth(&_this->sl_slice_p.super,GLWC_REMAINDER);
+        glwCompSetFill(&_this->sl_slice_p.super,GLWC_HORIZONTAL);
         glwCompSetInsets(&lb_slice_d->super,0,0,10,2);
         glwCompSetWeightX(&lb_slice_d->super,1);
         glwCompSetInsets(&_this->tf_slice_d.super,0,0,2,2);
         glwCompSetGridWidth(&_this->tf_slice_d.super,GLWC_REMAINDER);
         glwCompSetAlignX(&_this->tf_slice_d.super,1);
-        glwCompSetInsets(&_this->sl_slice_d->super,0,0,10,2);
-        glwCompSetGridWidth(&_this->sl_slice_d->super,GLWC_REMAINDER);
-        glwCompSetFill(&_this->sl_slice_d->super,GLWC_HORIZONTAL);
+        glwCompSetInsets(&_this->sl_slice_d.super,0,0,10,2);
+        glwCompSetGridWidth(&_this->sl_slice_d.super,GLWC_REMAINDER);
+        glwCompSetFill(&_this->sl_slice_d.super,GLWC_HORIZONTAL);
         glwCompSetInsets(&_this->cb_draw_iso.super, 0, 0, 2, 2);
         glwCompSetGridWidth(&_this->cb_draw_iso.super, GLWC_REMAINDER);
         glwCompSetInsets(&lb_iso_v->super,0,0,10,2);
@@ -1613,34 +1611,34 @@ DS3Viewer::DS3Viewer() :
         glwCompSetInsets(&_this->tf_iso_v.super, 0, 0, 2, 2);
         glwCompSetGridWidth(&_this->tf_iso_v.super, GLWC_REMAINDER);
         glwCompSetAlignX(&_this->tf_iso_v.super, 1);
-        glwCompSetInsets(&_this->sl_iso_v->super, 0, 0, 10, 2);
-        glwCompSetGridWidth(&_this->sl_iso_v->super,GLWC_REMAINDER);
-        glwCompSetFill(&_this->sl_iso_v->super,GLWC_HORIZONTAL);
+        glwCompSetInsets(&_this->sl_iso_v.super, 0, 0, 10, 2);
+        glwCompSetGridWidth(&_this->sl_iso_v.super,GLWC_REMAINDER);
+        glwCompSetFill(&_this->sl_iso_v.super,GLWC_HORIZONTAL);
         glwCompSetInsets(&lb_iso_d->super,0,0,10,2);
         /*glwCompSetInsets(&_this->tf_iso_d->super,0,0,2,2);
         glwCompSetGridWidth(&_this->tf_iso_d->super,GLWC_REMAINDER);
         glwCompSetAlignX(&_this->tf_iso_d->super,1);*/
         glwCompSetGridWidth(&lb_iso_d->super,GLWC_REMAINDER);
-        glwCompSetInsets(&_this->sl_iso_d->super,0,0,10,2);
-        glwCompSetGridWidth(&_this->sl_iso_d->super,GLWC_REMAINDER);
-        glwCompSetFill(&_this->sl_iso_d->super,GLWC_HORIZONTAL);
+        glwCompSetInsets(&_this->sl_iso_d.super,0,0,10,2);
+        glwCompSetGridWidth(&_this->sl_iso_d.super,GLWC_REMAINDER);
+        glwCompSetFill(&_this->sl_iso_d.super,GLWC_HORIZONTAL);
         glwCompAdd(cm_data,&_this->cb_draw_slice.super, -1);
         glwCompAdd(cm_data,&lb_slice_t->super,-1);
         glwCompAdd(cm_data,&_this->tf_slice_t.super,-1);
-        glwCompAdd(cm_data,&_this->sl_slice_t->super,-1);
+        glwCompAdd(cm_data,&_this->sl_slice_t.super,-1);
         glwCompAdd(cm_data,&lb_slice_p->super,-1);
         glwCompAdd(cm_data,&_this->tf_slice_p.super,-1);
-        glwCompAdd(cm_data,&_this->sl_slice_p->super,-1);
+        glwCompAdd(cm_data,&_this->sl_slice_p.super,-1);
         glwCompAdd(cm_data,&lb_slice_d->super,-1);
         glwCompAdd(cm_data,&_this->tf_slice_d.super,-1);
-        glwCompAdd(cm_data,&_this->sl_slice_d->super,-1);
+        glwCompAdd(cm_data,&_this->sl_slice_d.super,-1);
         glwCompAdd(cm_data,&_this->cb_draw_iso.super, -1);
         glwCompAdd(cm_data,&lb_iso_v->super,-1);
         glwCompAdd(cm_data,&_this->tf_iso_v.super, -1);
-        glwCompAdd(cm_data,&_this->sl_iso_v->super,-1);
+        glwCompAdd(cm_data,&_this->sl_iso_v.super,-1);
         glwCompAdd(cm_data,&lb_iso_d->super,-1);
         /*glwCompAdd(cm_data,&_this->tf_iso_d->super,-1);*/
-        glwCompAdd(cm_data,&_this->sl_iso_d->super,-1);
+        glwCompAdd(cm_data,&_this->sl_iso_d.super,-1);
         glwCompSetLayout(cm_strc,&(new GLWGridBagLayout())->super);
         glwCompSetInsets(&_this->cb_draw_points.super, 0, 0, 2, 2);
         glwCompSetGridWidth(&_this->cb_draw_points.super, GLWC_REMAINDER);
@@ -1649,9 +1647,9 @@ DS3Viewer::DS3Viewer() :
         glwCompSetInsets(&_this->tf_point_r.super,0,0,2,2);
         glwCompSetGridWidth(&_this->tf_point_r.super,GLWC_REMAINDER);
         glwCompSetAlignX(&_this->tf_point_r.super,1);
-        glwCompSetInsets(&_this->sl_point_r->super,0,0,10,2);
-        glwCompSetGridWidth(&_this->sl_point_r->super,GLWC_REMAINDER);
-        glwCompSetFill(&_this->sl_point_r->super,GLWC_HORIZONTAL);
+        glwCompSetInsets(&_this->sl_point_r.super,0,0,10,2);
+        glwCompSetGridWidth(&_this->sl_point_r.super,GLWC_REMAINDER);
+        glwCompSetFill(&_this->sl_point_r.super,GLWC_HORIZONTAL);
         glwCompSetInsets(&lb_point_s->super,0,0,10,2);
         glwCompSetWeightX(&lb_point_s->super,1);
         glwCompSetInsets(&_this->tf_point_s.super,0,0,2,2);
@@ -1690,7 +1688,7 @@ DS3Viewer::DS3Viewer() :
         glwCompAdd(cm_strc,&_this->cb_draw_points.super, -1);
         glwCompAdd(cm_strc,&lb_point_r->super,-1);
         glwCompAdd(cm_strc,&_this->tf_point_r.super,-1);
-        glwCompAdd(cm_strc,&_this->sl_point_r->super,-1);
+        glwCompAdd(cm_strc,&_this->sl_point_r.super, -1);
         glwCompAdd(cm_strc,&lb_point_s->super,-1);
         glwCompAdd(cm_strc,&_this->tf_point_s.super, -1);
         glwCompAdd(cm_strc,&_this->lb_point_t.super, -1);
@@ -1732,156 +1730,156 @@ DS3Viewer::DS3Viewer() :
         glwCompSetInsets(&_this->tf_minx.super, 0, 0, 2, 2);
         glwCompSetGridWidth(&_this->tf_minx.super, GLWC_REMAINDER);
         glwCompSetAlignX(&_this->tf_minx.super, 1);
-        glwCompSetInsets(&_this->sl_minx->super,0,0,10,2);
-        glwCompSetGridWidth(&_this->sl_minx->super,GLWC_REMAINDER);
-        glwCompSetFill(&_this->sl_minx->super,GLWC_HORIZONTAL);
+        glwCompSetInsets(&_this->sl_minx.super,0,0,10,2);
+        glwCompSetGridWidth(&_this->sl_minx.super,GLWC_REMAINDER);
+        glwCompSetFill(&_this->sl_minx.super,GLWC_HORIZONTAL);
         glwCompSetInsets(&lb_miny->super,0,0,2,2);
         glwCompSetWeightX(&lb_miny->super,1);
         glwCompSetInsets(&_this->tf_miny.super, 0, 0, 2, 2);
         glwCompSetGridWidth(&_this->tf_miny.super, GLWC_REMAINDER);
         glwCompSetAlignX(&_this->tf_miny.super, 1);
-        glwCompSetInsets(&_this->sl_miny->super,0,0,10,2);
-        glwCompSetGridWidth(&_this->sl_miny->super,GLWC_REMAINDER);
-        glwCompSetFill(&_this->sl_miny->super,GLWC_HORIZONTAL);
+        glwCompSetInsets(&_this->sl_miny.super,0,0,10,2);
+        glwCompSetGridWidth(&_this->sl_miny.super,GLWC_REMAINDER);
+        glwCompSetFill(&_this->sl_miny.super,GLWC_HORIZONTAL);
         glwCompSetInsets(&lb_minz->super,0,0,2,2);
         glwCompSetWeightX(&lb_minz->super,1);
         glwCompSetInsets(&_this->tf_minz.super, 0, 0, 2, 2);
         glwCompSetGridWidth(&_this->tf_minz.super, GLWC_REMAINDER);
         glwCompSetAlignX(&_this->tf_minz.super, 1);
-        glwCompSetInsets(&_this->sl_minz->super,0,0,10,2);
-        glwCompSetGridWidth(&_this->sl_minz->super,GLWC_REMAINDER);
-        glwCompSetFill(&_this->sl_minz->super,GLWC_HORIZONTAL);
+        glwCompSetInsets(&_this->sl_minz.super,0,0,10,2);
+        glwCompSetGridWidth(&_this->sl_minz.super,GLWC_REMAINDER);
+        glwCompSetFill(&_this->sl_minz.super,GLWC_HORIZONTAL);
         glwCompSetInsets(&lb_maxx->super,0,0,2,2);
         glwCompSetWeightX(&lb_maxx->super,1);
         glwCompSetInsets(&_this->tf_maxx.super, 0, 0, 2, 2);
         glwCompSetGridWidth(&_this->tf_maxx.super, GLWC_REMAINDER);
         glwCompSetAlignX(&_this->tf_maxx.super, 1);
-        glwCompSetInsets(&_this->sl_maxx->super,0,0,10,2);
-        glwCompSetGridWidth(&_this->sl_maxx->super,GLWC_REMAINDER);
-        glwCompSetFill(&_this->sl_maxx->super,GLWC_HORIZONTAL);
+        glwCompSetInsets(&_this->sl_maxx.super,0,0,10,2);
+        glwCompSetGridWidth(&_this->sl_maxx.super,GLWC_REMAINDER);
+        glwCompSetFill(&_this->sl_maxx.super,GLWC_HORIZONTAL);
         glwCompSetInsets(&lb_maxy->super,0,0,2,2);
         glwCompSetWeightX(&lb_maxy->super,1);
         glwCompSetInsets(&_this->tf_maxy.super, 0, 0, 2, 2);
         glwCompSetGridWidth(&_this->tf_maxy.super, GLWC_REMAINDER);
         glwCompSetAlignX(&_this->tf_maxy.super, 1);
-        glwCompSetInsets(&_this->sl_maxy->super,0,0,10,2);
-        glwCompSetGridWidth(&_this->sl_maxy->super,GLWC_REMAINDER);
-        glwCompSetFill(&_this->sl_maxy->super,GLWC_HORIZONTAL);
+        glwCompSetInsets(&_this->sl_maxy.super,0,0,10,2);
+        glwCompSetGridWidth(&_this->sl_maxy.super,GLWC_REMAINDER);
+        glwCompSetFill(&_this->sl_maxy.super,GLWC_HORIZONTAL);
         glwCompSetInsets(&lb_maxz->super,0,0,2,2);
         glwCompSetWeightX(&lb_maxz->super,1);
         glwCompSetInsets(&_this->tf_maxz.super, 0, 0, 2, 2);
         glwCompSetGridWidth(&_this->tf_maxz.super, GLWC_REMAINDER);
         glwCompSetAlignX(&_this->tf_maxz.super, 1);
-        glwCompSetInsets(&_this->sl_maxz->super,0,0,10,2);
-        glwCompSetGridWidth(&_this->sl_maxz->super,GLWC_REMAINDER);
-        glwCompSetFill(&_this->sl_maxz->super,GLWC_HORIZONTAL);
+        glwCompSetInsets(&_this->sl_maxz.super,0,0,10,2);
+        glwCompSetGridWidth(&_this->sl_maxz.super,GLWC_REMAINDER);
+        glwCompSetFill(&_this->sl_maxz.super,GLWC_HORIZONTAL);
         glwCompAdd(cm_bnds,&lb_minx->super,-1);
         glwCompAdd(cm_bnds,&_this->tf_minx.super, -1);
-        glwCompAdd(cm_bnds,&_this->sl_minx->super,-1);
+        glwCompAdd(cm_bnds,&_this->sl_minx.super,-1);
         glwCompAdd(cm_bnds,&lb_miny->super,-1);
         glwCompAdd(cm_bnds,&_this->tf_miny.super, -1);
-        glwCompAdd(cm_bnds,&_this->sl_miny->super,-1);
+        glwCompAdd(cm_bnds,&_this->sl_miny.super,-1);
         glwCompAdd(cm_bnds,&lb_minz->super,-1);
         glwCompAdd(cm_bnds,&_this->tf_minz.super, -1);
-        glwCompAdd(cm_bnds,&_this->sl_minz->super,-1);
+        glwCompAdd(cm_bnds,&_this->sl_minz.super,-1);
         glwCompAdd(cm_bnds,&lb_maxx->super,-1);
         glwCompAdd(cm_bnds,&_this->tf_maxx.super, -1);
-        glwCompAdd(cm_bnds,&_this->sl_maxx->super,-1);
+        glwCompAdd(cm_bnds,&_this->sl_maxx.super,-1);
         glwCompAdd(cm_bnds,&lb_maxy->super,-1);
         glwCompAdd(cm_bnds,&_this->tf_maxy.super, -1);
-        glwCompAdd(cm_bnds,&_this->sl_maxy->super,-1);
+        glwCompAdd(cm_bnds,&_this->sl_maxy.super,-1);
         glwCompAdd(cm_bnds,&lb_maxz->super,-1);
         glwCompAdd(cm_bnds,&_this->tf_maxz.super, -1);
-        glwCompAdd(cm_bnds,&_this->sl_maxz->super,-1);
+        glwCompAdd(cm_bnds,&_this->sl_maxz.super,-1);
         glwCompSetLayout(cm_view,&(new GLWGridBagLayout())->super);
         glwCompSetInsets(&_this->cb_draw_coords->super,0,0,2,2);
         glwCompSetGridWidth(&_this->cb_draw_coords->super,GLWC_REMAINDER);
         glwCompSetInsets(&lb_zoom->super,2,2,2,2);
         glwCompSetFill(&lb_zoom->super,GLWC_HORIZONTAL);
         glwCompSetWeightX(&lb_zoom->super,1);
-        glwCompSetInsets(&_this->tf_zoom->super,2,2,2,2);
-        glwCompSetAlignX(&_this->tf_zoom->super,1);
-        glwCompSetPreWidth(&_this->sl_zoom->super,DS3V_SLIDER_SMALL_WIDTH);
-        glwCompSetInsets(&_this->sl_zoom->super,0,0,2,2);
-        glwCompSetWeightX(&_this->sl_zoom->super,1);
-        glwCompSetGridWidth(&_this->sl_zoom->super,GLWC_REMAINDER);
+        glwCompSetInsets(&_this->tf_zoom.super,2,2,2,2);
+        glwCompSetAlignX(&_this->tf_zoom.super,1);
+        glwCompSetPreWidth(&_this->sl_zoom.super,DS3V_SLIDER_SMALL_WIDTH);
+        glwCompSetInsets(&_this->sl_zoom.super,0,0,2,2);
+        glwCompSetWeightX(&_this->sl_zoom.super,1);
+        glwCompSetGridWidth(&_this->sl_zoom.super,GLWC_REMAINDER);
         glwCompSetInsets(&lb_ornt->super,0,0,2,2);
         glwCompSetGridWidth(&lb_ornt->super,GLWC_REMAINDER);
         glwCompSetInsets(&lb_ornt_y->super,0,0,2,2);
         glwCompSetFill(&lb_ornt_y->super,GLWC_HORIZONTAL);
         glwCompSetWeightX(&lb_ornt_y->super,1);
-        glwCompSetInsets(&_this->tf_ornt_y->super,2,2,2,2);
-        glwCompSetPreWidth(&_this->sl_ornt_y->super,DS3V_SLIDER_SMALL_WIDTH);
-        glwCompSetInsets(&_this->sl_ornt_y->super,0,0,2,2);
-        glwCompSetWeightX(&_this->sl_ornt_y->super,1);
-        glwCompSetGridWidth(&_this->sl_ornt_y->super,GLWC_REMAINDER);
+        glwCompSetInsets(&_this->tf_ornt_y.super,2,2,2,2);
+        glwCompSetPreWidth(&_this->sl_ornt_y.super,DS3V_SLIDER_SMALL_WIDTH);
+        glwCompSetInsets(&_this->sl_ornt_y.super,0,0,2,2);
+        glwCompSetWeightX(&_this->sl_ornt_y.super,1);
+        glwCompSetGridWidth(&_this->sl_ornt_y.super,GLWC_REMAINDER);
         glwCompSetInsets(&lb_ornt_p->super,0,0,2,2);
         glwCompSetFill(&lb_ornt_p->super,GLWC_HORIZONTAL);
         glwCompSetWeightX(&lb_ornt_p->super,1);
-        glwCompSetInsets(&_this->tf_ornt_p->super,2,2,2,2);
-        glwCompSetPreWidth(&_this->sl_ornt_p->super,DS3V_SLIDER_SMALL_WIDTH);
-        glwCompSetInsets(&_this->sl_ornt_p->super,0,0,2,2);
-        glwCompSetWeightX(&_this->sl_ornt_p->super,1);
-        glwCompSetGridWidth(&_this->sl_ornt_p->super,GLWC_REMAINDER);
+        glwCompSetInsets(&_this->tf_ornt_p.super,2,2,2,2);
+        glwCompSetPreWidth(&_this->sl_ornt_p.super,DS3V_SLIDER_SMALL_WIDTH);
+        glwCompSetInsets(&_this->sl_ornt_p.super,0,0,2,2);
+        glwCompSetWeightX(&_this->sl_ornt_p.super,1);
+        glwCompSetGridWidth(&_this->sl_ornt_p.super,GLWC_REMAINDER);
         glwCompSetInsets(&lb_ornt_r->super,0,0,2,2);
         glwCompSetFill(&lb_ornt_r->super,GLWC_HORIZONTAL);
         glwCompSetWeightX(&lb_ornt_r->super,1);
-        glwCompSetInsets(&_this->tf_ornt_r->super,2,2,2,2);
-        glwCompSetPreWidth(&_this->sl_ornt_r->super,DS3V_SLIDER_SMALL_WIDTH);
-        glwCompSetInsets(&_this->sl_ornt_r->super,0,0,2,2);
-        glwCompSetWeightX(&_this->sl_ornt_r->super,1);
-        glwCompSetGridWidth(&_this->sl_ornt_r->super,GLWC_REMAINDER);
+        glwCompSetInsets(&_this->tf_ornt_r.super,2,2,2,2);
+        glwCompSetPreWidth(&_this->sl_ornt_r.super,DS3V_SLIDER_SMALL_WIDTH);
+        glwCompSetInsets(&_this->sl_ornt_r.super,0,0,2,2);
+        glwCompSetWeightX(&_this->sl_ornt_r.super,1);
+        glwCompSetGridWidth(&_this->sl_ornt_r.super,GLWC_REMAINDER);
         glwCompSetInsets(&lb_cntr->super,0,0,2,2);
         glwCompSetGridWidth(&lb_cntr->super,GLWC_REMAINDER);
         glwCompSetInsets(&lb_cntr_x->super,0,0,2,2);
         glwCompSetFill(&lb_cntr_x->super,GLWC_HORIZONTAL);
         glwCompSetWeightX(&lb_cntr_x->super,1);
-        glwCompSetInsets(&_this->tf_cntr_x->super,2,2,2,2);
-        glwCompSetPreWidth(&_this->sl_cntr_x->super,DS3V_SLIDER_SMALL_WIDTH);
-        glwCompSetInsets(&_this->sl_cntr_x->super,0,0,2,2);
-        glwCompSetWeightX(&_this->sl_cntr_x->super,1);
-        glwCompSetGridWidth(&_this->sl_cntr_x->super,GLWC_REMAINDER);
+        glwCompSetInsets(&_this->tf_cntr_x.super,2,2,2,2);
+        glwCompSetPreWidth(&_this->sl_cntr_x.super,DS3V_SLIDER_SMALL_WIDTH);
+        glwCompSetInsets(&_this->sl_cntr_x.super,0,0,2,2);
+        glwCompSetWeightX(&_this->sl_cntr_x.super,1);
+        glwCompSetGridWidth(&_this->sl_cntr_x.super,GLWC_REMAINDER);
         glwCompSetInsets(&lb_cntr_y->super,0,0,2,2);
         glwCompSetFill(&lb_cntr_y->super,GLWC_HORIZONTAL);
         glwCompSetWeightX(&lb_cntr_y->super,1);
-        glwCompSetInsets(&_this->tf_cntr_y->super,2,2,2,2);
-        glwCompSetPreWidth(&_this->sl_cntr_y->super,DS3V_SLIDER_SMALL_WIDTH);
-        glwCompSetInsets(&_this->sl_cntr_y->super,0,0,2,2);
-        glwCompSetWeightX(&_this->sl_cntr_y->super,1);
-        glwCompSetGridWidth(&_this->sl_cntr_y->super,GLWC_REMAINDER);
+        glwCompSetInsets(&_this->tf_cntr_y.super,2,2,2,2);
+        glwCompSetPreWidth(&_this->sl_cntr_y.super, DS3V_SLIDER_SMALL_WIDTH);
+        glwCompSetInsets(&_this->sl_cntr_y.super,0,0,2,2);
+        glwCompSetWeightX(&_this->sl_cntr_y.super,1);
+        glwCompSetGridWidth(&_this->sl_cntr_y.super,GLWC_REMAINDER);
         glwCompSetInsets(&lb_cntr_z->super,0,0,2,2);
         glwCompSetFill(&lb_cntr_z->super,GLWC_HORIZONTAL);
         glwCompSetWeightX(&lb_cntr_z->super,1);
-        glwCompSetInsets(&_this->tf_cntr_z->super,2,2,2,2);
-        glwCompSetPreWidth(&_this->sl_cntr_z->super,DS3V_SLIDER_SMALL_WIDTH);
-        glwCompSetInsets(&_this->sl_cntr_z->super,0,0,2,2);
-        glwCompSetWeightX(&_this->sl_cntr_z->super,1);
-        glwCompSetGridWidth(&_this->sl_cntr_z->super,GLWC_REMAINDER);
+        glwCompSetInsets(&_this->tf_cntr_z.super,2,2,2,2);
+        glwCompSetPreWidth(&_this->sl_cntr_z.super,DS3V_SLIDER_SMALL_WIDTH);
+        glwCompSetInsets(&_this->sl_cntr_z.super,0,0,2,2);
+        glwCompSetWeightX(&_this->sl_cntr_z.super,1);
+        glwCompSetGridWidth(&_this->sl_cntr_z.super,GLWC_REMAINDER);
         glwCompSetGridWidth(cm_view_btns,GLWC_REMAINDER);
         glwCompAdd(cm_view,&_this->cb_draw_coords->super,-1);
         glwCompAdd(cm_view,&lb_zoom->super,-1);
-        glwCompAdd(cm_view,&_this->tf_zoom->super,-1);
-        glwCompAdd(cm_view,&_this->sl_zoom->super,-1);
+        glwCompAdd(cm_view,&_this->tf_zoom.super, -1);
+        glwCompAdd(cm_view,&_this->sl_zoom.super,-1);
         glwCompAdd(cm_view,&lb_ornt->super,-1);
         glwCompAdd(cm_view,&lb_ornt_y->super,-1);
-        glwCompAdd(cm_view,&_this->tf_ornt_y->super,-1);
-        glwCompAdd(cm_view,&_this->sl_ornt_y->super,-1);
+        glwCompAdd(cm_view,&_this->tf_ornt_y.super,-1);
+        glwCompAdd(cm_view,&_this->sl_ornt_y.super,-1);
         glwCompAdd(cm_view,&lb_ornt_p->super,-1);
-        glwCompAdd(cm_view,&_this->tf_ornt_p->super,-1);
-        glwCompAdd(cm_view,&_this->sl_ornt_p->super,-1);
+        glwCompAdd(cm_view,&_this->tf_ornt_p.super,-1);
+        glwCompAdd(cm_view,&_this->sl_ornt_p.super,-1);
         glwCompAdd(cm_view,&lb_ornt_r->super,-1);
-        glwCompAdd(cm_view,&_this->tf_ornt_r->super,-1);
-        glwCompAdd(cm_view,&_this->sl_ornt_r->super,-1);
+        glwCompAdd(cm_view,&_this->tf_ornt_r.super,-1);
+        glwCompAdd(cm_view,&_this->sl_ornt_r.super,-1);
         glwCompAdd(cm_view,&lb_cntr->super,-1);
         glwCompAdd(cm_view,&lb_cntr_x->super,-1);
-        glwCompAdd(cm_view,&_this->tf_cntr_x->super,-1);
-        glwCompAdd(cm_view,&_this->sl_cntr_x->super,-1);
+        glwCompAdd(cm_view,&_this->tf_cntr_x.super,-1);
+        glwCompAdd(cm_view,&_this->sl_cntr_x.super,-1);
         glwCompAdd(cm_view,&lb_cntr_y->super,-1);
-        glwCompAdd(cm_view,&_this->tf_cntr_y->super,-1);
-        glwCompAdd(cm_view,&_this->sl_cntr_y->super,-1);
+        glwCompAdd(cm_view,&_this->tf_cntr_y.super,-1);
+        glwCompAdd(cm_view,&_this->sl_cntr_y.super,-1);
         glwCompAdd(cm_view,&lb_cntr_z->super,-1);
-        glwCompAdd(cm_view,&_this->tf_cntr_z->super,-1);
-        glwCompAdd(cm_view,&_this->sl_cntr_z->super,-1);
+        glwCompAdd(cm_view,&_this->tf_cntr_z.super,-1);
+        glwCompAdd(cm_view,&_this->sl_cntr_z.super,-1);
         glwCompAdd(cm_view,cm_view_btns,-1);
         glwCompSetInsets(&bn_ornt->super,2,2,2,2);
         glwCompSetAlignX(&bn_ornt->super,1);
@@ -1964,51 +1962,26 @@ DS3Viewer::~DS3Viewer()
     // glwButtonFree(bn_align);
     // glwButtonFree(bn_cntr);
     // glwButtonFree(bn_ornt);
-    delete _this->sl_cntr_z;
-    delete (_this->tf_cntr_z);
 //    delete (lb_cntr_z);
-    delete _this->sl_cntr_y;
-    delete (_this->tf_cntr_y);
 //    delete (lb_cntr_y);
-    delete _this->sl_cntr_x;
-    delete (_this->tf_cntr_x);
 //    delete (lb_cntr_x);
 //    delete (lb_cntr);
-    delete _this->sl_ornt_r;
-    delete (_this->tf_ornt_r);
 //    delete (lb_ornt_r);
-    delete _this->sl_ornt_p;
-    delete (_this->tf_ornt_p);
 //    delete (lb_ornt_p);
-    delete _this->sl_ornt_y;
-    delete (_this->tf_ornt_y);
 //    delete (lb_ornt_y);
 //    delete (lb_ornt);
-    delete _this->sl_zoom;
-    delete (_this->tf_zoom);
 //    delete (lb_zoom);
     delete (_this->cb_draw_coords);
-    delete _this->sl_maxz;
 //    delete (lb_maxz);
-    delete _this->sl_minz;
 //    delete (lb_minz);
-    delete _this->sl_maxy;
 //    delete (lb_maxy);
-    delete _this->sl_miny;
 //    delete (lb_miny);
-    delete _this->sl_maxx;
 //    delete (lb_maxx);
-    delete _this->sl_minx;
 //    delete (lb_minx);
-    delete _this->sl_point_r;
-    delete _this->sl_iso_d;
     /*delete (_this->tf_iso_d);*/
 //    delete (lb_iso_d);
-    delete _this->sl_iso_v;
 //    delete (lb_iso_v);
-    delete _this->sl_slice_d;
 //    delete (lb_slice_d);
-    delete _this->sl_slice_p;
 //    delete (lb_slice_p);
 //    delete _this->sl_slice_t; // unique_ptr auto-delete?
 //    delete (lb_slice_t);
@@ -2033,7 +2006,7 @@ void ds3ViewerUpdatePointRLabels(DS3Viewer *_this)
     for (i=0; i<=100; i+=50) {
         char text[32];
         sprintf(text,"%0.3g",i*0.001*_this->ds3view->offs);
-        glwSliderAddLabel(_this->sl_point_r,i,text);
+        glwSliderAddLabel(&_this->sl_point_r,i,text);
     }
 }
 
@@ -2041,12 +2014,12 @@ void ds3ViewerUpdateIsoVLabels(DS3Viewer *_this)
 {
     char text[32];
     sprintf(text,"%0.4g", _this->ds3->min);
-    glwSliderAddLabel(_this->sl_iso_v,0,text);
+    glwSliderAddLabel(&_this->sl_iso_v,0,text);
     sprintf(text,"%0.4g",dsUnscale(_this->ds3view->ds,
                                    (DS3V_ISO_V_RES>>1)*(1.0/DS3V_ISO_V_RES)));
-    glwSliderAddLabel(_this->sl_iso_v,DS3V_ISO_V_RES>>1,text);
+    glwSliderAddLabel(&_this->sl_iso_v,DS3V_ISO_V_RES>>1,text);
     sprintf(text,"%0.4g", _this->ds3->max);
-    glwSliderAddLabel(_this->sl_iso_v,DS3V_ISO_V_RES,text);
+    glwSliderAddLabel(&_this->sl_iso_v,DS3V_ISO_V_RES,text);
 }
 
 /*
@@ -2055,7 +2028,7 @@ void ds3ViewerUpdateZoomLabels(DS3Viewer *_this){
  int  i;
  for(i=0;i<=200;i+=100){
   sprintf(text,"%0.4g",i*0.01*_this->ds3view->offs);
-  glwSliderAddLabel(_this->sl_zoom,i,text);} }
+  glwSliderAddLabel(&_this->sl_zoom,i,text);} }
 */
 
 void ds3ViewerSetPointR(DS3Viewer *_this,double _r)
@@ -2073,9 +2046,9 @@ void ds3ViewerSetPointR(DS3Viewer *_this,double _r)
     r=_r*1000;
     if (_this->ds3view->offs>1E-16)r/=_this->ds3view->offs;
     r+=0.5;
-    glwSliderSetChangedFunc(_this->sl_point_r,NULL);
-    glwSliderSetVal(_this->sl_point_r,(int)r,0);
-    glwSliderSetChangedFunc(_this->sl_point_r,
+    glwSliderSetChangedFunc(&_this->sl_point_r,NULL);
+    glwSliderSetVal(&_this->sl_point_r,(int)r,0);
+    glwSliderSetChangedFunc(&_this->sl_point_r,
                             (GLWActionFunc)ds3ViewerPointRSliderChanged);
 }
 
@@ -2095,9 +2068,9 @@ void ds3ViewerSetSlice(DS3Viewer *_this,double _t,double _p,double _d)
     glwTextFieldSetText(&_this->tf_slice_t,text);
     glwTextFieldSetChangedFunc(&_this->tf_slice_t,
                                (GLWActionFunc)ds3ViewerTextChanged);
-    _this->sl_slice_t->setChangedFunc(NULL);
-    _this->sl_slice_t->setVal((int)(_t+0.5),0);
-    _this->sl_slice_t->setChangedFunc(
+    _this->sl_slice_t.setChangedFunc(NULL);
+    _this->sl_slice_t.setVal((int)(_t+0.5),0);
+    _this->sl_slice_t.setChangedFunc(
         (GLWActionFunc)ds3ViewerSliceTSliderChanged);
     sprintf(text,"%0.3g",_p);
     glwTextFieldSetChangedFunc(&_this->tf_slice_p,
@@ -2105,9 +2078,9 @@ void ds3ViewerSetSlice(DS3Viewer *_this,double _t,double _p,double _d)
     glwTextFieldSetText(&_this->tf_slice_p,text);
     glwTextFieldSetChangedFunc(&_this->tf_slice_p,
                                (GLWActionFunc)ds3ViewerTextChanged);
-    glwSliderSetChangedFunc(_this->sl_slice_p,NULL);
-    glwSliderSetVal(_this->sl_slice_p,(int)(_p+0.5),0);
-    glwSliderSetChangedFunc(_this->sl_slice_p,
+    glwSliderSetChangedFunc(&_this->sl_slice_p,NULL);
+    glwSliderSetVal(&_this->sl_slice_p,(int)(_p+0.5),0);
+    glwSliderSetChangedFunc(&_this->sl_slice_p,
                             (GLWActionFunc)ds3ViewerSlicePSliderChanged);
     sprintf(text,"%0.3g",_d);
     glwTextFieldSetChangedFunc(&_this->tf_slice_d,
@@ -2115,9 +2088,9 @@ void ds3ViewerSetSlice(DS3Viewer *_this,double _t,double _p,double _d)
     glwTextFieldSetText(&_this->tf_slice_d,text);
     glwTextFieldSetChangedFunc(&_this->tf_slice_d,
                                (GLWActionFunc)ds3ViewerTextChanged);
-    glwSliderSetChangedFunc(_this->sl_slice_d,NULL);
-    glwSliderSetVal(_this->sl_slice_d,(int)floor(_d*100+0.5),0);
-    glwSliderSetChangedFunc(_this->sl_slice_d,
+    glwSliderSetChangedFunc(&_this->sl_slice_d,NULL);
+    glwSliderSetVal(&_this->sl_slice_d,(int)floor(_d*100+0.5),0);
+    glwSliderSetChangedFunc(&_this->sl_slice_d,
                             (GLWActionFunc)ds3ViewerSliceDSliderChanged);
 }
 
@@ -2133,21 +2106,21 @@ void ds3ViewerSetIso(DS3Viewer *_this,double _v,int _d)
     glwTextFieldSetText(&_this->tf_iso_v, text);
     glwTextFieldSetChangedFunc(&_this->tf_iso_v,
                                (GLWActionFunc)ds3ViewerTextChanged);
-    glwSliderSetChangedFunc(_this->sl_iso_v,NULL);
-    glwSliderSetVal(_this->sl_iso_v,
+    glwSliderSetChangedFunc(&_this->sl_iso_v,NULL);
+    glwSliderSetVal(&_this->sl_iso_v,
                     (int)floor(dsScale(_this->ds3view->ds,_v)*DS3V_ISO_V_RES+
                                0.5),0);
-    glwSliderSetChangedFunc(_this->sl_iso_v,
+    glwSliderSetChangedFunc(&_this->sl_iso_v,
                             (GLWActionFunc)ds3ViewerIsoVSliderChanged);
     /*sprintf(text,"%i",_d);*/
-    /*glwTextFieldSetChangedFunc(_this->tf_iso_d,
+    /*glwTextFieldSetChangedFunc(&_this->tf_iso_d,
                                  (GLWActionFunc)ds3ViewerTextSet);*/
-    /*glwTextFieldSetText(_this->tf_iso_d,text);*/
-    /*glwTextFieldSetChangedFunc(_this->tf_iso_d,
+    /*glwTextFieldSetText(&_this->tf_iso_d,text);*/
+    /*glwTextFieldSetChangedFunc(&_this->tf_iso_d,
                                  (GLWActionFunc)ds3ViewerTextChanged);*/
-    glwSliderSetChangedFunc(_this->sl_iso_d,NULL);
-    glwSliderSetVal(_this->sl_iso_d,_d,0);
-    glwSliderSetChangedFunc(_this->sl_iso_d,
+    glwSliderSetChangedFunc(&_this->sl_iso_d,NULL);
+    glwSliderSetVal(&_this->sl_iso_d,_d,0);
+    glwSliderSetChangedFunc(&_this->sl_iso_d,
                             (GLWActionFunc)ds3ViewerIsoDSliderChanged);
 }
 
@@ -2161,13 +2134,13 @@ void ds3ViewerSetZoom(DS3Viewer *_this,double _z)
     _z=_this->ds3view->zoom;
     if (_this->ds3view->offs>1E-16)_z/=_this->ds3view->offs;
     sprintf(text,"%0.4g",_z);
-    glwTextFieldSetChangedFunc(_this->tf_zoom,(GLWActionFunc)ds3ViewerTextSet);
-    glwTextFieldSetText(_this->tf_zoom,text);
-    glwTextFieldSetChangedFunc(_this->tf_zoom,
+    glwTextFieldSetChangedFunc(&_this->tf_zoom,(GLWActionFunc)ds3ViewerTextSet);
+    glwTextFieldSetText(&_this->tf_zoom,text);
+    glwTextFieldSetChangedFunc(&_this->tf_zoom,
                                (GLWActionFunc)ds3ViewerTextChanged);
-    glwSliderSetChangedFunc(_this->sl_zoom,NULL);
-    glwSliderSetVal(_this->sl_zoom,(int)(_z*100+0.5),0);
-    glwSliderSetChangedFunc(_this->sl_zoom,
+    glwSliderSetChangedFunc(&_this->sl_zoom,NULL);
+    glwSliderSetVal(&_this->sl_zoom,(int)(_z*100+0.5),0);
+    glwSliderSetChangedFunc(&_this->sl_zoom,
                             (GLWActionFunc)ds3ViewerZoomSliderChanged);
 }
 
@@ -2182,31 +2155,31 @@ void ds3ViewerSetOrientation(DS3Viewer *_this,double _y,double _p,double _r)
     _p=_this->ds3view->pitch;
     _r=_this->ds3view->roll;
     sprintf(text,"%0.3g",_y);
-    glwTextFieldSetChangedFunc(_this->tf_ornt_y,(GLWActionFunc)ds3ViewerTextSet);
-    glwTextFieldSetText(_this->tf_ornt_y,text);
-    glwTextFieldSetChangedFunc(_this->tf_ornt_y,
+    glwTextFieldSetChangedFunc(&_this->tf_ornt_y,(GLWActionFunc)ds3ViewerTextSet);
+    glwTextFieldSetText(&_this->tf_ornt_y,text);
+    glwTextFieldSetChangedFunc(&_this->tf_ornt_y,
                                (GLWActionFunc)ds3ViewerTextChanged);
-    glwSliderSetChangedFunc(_this->sl_ornt_y,NULL);
-    glwSliderSetVal(_this->sl_ornt_y,(int)(_y+0.5),0);
-    glwSliderSetChangedFunc(_this->sl_ornt_y,
+    glwSliderSetChangedFunc(&_this->sl_ornt_y,NULL);
+    glwSliderSetVal(&_this->sl_ornt_y,(int)(_y+0.5),0);
+    glwSliderSetChangedFunc(&_this->sl_ornt_y,
                             (GLWActionFunc)ds3ViewerOrntYSliderChanged);
     sprintf(text,"%0.3g",_p);
-    glwTextFieldSetChangedFunc(_this->tf_ornt_p,(GLWActionFunc)ds3ViewerTextSet);
-    glwTextFieldSetText(_this->tf_ornt_p,text);
-    glwTextFieldSetChangedFunc(_this->tf_ornt_p,
+    glwTextFieldSetChangedFunc(&_this->tf_ornt_p,(GLWActionFunc)ds3ViewerTextSet);
+    glwTextFieldSetText(&_this->tf_ornt_p,text);
+    glwTextFieldSetChangedFunc(&_this->tf_ornt_p,
                                (GLWActionFunc)ds3ViewerTextChanged);
-    glwSliderSetChangedFunc(_this->sl_ornt_p,NULL);
-    glwSliderSetVal(_this->sl_ornt_p,(int)(_p+0.5),0);
-    glwSliderSetChangedFunc(_this->sl_ornt_p,
+    glwSliderSetChangedFunc(&_this->sl_ornt_p,NULL);
+    glwSliderSetVal(&_this->sl_ornt_p,(int)(_p+0.5),0);
+    glwSliderSetChangedFunc(&_this->sl_ornt_p,
                             (GLWActionFunc)ds3ViewerOrntPSliderChanged);
     sprintf(text,"%0.3g",_r);
-    glwTextFieldSetChangedFunc(_this->tf_ornt_r,(GLWActionFunc)ds3ViewerTextSet);
-    glwTextFieldSetText(_this->tf_ornt_r,text);
-    glwTextFieldSetChangedFunc(_this->tf_ornt_r,
+    glwTextFieldSetChangedFunc(&_this->tf_ornt_r,(GLWActionFunc)ds3ViewerTextSet);
+    glwTextFieldSetText(&_this->tf_ornt_r,text);
+    glwTextFieldSetChangedFunc(&_this->tf_ornt_r,
                                (GLWActionFunc)ds3ViewerTextChanged);
-    glwSliderSetChangedFunc(_this->sl_ornt_r,NULL);
-    glwSliderSetVal(_this->sl_ornt_r,(int)(_r+0.5),0);
-    glwSliderSetChangedFunc(_this->sl_ornt_r,
+    glwSliderSetChangedFunc(&_this->sl_ornt_r,NULL);
+    glwSliderSetVal(&_this->sl_ornt_r,(int)(_r+0.5),0);
+    glwSliderSetChangedFunc(&_this->sl_ornt_r,
                             (GLWActionFunc)ds3ViewerOrntRSliderChanged);
 }
 
@@ -2227,31 +2200,31 @@ void ds3ViewerSetCenter(DS3Viewer *_this,double _x,double _y,double _z)
     _y=vectDot3d(_this->ds3view->basinv[Y],_this->ds3view->cntr);
     _z=vectDot3d(_this->ds3view->basinv[Z],_this->ds3view->cntr);
     sprintf(text,"%0.3g",_x);
-    glwTextFieldSetChangedFunc(_this->tf_cntr_x,(GLWActionFunc)ds3ViewerTextSet);
-    glwTextFieldSetText(_this->tf_cntr_x,text);
-    glwTextFieldSetChangedFunc(_this->tf_cntr_x,
+    glwTextFieldSetChangedFunc(&_this->tf_cntr_x,(GLWActionFunc)ds3ViewerTextSet);
+    glwTextFieldSetText(&_this->tf_cntr_x,text);
+    glwTextFieldSetChangedFunc(&_this->tf_cntr_x,
                                (GLWActionFunc)ds3ViewerTextChanged);
-    glwSliderSetChangedFunc(_this->sl_cntr_x,NULL);
-    glwSliderSetVal(_this->sl_cntr_x,(int)floor(_x*100+0.5),0);
-    glwSliderSetChangedFunc(_this->sl_cntr_x,
+    glwSliderSetChangedFunc(&_this->sl_cntr_x,NULL);
+    glwSliderSetVal(&_this->sl_cntr_x,(int)floor(_x*100+0.5),0);
+    glwSliderSetChangedFunc(&_this->sl_cntr_x,
                             (GLWActionFunc)ds3ViewerCntrXSliderChanged);
     sprintf(text,"%0.3g",_y);
-    glwTextFieldSetChangedFunc(_this->tf_cntr_y,(GLWActionFunc)ds3ViewerTextSet);
-    glwTextFieldSetText(_this->tf_cntr_y,text);
-    glwTextFieldSetChangedFunc(_this->tf_cntr_x,
+    glwTextFieldSetChangedFunc(&_this->tf_cntr_y,(GLWActionFunc)ds3ViewerTextSet);
+    glwTextFieldSetText(&_this->tf_cntr_y,text);
+    glwTextFieldSetChangedFunc(&_this->tf_cntr_x,
                                (GLWActionFunc)ds3ViewerTextChanged);
-    glwSliderSetChangedFunc(_this->sl_cntr_y,NULL);
-    glwSliderSetVal(_this->sl_cntr_y,(int)floor(_y*100+0.5),0);
-    glwSliderSetChangedFunc(_this->sl_cntr_y,
+    glwSliderSetChangedFunc(&_this->sl_cntr_y,NULL);
+    glwSliderSetVal(&_this->sl_cntr_y,(int)floor(_y*100+0.5),0);
+    glwSliderSetChangedFunc(&_this->sl_cntr_y,
                             (GLWActionFunc)ds3ViewerCntrYSliderChanged);
     sprintf(text,"%0.3g",_z);
-    glwTextFieldSetChangedFunc(_this->tf_cntr_z,(GLWActionFunc)ds3ViewerTextSet);
-    glwTextFieldSetText(_this->tf_cntr_z,text);
-    glwTextFieldSetChangedFunc(_this->tf_cntr_z,
+    glwTextFieldSetChangedFunc(&_this->tf_cntr_z,(GLWActionFunc)ds3ViewerTextSet);
+    glwTextFieldSetText(&_this->tf_cntr_z,text);
+    glwTextFieldSetChangedFunc(&_this->tf_cntr_z,
                                (GLWActionFunc)ds3ViewerTextChanged);
-    glwSliderSetChangedFunc(_this->sl_cntr_z,NULL);
-    glwSliderSetVal(_this->sl_cntr_z,(int)floor(_z*100+0.5),0);
-    glwSliderSetChangedFunc(_this->sl_cntr_z,
+    glwSliderSetChangedFunc(&_this->sl_cntr_z,NULL);
+    glwSliderSetVal(&_this->sl_cntr_z,(int)floor(_z*100+0.5),0);
+    glwSliderSetChangedFunc(&_this->sl_cntr_z,
                             (GLWActionFunc)ds3ViewerCntrZSliderChanged);
 }
 
@@ -2275,9 +2248,9 @@ void ds3ViewerSetBox(DS3Viewer *_this,double _minx,double _miny,double _minz,
     glwTextFieldSetText(&_this->tf_minx, text);
     glwTextFieldSetChangedFunc(&_this->tf_minx,
                                (GLWActionFunc)ds3ViewerTextChanged);
-    glwSliderSetChangedFunc(_this->sl_minx,NULL);
-    glwSliderSetVal(_this->sl_minx,(int)floor(_minx*100+0.5),0);
-    glwSliderSetChangedFunc(_this->sl_minx,
+    glwSliderSetChangedFunc(&_this->sl_minx,NULL);
+    glwSliderSetVal(&_this->sl_minx,(int)floor(_minx*100+0.5),0);
+    glwSliderSetChangedFunc(&_this->sl_minx,
                             (GLWActionFunc)ds3ViewerMinXSliderChanged);
     sprintf(text,"%0.3g",_miny);
     glwTextFieldSetChangedFunc(&_this->tf_miny,
@@ -2285,9 +2258,9 @@ void ds3ViewerSetBox(DS3Viewer *_this,double _minx,double _miny,double _minz,
     glwTextFieldSetText(&_this->tf_miny, text);
     glwTextFieldSetChangedFunc(&_this->tf_miny,
                                (GLWActionFunc)ds3ViewerTextChanged);
-    glwSliderSetChangedFunc(_this->sl_miny,NULL);
-    glwSliderSetVal(_this->sl_miny,(int)floor(_miny*100+0.5),0);
-    glwSliderSetChangedFunc(_this->sl_miny,
+    glwSliderSetChangedFunc(&_this->sl_miny,NULL);
+    glwSliderSetVal(&_this->sl_miny,(int)floor(_miny*100+0.5),0);
+    glwSliderSetChangedFunc(&_this->sl_miny,
                             (GLWActionFunc)ds3ViewerMinYSliderChanged);
     sprintf(text,"%0.3g",_minz);
     glwTextFieldSetChangedFunc(&_this->tf_minz,
@@ -2295,9 +2268,9 @@ void ds3ViewerSetBox(DS3Viewer *_this,double _minx,double _miny,double _minz,
     glwTextFieldSetText(&_this->tf_minz, text);
     glwTextFieldSetChangedFunc(&_this->tf_minz,
                                (GLWActionFunc)ds3ViewerTextChanged);
-    glwSliderSetChangedFunc(_this->sl_minz,NULL);
-    glwSliderSetVal(_this->sl_minz,(int)floor(_minz*100+0.5),0);
-    glwSliderSetChangedFunc(_this->sl_minz,
+    glwSliderSetChangedFunc(&_this->sl_minz,NULL);
+    glwSliderSetVal(&_this->sl_minz,(int)floor(_minz*100+0.5),0);
+    glwSliderSetChangedFunc(&_this->sl_minz,
                             (GLWActionFunc)ds3ViewerMinZSliderChanged);
     sprintf(text,"%0.3g",_maxx);
     glwTextFieldSetChangedFunc(&_this->tf_maxx,
@@ -2305,9 +2278,9 @@ void ds3ViewerSetBox(DS3Viewer *_this,double _minx,double _miny,double _minz,
     glwTextFieldSetText(&_this->tf_maxx, text);
     glwTextFieldSetChangedFunc(&_this->tf_maxx,
                                (GLWActionFunc)ds3ViewerTextChanged);
-    glwSliderSetChangedFunc(_this->sl_maxx,NULL);
-    glwSliderSetVal(_this->sl_maxx,(int)floor(_maxx*100+0.5),0);
-    glwSliderSetChangedFunc(_this->sl_maxx,
+    glwSliderSetChangedFunc(&_this->sl_maxx,NULL);
+    glwSliderSetVal(&_this->sl_maxx,(int)floor(_maxx*100+0.5),0);
+    glwSliderSetChangedFunc(&_this->sl_maxx,
                             (GLWActionFunc)ds3ViewerMaxXSliderChanged);
     sprintf(text,"%0.3g",_maxy);
     glwTextFieldSetChangedFunc(&_this->tf_maxy,
@@ -2315,9 +2288,9 @@ void ds3ViewerSetBox(DS3Viewer *_this,double _minx,double _miny,double _minz,
     glwTextFieldSetText(&_this->tf_maxy, text);
     glwTextFieldSetChangedFunc(&_this->tf_maxy,
                                (GLWActionFunc)ds3ViewerTextChanged);
-    glwSliderSetChangedFunc(_this->sl_maxy,NULL);
-    glwSliderSetVal(_this->sl_maxy,(int)floor(_maxy*100+0.5),0);
-    glwSliderSetChangedFunc(_this->sl_maxy,
+    glwSliderSetChangedFunc(&_this->sl_maxy,NULL);
+    glwSliderSetVal(&_this->sl_maxy,(int)floor(_maxy*100+0.5),0);
+    glwSliderSetChangedFunc(&_this->sl_maxy,
                             (GLWActionFunc)ds3ViewerMaxYSliderChanged);
     sprintf(text,"%0.3g",_maxz);
     glwTextFieldSetChangedFunc(&_this->tf_maxz,
@@ -2325,9 +2298,9 @@ void ds3ViewerSetBox(DS3Viewer *_this,double _minx,double _miny,double _minz,
     glwTextFieldSetText(&_this->tf_maxz, text);
     glwTextFieldSetChangedFunc(&_this->tf_maxz,
                                (GLWActionFunc)ds3ViewerTextChanged);
-    glwSliderSetChangedFunc(_this->sl_maxz,NULL);
-    glwSliderSetVal(_this->sl_maxz,(int)floor(_maxz*100+0.5),0);
-    glwSliderSetChangedFunc(_this->sl_maxz,
+    glwSliderSetChangedFunc(&_this->sl_maxz,NULL);
+    glwSliderSetVal(&_this->sl_maxz,(int)floor(_maxz*100+0.5),0);
+    glwSliderSetChangedFunc(&_this->sl_maxz,
                             (GLWActionFunc)ds3ViewerMaxZSliderChanged);
 }
 
