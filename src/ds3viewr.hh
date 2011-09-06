@@ -41,7 +41,7 @@ public:
     GLWTabbedPane     tp_ctrl;
     DSColorLegend     legend;
     GLWLabel          lb_status;
-    GLWCheckBox      *cb_draw_slice;
+    GLWCheckBox       cb_draw_slice;
     GLWLabel         *lb_datax;
     GLWLabel         *lb_datay;
     GLWLabel         *lb_dataz;

@@ -274,7 +274,7 @@ static void ds3ViewerFileTextChanged(DS3Viewer *_this,GLWComponent *_c)
 static void ds3ViewerDrawSliceChanged(DS3Viewer *_this,GLWComponent *_c)
 {
     int b;
-    b=glwCheckBoxGetState(_this->cb_draw_slice);
+    b = glwCheckBoxGetState(&_this->cb_draw_slice);
     ds3ViewSetDrawSlice(_this->ds3view,b);
     glwCompEnable(&_this->tf_slice_t->super,b);
     glwCompEnable(&_this->sl_slice_t->super,b);
@@ -918,7 +918,7 @@ DS3Viewer::DS3Viewer() :
         tf_file(NULL, 20),
         lb_data_set("Data Set: "),
         lb_status(""),
-        cb_draw_slice(new GLWCheckBox("Draw Slice",1,NULL)),
+        cb_draw_slice("Draw Slice",1,NULL),
         lb_datax(new GLWLabel("")),
         lb_datay(new GLWLabel("")),
         lb_dataz(new GLWLabel("")),
@@ -1093,7 +1093,7 @@ DS3Viewer::DS3Viewer() :
 # endif
             cm_bnds!=NULL&&cm_view!=NULL&&cm_view_btns!=NULL&&cm_opts!=NULL&&
             _this->lb_datax!=NULL&&_this->lb_datay!=NULL&&_this->lb_dataz!=NULL&&
-            _this->lb_datav!=NULL&&_this->cb_draw_slice!=NULL&&lb_slice_t!=NULL&&
+            _this->lb_datav!=NULL && lb_slice_t!=NULL&&
             _this->tf_slice_t!=NULL&&_this->sl_slice_t != NULL&&lb_slice_p!=NULL&&
             _this->tf_slice_p!=NULL&&_this->sl_slice_p!=NULL&&lb_slice_d!=NULL&&
             _this->tf_slice_d!=NULL&&_this->sl_slice_d!=NULL&&
@@ -1190,9 +1190,9 @@ DS3Viewer::DS3Viewer() :
         glwCheckBoxSetChangedFunc(_this->cb_draw_points,
                                   (GLWActionFunc)ds3ViewerDrawPointsChanged);
         glwCheckBoxSetChangedCtx(_this->cb_draw_points,_this);
-        glwCheckBoxSetChangedFunc(_this->cb_draw_slice,
+        glwCheckBoxSetChangedFunc(&_this->cb_draw_slice,
                                   (GLWActionFunc)ds3ViewerDrawSliceChanged);
-        glwCheckBoxSetChangedCtx(_this->cb_draw_slice,_this);
+        glwCheckBoxSetChangedCtx(&_this->cb_draw_slice, _this);
         glwCheckBoxSetChangedFunc(_this->cb_draw_iso,
                                   (GLWActionFunc)ds3ViewerDrawIsoChanged);
         glwCheckBoxSetChangedCtx(_this->cb_draw_iso,_this);
@@ -1583,8 +1583,8 @@ DS3Viewer::DS3Viewer() :
         glwTabbedPaneAdd(&_this->tp_ctrl, cm_view, "View", -1);
         glwTabbedPaneAdd(&_this->tp_ctrl, cm_opts, "Options", -1);
         glwCompSetLayout(cm_data,&(new GLWGridBagLayout())->super);
-        glwCompSetInsets(&_this->cb_draw_slice->super,0,0,2,2);
-        glwCompSetGridWidth(&_this->cb_draw_slice->super,GLWC_REMAINDER);
+        glwCompSetInsets(&_this->cb_draw_slice.super, 0, 0, 2, 2);
+        glwCompSetGridWidth(&_this->cb_draw_slice.super, GLWC_REMAINDER);
         glwCompSetInsets(&lb_slice_t->super,0,0,10,2);
         glwCompSetWeightX(&lb_slice_t->super,1);
         glwCompSetInsets(&_this->tf_slice_t->super,0,0,2,2);
@@ -1627,7 +1627,7 @@ DS3Viewer::DS3Viewer() :
         glwCompSetInsets(&_this->sl_iso_d->super,0,0,10,2);
         glwCompSetGridWidth(&_this->sl_iso_d->super,GLWC_REMAINDER);
         glwCompSetFill(&_this->sl_iso_d->super,GLWC_HORIZONTAL);
-        glwCompAdd(cm_data,&_this->cb_draw_slice->super,-1);
+        glwCompAdd(cm_data,&_this->cb_draw_slice.super, -1);
         glwCompAdd(cm_data,&lb_slice_t->super,-1);
         glwCompAdd(cm_data,&_this->tf_slice_t->super,-1);
         glwCompAdd(cm_data,&_this->sl_slice_t->super,-1);
@@ -2047,7 +2047,6 @@ DS3Viewer::~DS3Viewer()
 //    delete _this->sl_slice_t; // unique_ptr auto-delete?
     delete (_this->tf_slice_t);
 //    delete (lb_slice_t);
-    delete (_this->cb_draw_slice);
     delete (_this->lb_datav);
     delete (_this->lb_dataz);
     delete (_this->lb_datay);
