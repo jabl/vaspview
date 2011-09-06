@@ -112,7 +112,7 @@ public:
     GLWCheckBox      *cb_backc_white;
     GLWCheckBoxGroup  cg_projt;
     GLWCheckBox      *cb_projt_persp;
-    GLWCheckBox      *cb_projt_ortho;
+    GLWCheckBox      cb_projt_ortho;
     DSLinearScale     scale_linear;
     DSLogScale        scale_log;
     DataSet3D*        ds3;

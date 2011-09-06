@@ -946,7 +946,8 @@ DS3Viewer::DS3Viewer() :
         bn_bond_a(new GLWButton("Add Bond")),
         bn_bond_d(new GLWButton("Delete Bond")),
 #endif
-        tf_minx(new GLWTextField(NULL,5))
+        tf_minx(new GLWTextField(NULL,5)),
+	cb_projt_ortho("Orthographic", 0, &this->cg_projt)
 {
     GLWLabel     *lb_file;
     GLWLabel     *lb_slice_t;
@@ -1086,7 +1087,7 @@ DS3Viewer::DS3Viewer() :
     _this->cb_backc_white= new GLWCheckBox("White",0,&_this->cg_backc);
     lb_projt= new GLWLabel("Projection type:");
     _this->cb_projt_persp= new GLWCheckBox("Perspective",1,&_this->cg_projt);
-    _this->cb_projt_ortho= new GLWCheckBox("Orthographic",0,&_this->cg_projt);
+
     if (_this->frame!=NULL&&_this->ds3view!=NULL&&cm_vals!=NULL&&lb_file!=NULL&&
             _this->tf_file!=NULL&&_this->lb_data_set!=NULL&&
             cm_data!=NULL&&cm_strc!=NULL&&cm_point_btns!=NULL&&
@@ -1130,7 +1131,7 @@ DS3Viewer::DS3Viewer() :
             _this->cb_scale_linear!=NULL&&_this->cb_scale_log!=NULL&&lb_color!=NULL&&
             _this->cb_color_rainbow!=NULL&&_this->cb_color_grayscale!=NULL&&
             lb_backc!=NULL&&_this->cb_backc_black!=NULL&&_this->cb_backc_white!=NULL&&
-            lb_projt!=NULL&&_this->cb_projt_persp!=NULL&&_this->cb_projt_ortho!=NULL) {
+            lb_projt!=NULL&&_this->cb_projt_persp!=NULL) {
         int i;
         ds3ViewSetDataScale(_this->ds3view,&_this->scale_linear.super);
         glwButtonSetPressedFunc(&_this->bn_open,(GLWActionFunc)ds3ViewerOpen);
@@ -1918,8 +1919,8 @@ DS3Viewer::DS3Viewer() :
         glwCompSetInsets(&lb_projt->super,0,0,2,2);
         glwCompSetGridWidth(&lb_projt->super,GLWC_REMAINDER);
         glwCompSetInsets(&_this->cb_projt_persp->super,0,0,2,2);
-        glwCompSetInsets(&_this->cb_projt_ortho->super,0,0,2,2);
-        glwCompSetGridWidth(&_this->cb_projt_ortho->super,GLWC_REMAINDER);
+        glwCompSetInsets(&_this->cb_projt_ortho.super, 0, 0, 2, 2);
+        glwCompSetGridWidth(&_this->cb_projt_ortho.super, GLWC_REMAINDER);
         glwCompAdd(cm_opts,&lb_scale->super,-1);
         glwCompAdd(cm_opts,&_this->cb_scale_linear->super,-1);
         glwCompAdd(cm_opts,&_this->cb_scale_log->super,-1);
@@ -1931,7 +1932,7 @@ DS3Viewer::DS3Viewer() :
         glwCompAdd(cm_opts,&_this->cb_backc_white->super,-1);
         glwCompAdd(cm_opts,&lb_projt->super,-1);
         glwCompAdd(cm_opts,&_this->cb_projt_persp->super,-1);
-        glwCompAdd(cm_opts,&_this->cb_projt_ortho->super,-1);
+        glwCompAdd(cm_opts,&_this->cb_projt_ortho.super, -1);
         ds3ViewerFileTextChanged(_this,&_this->tf_file->super);
         ds3ViewerViewDataChanged(_this,_this->ds3view);
         ds3ViewerSetPointR(_this,_this->ds3view->point_r);
@@ -1955,7 +1956,6 @@ DS3Viewer::~DS3Viewer()
 {
     printf("Destroying DS3Viewer\n");
     DS3Viewer* _this = this;
-    delete _this->cb_projt_ortho;
     delete (_this->cb_projt_persp);
 //    delete (lb_projt);
     delete (_this->cb_backc_white);
