@@ -338,7 +338,7 @@ static void ds3ViewerDrawIsoChanged(DS3Viewer *_this,GLWComponent *_c)
     int b;
     b = glwCheckBoxGetState(&_this->cb_draw_iso);
     ds3ViewSetDrawIso(_this->ds3view,b);
-    glwCompEnable(&_this->tf_iso_v->super,b);
+    glwCompEnable(&_this->tf_iso_v.super, b);
     glwCompEnable(&_this->sl_iso_v->super,b);
     /*glwCompEnable(&_this->tf_iso_d->super,b);*/
     glwCompEnable(&_this->sl_iso_d->super,b);
@@ -350,7 +350,7 @@ static void ds3ViewerIsoVTextChanged(DS3Viewer *_this,GLWComponent *_c)
     char   *e;
     double  v;
     ds3ViewerTextSet(_this,_c);
-    text=glwTextFieldGetText(_this->tf_iso_v);
+    text=glwTextFieldGetText(&_this->tf_iso_v);
     v=strtod(text,&e);
     if (e!=text&&e[0]=='\0') {
         ds3ViewerSetIso(_this,v,_this->ds3view->iso_d);
@@ -403,9 +403,9 @@ static void ds3ViewerDrawPointsChanged(DS3Viewer *_this,GLWComponent *_c)
     glwCompEnable(&_this->bn_bond_a->super,b);
     glwCompEnable(&_this->bn_bond_d->super,b);
 # endif
-    glwCompEnable(&_this->tf_point_r->super,b);
+    glwCompEnable(&_this->tf_point_r.super,b);
     glwCompEnable(&_this->sl_point_r->super,b);
-    glwCompEnable(&_this->tf_point_s->super,b);
+    glwCompEnable(&_this->tf_point_s.super,b);
     glwCompEnable(&_this->bn_point_v->super,b);
     glwCompEnable(&_this->bn_point_sa->super,b);
     glwCompEnable(&_this->bn_point_c->super,b);
@@ -417,7 +417,7 @@ static void ds3ViewerPointRTextChanged(DS3Viewer *_this,GLWComponent *_c)
     char   *e;
     double  r;
     ds3ViewerTextSet(_this,_c);
-    text=glwTextFieldGetText(_this->tf_point_r);
+    text=glwTextFieldGetText(&_this->tf_point_r);
     r=strtod(text,&e);
     if (e!=text&&e[0]=='\0')ds3ViewerSetPointR(_this,r);
 }
@@ -435,7 +435,7 @@ static void ds3ViewerPointSTextChanged(DS3Viewer *_this,GLWComponent *_c)
     char *e;
     long  l;
     ds3ViewerTextSet(_this,_c);
-    text=glwTextFieldGetText(_this->tf_point_s);
+    text=glwTextFieldGetText(&_this->tf_point_s);
     l=strtol(text,&e,0)-1;
     if (e!=text&&e[0]=='\0')ds3ViewerSetSelectedPoint(_this,l);
 }
@@ -927,10 +927,10 @@ DS3Viewer::DS3Viewer() :
         tf_slice_p("", 5),
         tf_slice_d("", 5),
         cb_draw_iso("Draw Iso-Surface",1,NULL),
-        tf_iso_v(new GLWTextField("", 5)),
+        tf_iso_v("", 5),
         cb_draw_points("Draw Atoms",1,NULL),
-        tf_point_r(new GLWTextField("", 5)),
-        tf_point_s(new GLWTextField("", 5)),
+        tf_point_r("", 5),
+        tf_point_s("", 5),
         lb_point_t(new GLWLabel("Atom type:")),
         lb_point_l(new GLWLabel("Atom location:")),
         bn_point_c(new GLWButton("Look at Atom")),
@@ -1096,11 +1096,11 @@ DS3Viewer::DS3Viewer() :
             _this->sl_slice_t != NULL&&lb_slice_p!=NULL&&
             _this->sl_slice_p!=NULL&&lb_slice_d!=NULL&&
             _this->sl_slice_d!=NULL&&
-            lb_iso_v!=NULL&&_this->tf_iso_v!=NULL&&
+            lb_iso_v!=NULL&&
             _this->sl_iso_v!=NULL&&lb_iso_d!=NULL&&/*_this->tf_iso_d!=NULL&&*/
             _this->sl_iso_d!=NULL && lb_point_r!=NULL&&
-            _this->tf_point_r!=NULL&&_this->sl_point_r!=NULL&&lb_point_s!=NULL&&
-            _this->tf_point_s!=NULL&&_this->lb_point_t!=NULL&&
+            _this->sl_point_r!=NULL&&lb_point_s!=NULL&&
+            _this->lb_point_t!=NULL&&
             _this->lb_point_l!=NULL&&_this->bn_point_c!=NULL&&
             _this->bn_point_v!=NULL&&_this->bn_point_sa!=NULL&&
 # if defined(__DS3_ADD_BONDS__)
@@ -1231,30 +1231,30 @@ DS3Viewer::DS3Viewer() :
         glwTextFieldSetChangedFunc(&_this->tf_slice_d,
                                    (GLWActionFunc)ds3ViewerTextChanged);
         glwTextFieldSetChangedCtx(&_this->tf_slice_d,_this);
-        glwTextFieldSetActionFunc(_this->tf_iso_v,
+        glwTextFieldSetActionFunc(&_this->tf_iso_v,
                                   (GLWActionFunc)ds3ViewerIsoVTextChanged);
-        glwTextFieldSetActionCtx(_this->tf_iso_v,_this);
-        glwTextFieldSetChangedFunc(_this->tf_iso_v,
+        glwTextFieldSetActionCtx(&_this->tf_iso_v, _this);
+        glwTextFieldSetChangedFunc(&_this->tf_iso_v,
                                    (GLWActionFunc)ds3ViewerTextChanged);
-        glwTextFieldSetChangedCtx(_this->tf_iso_v,_this);
+        glwTextFieldSetChangedCtx(&_this->tf_iso_v, _this);
         /*glwTextFieldSetActionFunc(_this->tf_iso_d,
                                    (GLWActionFunc)ds3ViewerIsoDTextChanged);
         glwTextFieldSetActionCtx(_this->tf_iso_d,_this);
         glwTextFieldSetChangedFunc(_this->tf_iso_d,
                                    (GLWActionFunc)ds3ViewerTextChanged);
         glwTextFieldSetChangedCtx(_this->tf_iso_d,_this);*/
-        glwTextFieldSetActionFunc(_this->tf_point_r,
+        glwTextFieldSetActionFunc(&_this->tf_point_r,
                                   (GLWActionFunc)ds3ViewerPointRTextChanged);
-        glwTextFieldSetActionCtx(_this->tf_point_r,_this);
-        glwTextFieldSetChangedFunc(_this->tf_point_r,
+        glwTextFieldSetActionCtx(&_this->tf_point_r,_this);
+        glwTextFieldSetChangedFunc(&_this->tf_point_r,
                                    (GLWActionFunc)ds3ViewerTextChanged);
-        glwTextFieldSetChangedCtx(_this->tf_point_r,_this);
-        glwTextFieldSetActionFunc(_this->tf_point_s,
+        glwTextFieldSetChangedCtx(&_this->tf_point_r,_this);
+        glwTextFieldSetActionFunc(&_this->tf_point_s,
                                   (GLWActionFunc)ds3ViewerPointSTextChanged);
-        glwTextFieldSetActionCtx(_this->tf_point_s,_this);
-        glwTextFieldSetChangedFunc(_this->tf_point_s,
+        glwTextFieldSetActionCtx(&_this->tf_point_s,_this);
+        glwTextFieldSetChangedFunc(&_this->tf_point_s,
                                    (GLWActionFunc)ds3ViewerTextChanged);
-        glwTextFieldSetChangedCtx(_this->tf_point_s,_this);
+        glwTextFieldSetChangedCtx(&_this->tf_point_s,_this);
 # if defined(__DS3_ADD_BONDS__)
         glwTextFieldSetActionFunc(_this->tf_bond_f,
                                   (GLWActionFunc)ds3ViewerBondFTextChanged);
@@ -1612,10 +1612,10 @@ DS3Viewer::DS3Viewer() :
         glwCompSetGridWidth(&_this->cb_draw_iso.super, GLWC_REMAINDER);
         glwCompSetInsets(&lb_iso_v->super,0,0,10,2);
         glwCompSetWeightX(&lb_iso_v->super,1);
-        glwCompSetInsets(&_this->tf_iso_v->super,0,0,2,2);
-        glwCompSetGridWidth(&_this->tf_iso_v->super,GLWC_REMAINDER);
-        glwCompSetAlignX(&_this->tf_iso_v->super,1);
-        glwCompSetInsets(&_this->sl_iso_v->super,0,0,10,2);
+        glwCompSetInsets(&_this->tf_iso_v.super, 0, 0, 2, 2);
+        glwCompSetGridWidth(&_this->tf_iso_v.super, GLWC_REMAINDER);
+        glwCompSetAlignX(&_this->tf_iso_v.super, 1);
+        glwCompSetInsets(&_this->sl_iso_v->super, 0, 0, 10, 2);
         glwCompSetGridWidth(&_this->sl_iso_v->super,GLWC_REMAINDER);
         glwCompSetFill(&_this->sl_iso_v->super,GLWC_HORIZONTAL);
         glwCompSetInsets(&lb_iso_d->super,0,0,10,2);
@@ -1638,7 +1638,7 @@ DS3Viewer::DS3Viewer() :
         glwCompAdd(cm_data,&_this->sl_slice_d->super,-1);
         glwCompAdd(cm_data,&_this->cb_draw_iso.super, -1);
         glwCompAdd(cm_data,&lb_iso_v->super,-1);
-        glwCompAdd(cm_data,&_this->tf_iso_v->super,-1);
+        glwCompAdd(cm_data,&_this->tf_iso_v.super, -1);
         glwCompAdd(cm_data,&_this->sl_iso_v->super,-1);
         glwCompAdd(cm_data,&lb_iso_d->super,-1);
         /*glwCompAdd(cm_data,&_this->tf_iso_d->super,-1);*/
@@ -1648,17 +1648,17 @@ DS3Viewer::DS3Viewer() :
         glwCompSetGridWidth(&_this->cb_draw_points.super, GLWC_REMAINDER);
         glwCompSetInsets(&lb_point_r->super,0,0,10,2);
         glwCompSetWeightX(&lb_point_r->super,1);
-        glwCompSetInsets(&_this->tf_point_r->super,0,0,2,2);
-        glwCompSetGridWidth(&_this->tf_point_r->super,GLWC_REMAINDER);
-        glwCompSetAlignX(&_this->tf_point_r->super,1);
+        glwCompSetInsets(&_this->tf_point_r.super,0,0,2,2);
+        glwCompSetGridWidth(&_this->tf_point_r.super,GLWC_REMAINDER);
+        glwCompSetAlignX(&_this->tf_point_r.super,1);
         glwCompSetInsets(&_this->sl_point_r->super,0,0,10,2);
         glwCompSetGridWidth(&_this->sl_point_r->super,GLWC_REMAINDER);
         glwCompSetFill(&_this->sl_point_r->super,GLWC_HORIZONTAL);
         glwCompSetInsets(&lb_point_s->super,0,0,10,2);
         glwCompSetWeightX(&lb_point_s->super,1);
-        glwCompSetInsets(&_this->tf_point_s->super,0,0,2,2);
-        glwCompSetGridWidth(&_this->tf_point_s->super,GLWC_REMAINDER);
-        glwCompSetAlignX(&_this->tf_point_s->super,1);
+        glwCompSetInsets(&_this->tf_point_s.super,0,0,2,2);
+        glwCompSetGridWidth(&_this->tf_point_s.super,GLWC_REMAINDER);
+        glwCompSetAlignX(&_this->tf_point_s.super,1);
         glwCompSetInsets(&_this->lb_point_t->super,2,2,10,2);
         glwCompSetGridWidth(&_this->lb_point_t->super,GLWC_REMAINDER);
         glwCompSetInsets(&_this->lb_point_l->super,2,2,10,2);
@@ -1691,10 +1691,10 @@ DS3Viewer::DS3Viewer() :
 # endif
         glwCompAdd(cm_strc,&_this->cb_draw_points.super, -1);
         glwCompAdd(cm_strc,&lb_point_r->super,-1);
-        glwCompAdd(cm_strc,&_this->tf_point_r->super,-1);
+        glwCompAdd(cm_strc,&_this->tf_point_r.super,-1);
         glwCompAdd(cm_strc,&_this->sl_point_r->super,-1);
         glwCompAdd(cm_strc,&lb_point_s->super,-1);
-        glwCompAdd(cm_strc,&_this->tf_point_s->super,-1);
+        glwCompAdd(cm_strc,&_this->tf_point_s.super,-1);
         glwCompAdd(cm_strc,&_this->lb_point_t->super,-1);
         glwCompAdd(cm_strc,&_this->lb_point_l->super,-1);
         glwCompAdd(cm_strc,cm_point_btns,-1);
@@ -2024,16 +2024,13 @@ DS3Viewer::~DS3Viewer()
     delete (_this->bn_point_c);
     delete (_this->lb_point_l);
     delete (_this->lb_point_t);
-    delete (_this->tf_point_s);
 //    delete (lb_point_s);
     delete _this->sl_point_r;
-    delete (_this->tf_point_r);
 //    delete (lb_point_r);
     delete _this->sl_iso_d;
     /*delete (_this->tf_iso_d);*/
 //    delete (lb_iso_d);
     delete _this->sl_iso_v;
-    delete (_this->tf_iso_v);
 //    delete (lb_iso_v);
     delete _this->sl_slice_d;
 //    delete (lb_slice_d);
@@ -2094,10 +2091,10 @@ void ds3ViewerSetPointR(DS3Viewer *_this,double _r)
     ds3ViewSetPointR(_this->ds3view,_r);
     _r=_this->ds3view->point_r;
     sprintf(text,"%0.3g",_r);
-    glwTextFieldSetChangedFunc(_this->tf_point_r,
+    glwTextFieldSetChangedFunc(&_this->tf_point_r,
                                (GLWActionFunc)ds3ViewerTextSet);
-    glwTextFieldSetText(_this->tf_point_r,text);
-    glwTextFieldSetChangedFunc(_this->tf_point_r,
+    glwTextFieldSetText(&_this->tf_point_r,text);
+    glwTextFieldSetChangedFunc(&_this->tf_point_r,
                                (GLWActionFunc)ds3ViewerTextChanged);
     r=_r*1000;
     if (_this->ds3view->offs>1E-16)r/=_this->ds3view->offs;
@@ -2157,9 +2154,10 @@ void ds3ViewerSetIso(DS3Viewer *_this,double _v,int _d)
     _v=_this->ds3view->iso_v;
     _d=_this->ds3view->iso_d;
     sprintf(text,"%0.4g",_v);
-    glwTextFieldSetChangedFunc(_this->tf_iso_v,(GLWActionFunc)ds3ViewerTextSet);
-    glwTextFieldSetText(_this->tf_iso_v,text);
-    glwTextFieldSetChangedFunc(_this->tf_iso_v,
+    glwTextFieldSetChangedFunc(&_this->tf_iso_v,
+			       (GLWActionFunc)ds3ViewerTextSet);
+    glwTextFieldSetText(&_this->tf_iso_v, text);
+    glwTextFieldSetChangedFunc(&_this->tf_iso_v,
                                (GLWActionFunc)ds3ViewerTextChanged);
     glwSliderSetChangedFunc(_this->sl_iso_v,NULL);
     glwSliderSetVal(_this->sl_iso_v,
@@ -2363,10 +2361,10 @@ void ds3ViewerSetSelectedPoint(DS3Viewer *_this,long _pt)
     _pt=ds3ViewGetSelectedPoint(_this->ds3view);
     if (_pt>=0) {
         sprintf(text,"%li",_pt+1);
-        glwTextFieldSetChangedFunc(_this->tf_point_s,
+        glwTextFieldSetChangedFunc(&_this->tf_point_s,
                                    (GLWActionFunc)ds3ViewerTextSet);
-        glwTextFieldSetText(_this->tf_point_s,text);
-        glwTextFieldSetChangedFunc(_this->tf_point_s,
+        glwTextFieldSetText(&_this->tf_point_s,text);
+        glwTextFieldSetChangedFunc(&_this->tf_point_s,
                                    (GLWActionFunc)ds3ViewerTextChanged);
         sprintf(text,"Atom type: %i",_this->ds3->points[_pt].typ+1);
         glwLabelSetLabel(_this->lb_point_t,text);

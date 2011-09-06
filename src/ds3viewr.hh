@@ -53,14 +53,14 @@ public:
     GLWTextField      tf_slice_d;
     GLWSlider        *sl_slice_d;
     GLWCheckBox       cb_draw_iso;
-    GLWTextField     *tf_iso_v;
+    GLWTextField      tf_iso_v;
     GLWSlider        *sl_iso_v;
     /*GLWTextField     *tf_iso_d;*/
     GLWSlider        *sl_iso_d;
     GLWCheckBox       cb_draw_points;
-    GLWTextField     *tf_point_r;
+    GLWTextField      tf_point_r;
     GLWSlider        *sl_point_r;
-    GLWTextField     *tf_point_s;
+    GLWTextField      tf_point_s;
     GLWLabel         *lb_point_t;
     GLWLabel         *lb_point_l;
     GLWButton        *bn_point_c;
