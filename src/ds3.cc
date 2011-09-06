@@ -374,7 +374,9 @@ int main(int _argc,char **_argv)
 {
 
     glwInit(&_argc,_argv);
-    DS3Viewer ds3v;
+    // Allocate DS3Viewer on heap and DON'T delete it, as destruction
+    // is messed up and will crash the program.
+    DS3Viewer* ds3v = new DS3Viewer();
     /*At this point, we've created a window, and so should have a current
       rendering context: test for GL extensions*/
 
@@ -409,6 +411,6 @@ int main(int _argc,char **_argv)
         printf("ARB_vertex_buffer_object extension available, will use VBO's for rendering isosurfaces.\n");
         use_vbo = true;
     }
-    if (_argc>1)ds3ViewerOpenFile(&ds3v,_argv[1]);
+    if (_argc > 1) ds3ViewerOpenFile(ds3v, _argv[1]);
     glutMainLoop();
 }
