@@ -129,14 +129,9 @@ int glwLabelSetLabel(GLWLabel *_this, const std::string& label)
     return 1;
 }
 
-int glwLabelAddLabel(GLWLabel *_this, const char* label)
+int glwLabelAddLabel(GLWLabel *_this, const std::string& label)
 {
-    if (_this->label.size() <= 1)
-        return glwLabelSetLabel(_this, label);
-    else if (label != NULL) {
-        _this->label.append(label);
-        glwCompRevalidate(&_this->super);
-        return 1;
-    } else return 1;
-    return 0;
+    _this->label.append(label);
+    glwCompRevalidate(&_this->super);
+    return 1;
 }
