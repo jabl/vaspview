@@ -267,7 +267,7 @@ static void ds3ViewerFileTextChanged(DS3Viewer *_this,GLWComponent *_c)
 {
     const char *text;
     glwCompSetForeColor(_c,_c->parent==NULL?GLW_COLOR_BLACK:_c->parent->forec);
-    text=glwTextFieldGetText(_this->tf_file);
+    text = glwTextFieldGetText(&_this->tf_file);
     glwCompEnable(&_this->bn_open.super,text!=NULL&&text[0]!='\0');
 }
 
@@ -907,7 +907,7 @@ static void ds3ViewerAsyncRead(DS3Viewer *_this,GLWComponent *_c)
 static void ds3ViewerOpen(DS3Viewer *_this,GLWComponent *_c)
 {
     const char *file;
-    file=glwTextFieldGetText(_this->tf_file);
+    file = glwTextFieldGetText(&_this->tf_file);
     ds3ViewerOpenFile(_this,file);
 }
 
@@ -915,7 +915,7 @@ DS3Viewer::DS3Viewer() :
         frame(new GLWFrame("VASP Data Viewer")),
         ds3view(new DS3View()),
         bn_open("Open"),
-        tf_file(new GLWTextField(NULL, 20)),
+        tf_file(NULL, 20),
         lb_data_set(new GLWLabel("Data Set: ")),
         tp_ctrl(new GLWTabbedPane()),
         legend(new DSColorLegend()),
@@ -1089,7 +1089,7 @@ DS3Viewer::DS3Viewer() :
     _this->cb_projt_persp= new GLWCheckBox("Perspective",1,&_this->cg_projt);
 
     if (_this->frame!=NULL&&_this->ds3view!=NULL&&cm_vals!=NULL&&lb_file!=NULL&&
-            _this->tf_file!=NULL&&_this->lb_data_set!=NULL&&
+            _this->lb_data_set!=NULL&&
             cm_data!=NULL&&cm_strc!=NULL&&cm_point_btns!=NULL&&
 # if defined(__DS3_ADD_BONDS__)
             cm_bond_btns!=NULL&&
@@ -1212,11 +1212,12 @@ DS3Viewer::DS3Viewer() :
         glwCheckBoxGroupSetChangedFunc(&_this->cg_projt,
                                        (GLWActionFunc)ds3ViewerProjTChanged);
         glwCheckBoxGroupSetChangedCtx(&_this->cg_projt,_this);
-        glwTextFieldSetActionFunc(_this->tf_file,(GLWActionFunc)ds3ViewerOpen);
-        glwTextFieldSetActionCtx(_this->tf_file,_this);
-        glwTextFieldSetChangedFunc(_this->tf_file,
+        glwTextFieldSetActionFunc(&_this->tf_file, 
+				  (GLWActionFunc)ds3ViewerOpen);
+        glwTextFieldSetActionCtx(&_this->tf_file, _this);
+        glwTextFieldSetChangedFunc(&_this->tf_file,
                                    (GLWActionFunc)ds3ViewerFileTextChanged);
-        glwTextFieldSetChangedCtx(_this->tf_file,_this);
+        glwTextFieldSetChangedCtx(&_this->tf_file, _this);
         glwTextFieldSetActionFunc(_this->tf_slice_t,
                                   (GLWActionFunc)ds3ViewerSliceTextChanged);
         glwTextFieldSetActionCtx(_this->tf_slice_t,_this);
@@ -1526,8 +1527,8 @@ DS3Viewer::DS3Viewer() :
         glwCompSetWeightY(&_this->ds3view->super,1);
         glwCompSetInsets(&lb_file->super,2,2,2,2);
         glwCompSetGridWidth(&lb_file->super,GLWC_REMAINDER);
-        glwCompSetInsets(&_this->tf_file->super,2,2,2,2);
-        glwCompSetFill(&_this->tf_file->super,GLWC_HORIZONTAL);
+        glwCompSetInsets(&_this->tf_file.super, 2, 2, 2, 2);
+        glwCompSetFill(&_this->tf_file.super, GLWC_HORIZONTAL);
         glwCompSetInsets(&_this->bn_open.super, 2, 2, 2, 2);
         glwCompSetGridWidth(&_this->bn_open.super, GLWC_REMAINDER);
         glwCompSetInsets(&_this->lb_data_set->super,0,0,2,2);
@@ -1550,7 +1551,7 @@ DS3Viewer::DS3Viewer() :
         glwCompSetFill(&_this->lb_status->super,GLWC_HORIZONTAL);
         glwCompAdd(&_this->frame->super,&_this->ds3view->super,-1);
         glwCompAdd(&_this->frame->super,&lb_file->super,-1);
-        glwCompAdd(&_this->frame->super,&_this->tf_file->super,-1);
+        glwCompAdd(&_this->frame->super, &_this->tf_file.super, -1);
         glwCompAdd(&_this->frame->super, &_this->bn_open.super, -1);
         glwCompAdd(&_this->frame->super,&_this->lb_data_set->super,-1);
         glwCompAdd(&_this->frame->super,&_this->tp_ctrl->super,-1);
@@ -1933,7 +1934,7 @@ DS3Viewer::DS3Viewer() :
         glwCompAdd(cm_opts,&lb_projt->super,-1);
         glwCompAdd(cm_opts,&_this->cb_projt_persp->super,-1);
         glwCompAdd(cm_opts,&_this->cb_projt_ortho.super, -1);
-        ds3ViewerFileTextChanged(_this,&_this->tf_file->super);
+        ds3ViewerFileTextChanged(_this, &_this->tf_file.super);
         ds3ViewerViewDataChanged(_this,_this->ds3view);
         ds3ViewerSetPointR(_this,_this->ds3view->point_r);
         ds3ViewerSetSlice(_this,_this->ds3view->slice_t,_this->ds3view->slice_p,
@@ -2069,7 +2070,6 @@ DS3Viewer::~DS3Viewer()
 //    glwCompFree(cm_strc);
 //    glwCompFree(cm_data);
     delete (_this->lb_data_set);
-    delete (_this->tf_file);
 //    delete (lb_file);
 //    glwCompFree(cm_vals);
     delete _this->ds3view;
@@ -2479,7 +2479,7 @@ void ds3ViewerOpenFile(DS3Viewer *_this,const char *_file)
         int    ret = 1;
         size_t name_sz;
         name_sz = (strlen(_file)+1)*sizeof(char);
-        glwTextFieldSetText(_this->tf_file,_file);
+        glwTextFieldSetText(&_this->tf_file, _file);
         _this->reader = new DS3VaspReader(_file, "r");
         if (_this->reader->file.f == NULL) {
             glwLabelSetLabel(_this->lb_status,"Could not open \"");
