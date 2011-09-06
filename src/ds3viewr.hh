@@ -63,9 +63,9 @@ public:
     GLWTextField      tf_point_s;
     GLWLabel          lb_point_t;
     GLWLabel          lb_point_l;
-    GLWButton        *bn_point_c;
-    GLWButton        *bn_point_v;
-    GLWButton        *bn_point_sa;
+    GLWButton         bn_point_c;
+    GLWButton         bn_point_v;
+    GLWButton         bn_point_sa;
 # if defined(__DS3_ADD_BONDS__)
     GLWTextField     *tf_bond_f;
     GLWTextField     *tf_bond_t;

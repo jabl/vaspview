@@ -406,9 +406,9 @@ static void ds3ViewerDrawPointsChanged(DS3Viewer *_this,GLWComponent *_c)
     glwCompEnable(&_this->tf_point_r.super,b);
     glwCompEnable(&_this->sl_point_r->super,b);
     glwCompEnable(&_this->tf_point_s.super,b);
-    glwCompEnable(&_this->bn_point_v->super,b);
-    glwCompEnable(&_this->bn_point_sa->super,b);
-    glwCompEnable(&_this->bn_point_c->super,b);
+    glwCompEnable(&_this->bn_point_v.super,b);
+    glwCompEnable(&_this->bn_point_sa.super,b);
+    glwCompEnable(&_this->bn_point_c.super,b);
 }
 
 static void ds3ViewerPointRTextChanged(DS3Viewer *_this,GLWComponent *_c)
@@ -933,9 +933,9 @@ DS3Viewer::DS3Viewer() :
         tf_point_s("", 5),
         lb_point_t("Atom type:"),
         lb_point_l("Atom location:"),
-        bn_point_c(new GLWButton("Look at Atom")),
-        bn_point_v(new GLWButton("Hide Atom")),
-        bn_point_sa(new GLWButton("Show All Atoms")),
+        bn_point_c("Look at Atom"),
+        bn_point_v("Hide Atom"),
+        bn_point_sa("Show All Atoms"),
 #if defined(__DS3_ADD_BONDS__)
         tf_bond_f(new GLWTextField("", 5)),
         tf_bond_t(new GLWTextField("", 5)),
@@ -1100,8 +1100,6 @@ DS3Viewer::DS3Viewer() :
             _this->sl_iso_v!=NULL&&lb_iso_d!=NULL&&/*_this->tf_iso_d!=NULL&&*/
             _this->sl_iso_d!=NULL && lb_point_r!=NULL&&
             _this->sl_point_r!=NULL&&lb_point_s!=NULL&&
-	    _this->bn_point_c!=NULL&&
-            _this->bn_point_v!=NULL&&_this->bn_point_sa!=NULL&&
 # if defined(__DS3_ADD_BONDS__)
             lb_bond_f!=NULL&&_this->tf_bond_f!=NULL&&lb_bond_t!=NULL&&
             _this->tf_bond_t!=NULL&&lb_bond_s!=NULL&&_this->tf_bond_s!=NULL&&
@@ -1130,15 +1128,15 @@ DS3Viewer::DS3Viewer() :
         ds3ViewSetDataScale(_this->ds3view,&_this->scale_linear.super);
         glwButtonSetPressedFunc(&_this->bn_open,(GLWActionFunc)ds3ViewerOpen);
         glwButtonSetPressedCtx(&_this->bn_open,_this);
-        glwButtonSetPressedFunc(_this->bn_point_c,
+        glwButtonSetPressedFunc(&_this->bn_point_c,
                                 (GLWActionFunc)ds3ViewerPointCenter);
-        glwButtonSetPressedCtx(_this->bn_point_c,_this);
-        glwButtonSetPressedFunc(_this->bn_point_v,
+        glwButtonSetPressedCtx(&_this->bn_point_c,_this);
+        glwButtonSetPressedFunc(&_this->bn_point_v,
                                 (GLWActionFunc)ds3ViewerPointVisible);
-        glwButtonSetPressedCtx(_this->bn_point_v,_this);
-        glwButtonSetPressedFunc(_this->bn_point_sa,
+        glwButtonSetPressedCtx(&_this->bn_point_v,_this);
+        glwButtonSetPressedFunc(&_this->bn_point_sa,
                                 (GLWActionFunc)ds3ViewerPointShowAll);
-        glwButtonSetPressedCtx(_this->bn_point_sa,_this);
+        glwButtonSetPressedCtx(&_this->bn_point_sa,_this);
         glwButtonSetPressedFunc(bn_ornt,(GLWActionFunc)ds3ViewerResetOrientation);
         glwButtonSetPressedCtx(bn_ornt,_this);
         glwButtonSetPressedFunc(bn_cntr,(GLWActionFunc)ds3ViewerResetPosition);
@@ -1707,16 +1705,16 @@ DS3Viewer::DS3Viewer() :
         glwCompAdd(cm_strc,&_this->sl_bond_s->super,-1);
         glwCompAdd(cm_strc,cm_bond_btns,-1);
 # endif
-        glwCompSetInsets(&_this->bn_point_c->super,0,0,2,2);
-        glwCompSetAlignX(&_this->bn_point_c->super,1);
-        glwCompSetInsets(&_this->bn_point_v->super,0,0,2,2);
-        glwCompSetInsets(&_this->bn_point_sa->super,0,0,2,2);
-        glwCompSetAlignX(&_this->bn_point_sa->super,0);
-        glwCompSetGridWidth(&_this->bn_point_sa->super,GLWC_REMAINDER);
+        glwCompSetInsets(&_this->bn_point_c.super,0,0,2,2);
+        glwCompSetAlignX(&_this->bn_point_c.super,1);
+        glwCompSetInsets(&_this->bn_point_v.super,0,0,2,2);
+        glwCompSetInsets(&_this->bn_point_sa.super,0,0,2,2);
+        glwCompSetAlignX(&_this->bn_point_sa.super,0);
+        glwCompSetGridWidth(&_this->bn_point_sa.super,GLWC_REMAINDER);
         glwCompSetLayout(cm_point_btns,&(new GLWGridBagLayout())->super);
-        glwCompAdd(cm_point_btns,&_this->bn_point_c->super,-1);
-        glwCompAdd(cm_point_btns,&_this->bn_point_v->super,-1);
-        glwCompAdd(cm_point_btns,&_this->bn_point_sa->super,-1);
+        glwCompAdd(cm_point_btns,&_this->bn_point_c.super,-1);
+        glwCompAdd(cm_point_btns,&_this->bn_point_v.super,-1);
+        glwCompAdd(cm_point_btns,&_this->bn_point_sa.super,-1);
 # if defined(__DS3_ADD_BONDS__)
         glwCompSetInsets(&_this->bn_bond_a->super,0,0,2,2);
         glwCompSetAlignX(&_this->bn_bond_a->super,1);
@@ -2018,9 +2016,6 @@ DS3Viewer::~DS3Viewer()
     delete (_this->tf_bond_f);
 //    delete (lb_bond_f);
 # endif
-    delete (_this->bn_point_sa);
-    delete (_this->bn_point_v);
-    delete (_this->bn_point_c);
     delete _this->sl_point_r;
     delete _this->sl_iso_d;
     /*delete (_this->tf_iso_d);*/
@@ -2382,9 +2377,9 @@ void ds3ViewerSetPointVisible(DS3Viewer *_this,int _v)
         ds3ViewSetPointChangedFunc(_this->ds3view,
                                    (GLWActionFunc)ds3ViewerViewPointChanged);
         _v=ds3ViewGetPointVisible(_this->ds3view,l);
-        if (_v)glwButtonSetLabel(_this->bn_point_v,"Hide Atom");
-        else glwButtonSetLabel(_this->bn_point_v,"Show Atom");
-    } else glwButtonSetLabel(_this->bn_point_v,"Hide Atom");
+        if (_v)glwButtonSetLabel(&_this->bn_point_v,"Hide Atom");
+        else glwButtonSetLabel(&_this->bn_point_v,"Show Atom");
+    } else glwButtonSetLabel(&_this->bn_point_v,"Hide Atom");
 }
 
 # if defined(__DS3_ADD_BONDS__)
