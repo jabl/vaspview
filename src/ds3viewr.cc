@@ -116,19 +116,19 @@ static void ds3ViewerViewDataChanged(DS3Viewer *_this,DS3View *_view)
         char   text[32];
         double v;
         sprintf(text,"X: %li",x);
-        glwLabelSetLabel(_this->lb_datax,text);
+        glwLabelSetLabel(&_this->lb_datax, text);
         sprintf(text,"Y: %li",y);
-        glwLabelSetLabel(_this->lb_datay,text);
+        glwLabelSetLabel(&_this->lb_datay, text);
         sprintf(text,"Z: %li",z);
-        glwLabelSetLabel(_this->lb_dataz,text);
+        glwLabelSetLabel(&_this->lb_dataz, text);
         v=_this->ds3->data[_DS3Index(_this->ds3,x,y,z)];
         sprintf(text,"Value: %0.6g",v);
-        glwLabelSetLabel(_this->lb_datav,text);
+        glwLabelSetLabel(&_this->lb_datav, text);
     } else {
-        glwLabelSetLabel(_this->lb_datax,"X:");
-        glwLabelSetLabel(_this->lb_datay,"Y:");
-        glwLabelSetLabel(_this->lb_dataz,"Z:");
-        glwLabelSetLabel(_this->lb_datav,"Value:");
+        glwLabelSetLabel(&_this->lb_datax, "X:");
+        glwLabelSetLabel(&_this->lb_datay, "Y:");
+        glwLabelSetLabel(&_this->lb_dataz, "Z:");
+        glwLabelSetLabel(&_this->lb_datav, "Value:");
     }
 }
 
@@ -919,10 +919,10 @@ DS3Viewer::DS3Viewer() :
         lb_data_set("Data Set: "),
         lb_status(""),
         cb_draw_slice("Draw Slice",1,NULL),
-        lb_datax(new GLWLabel("")),
-        lb_datay(new GLWLabel("")),
-        lb_dataz(new GLWLabel("")),
-        lb_datav(new GLWLabel("")),
+        lb_datax(""),
+        lb_datay(""),
+        lb_dataz(""),
+        lb_datav(""),
         tf_slice_t(new GLWTextField(NULL,5)),
         tf_slice_p(new GLWTextField(NULL,5)),
         tf_slice_d(new GLWTextField(NULL,5)),
@@ -1092,8 +1092,7 @@ DS3Viewer::DS3Viewer() :
             cm_bond_btns!=NULL&&
 # endif
             cm_bnds!=NULL&&cm_view!=NULL&&cm_view_btns!=NULL&&cm_opts!=NULL&&
-            _this->lb_datax!=NULL&&_this->lb_datay!=NULL&&_this->lb_dataz!=NULL&&
-            _this->lb_datav!=NULL && lb_slice_t!=NULL&&
+            lb_slice_t!=NULL&&
             _this->tf_slice_t!=NULL&&_this->sl_slice_t != NULL&&lb_slice_p!=NULL&&
             _this->tf_slice_p!=NULL&&_this->sl_slice_p!=NULL&&lb_slice_d!=NULL&&
             _this->tf_slice_d!=NULL&&_this->sl_slice_d!=NULL&&
@@ -1555,18 +1554,18 @@ DS3Viewer::DS3Viewer() :
         glwCompAdd(&_this->frame.super, cm_vals, -1);
         glwCompAdd(&_this->frame.super, &_this->lb_status.super, -1);
         glwCompSetLayout(cm_vals,&(new GLWGridBagLayout())->super);
-        glwCompSetInsets(&_this->lb_datax->super,2,2,2,2);
-        glwCompSetPreWidth(&_this->lb_datax->super,80);
-        glwCompSetInsets(&_this->lb_datay->super,2,2,2,2);
-        glwCompSetPreWidth(&_this->lb_datay->super,80);
-        glwCompSetInsets(&_this->lb_dataz->super,2,2,2,2);
-        glwCompSetPreWidth(&_this->lb_dataz->super,80);
-        glwCompSetInsets(&_this->lb_datav->super,2,2,2,2);
-        glwCompSetPreWidth(&_this->lb_datav->super,80);
-        glwCompAdd(cm_vals,&_this->lb_datax->super,-1);
-        glwCompAdd(cm_vals,&_this->lb_datay->super,-1);
-        glwCompAdd(cm_vals,&_this->lb_dataz->super,-1);
-        glwCompAdd(cm_vals,&_this->lb_datav->super,-1);
+        glwCompSetInsets(&_this->lb_datax.super, 2, 2, 2, 2);
+        glwCompSetPreWidth(&_this->lb_datax.super, 80);
+        glwCompSetInsets(&_this->lb_datay.super, 2, 2, 2, 2);
+        glwCompSetPreWidth(&_this->lb_datay.super, 80);
+        glwCompSetInsets(&_this->lb_dataz.super, 2, 2, 2, 2);
+        glwCompSetPreWidth(&_this->lb_dataz.super, 80);
+        glwCompSetInsets(&_this->lb_datav.super, 2, 2, 2, 2);
+        glwCompSetPreWidth(&_this->lb_datav.super, 80);
+        glwCompAdd(cm_vals,&_this->lb_datax.super, -1);
+        glwCompAdd(cm_vals,&_this->lb_datay.super, -1);
+        glwCompAdd(cm_vals,&_this->lb_dataz.super, -1);
+        glwCompAdd(cm_vals,&_this->lb_datav.super, -1);
         glwCompSetFill(cm_data,GLWC_HORIZONTAL);
         glwCompSetAlignY(cm_data,1);
         glwCompSetFill(cm_strc,GLWC_HORIZONTAL);
@@ -2047,10 +2046,6 @@ DS3Viewer::~DS3Viewer()
 //    delete _this->sl_slice_t; // unique_ptr auto-delete?
     delete (_this->tf_slice_t);
 //    delete (lb_slice_t);
-    delete (_this->lb_datav);
-    delete (_this->lb_dataz);
-    delete (_this->lb_datay);
-    delete (_this->lb_datax);
 //    glwCompFree(cm_opts);
 //    glwCompFree(cm_view_btns);
 //    glwCompFree(cm_view);

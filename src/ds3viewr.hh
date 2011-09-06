@@ -42,10 +42,10 @@ public:
     DSColorLegend     legend;
     GLWLabel          lb_status;
     GLWCheckBox       cb_draw_slice;
-    GLWLabel         *lb_datax;
-    GLWLabel         *lb_datay;
-    GLWLabel         *lb_dataz;
-    GLWLabel         *lb_datav;
+    GLWLabel          lb_datax;
+    GLWLabel          lb_datay;
+    GLWLabel          lb_dataz;
+    GLWLabel          lb_datav;
     GLWTextField     *tf_slice_t;
     GLWSlider*        sl_slice_t;
     GLWTextField     *tf_slice_p;
