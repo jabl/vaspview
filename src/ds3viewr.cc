@@ -210,11 +210,11 @@ static void ds3ViewerSaveBonds(DS3Viewer *_this)
             fclose(file);
         }
         if (err) {
-            glwLabelSetLabel(_this->lb_status,
+            glwLabelSetLabel(&_this->lb_status,
                              "Error writing bond information to \"");
-            glwLabelAddLabel(_this->lb_status, _this->bond_name.c_str());
-            glwLabelAddLabel(_this->lb_status,"\": ");
-            glwLabelAddLabel(_this->lb_status,strerror(errno));
+            glwLabelAddLabel(&_this->lb_status, _this->bond_name.c_str());
+            glwLabelAddLabel(&_this->lb_status, "\": ");
+            glwLabelAddLabel(&_this->lb_status, strerror(errno));
         }
     }
 }
@@ -252,11 +252,11 @@ static void ds3ViewerLoadBonds(DS3Viewer *_this)
                                        (GLWActionFunc)ds3ViewerSaveBonds);
         } else if (errno==ENOENT)err=0;
         if (err) {
-            glwLabelSetLabel(_this->lb_status,
+            glwLabelSetLabel(&_this->lb_status,
                              "Error reading bond information from \"");
-            glwLabelAddLabel(_this->lb_status, _this->bond_name.c_str());
-            glwLabelAddLabel(_this->lb_status,"\": ");
-            glwLabelAddLabel(_this->lb_status,strerror(errno));
+            glwLabelAddLabel(&_this->lb_status, _this->bond_name.c_str());
+            glwLabelAddLabel(&_this->lb_status, "\": ");
+            glwLabelAddLabel(&_this->lb_status, strerror(errno));
         }
     }
 }
@@ -863,9 +863,9 @@ static void ds3ViewerFinishRead(DS3Viewer *_this)
 
         glwLabelSetLabel(&_this->lb_data_set, "Data Set: ");
         glwLabelAddLabel(&_this->lb_data_set, _this->ds3->name.c_str());
-        glwLabelSetLabel(_this->lb_status,"\"");
-        glwLabelAddLabel(_this->lb_status, _this->read_name.c_str());
-        glwLabelAddLabel(_this->lb_status,"\" Loaded.");
+        glwLabelSetLabel(&_this->lb_status, "\"");
+        glwLabelAddLabel(&_this->lb_status, _this->read_name.c_str());
+        glwLabelAddLabel(&_this->lb_status, "\" Loaded.");
 # if defined(__DS3_ADD_BONDS__)&&defined(__DS3_SAVE_BONDS__)
 	_this->bond_name = _this->read_name;
 	_this->bond_name.append(".aux");
@@ -873,7 +873,7 @@ static void ds3ViewerFinishRead(DS3Viewer *_this)
 #endif
     } else {
         ds3ViewSetDataSet(_this->ds3view,NULL);
-        glwLabelSetLabel(_this->lb_status,strerror(ENOMEM));
+        glwLabelSetLabel(&_this->lb_status, strerror(ENOMEM));
     }
 }
 
@@ -886,10 +886,10 @@ static void ds3ViewerAsyncRead(DS3Viewer *_this,GLWComponent *_c)
         _this->read_id=0;
         if (!ret) {
             if (!errno)errno=ENOMEM;
-            glwLabelSetLabel(_this->lb_status,"Error reading \"");
-            glwLabelAddLabel(_this->lb_status, _this->read_name.c_str());
-            glwLabelAddLabel(_this->lb_status,"\": ");
-            glwLabelAddLabel(_this->lb_status,strerror(errno));
+            glwLabelSetLabel(&_this->lb_status, "Error reading \"");
+            glwLabelAddLabel(&_this->lb_status, _this->read_name.c_str());
+            glwLabelAddLabel(&_this->lb_status, "\": ");
+            glwLabelAddLabel(&_this->lb_status, strerror(errno));
         } else ds3ViewerFinishRead(_this);
 	_this->read_name.clear();
         delete _this->reader;
@@ -897,10 +897,10 @@ static void ds3ViewerAsyncRead(DS3Viewer *_this,GLWComponent *_c)
         char text[32];
         _this->read_prog=ret;
         sprintf(text,"%i%%",ret);
-        glwLabelSetLabel(_this->lb_status,"Loading \"");
-        glwLabelAddLabel(_this->lb_status, _this->read_name.c_str());
-        glwLabelAddLabel(_this->lb_status,"\"... ");
-        glwLabelAddLabel(_this->lb_status,text);
+        glwLabelSetLabel(&_this->lb_status, "Loading \"");
+        glwLabelAddLabel(&_this->lb_status, _this->read_name.c_str());
+        glwLabelAddLabel(&_this->lb_status, "\"... ");
+        glwLabelAddLabel(&_this->lb_status, text);
     }
 }
 
@@ -917,7 +917,7 @@ DS3Viewer::DS3Viewer() :
         bn_open("Open"),
         tf_file(NULL, 20),
         lb_data_set("Data Set: "),
-        lb_status(new GLWLabel("")),
+        lb_status(""),
         cb_draw_slice(new GLWCheckBox("Draw Slice",1,NULL)),
         lb_datax(new GLWLabel("")),
         lb_datay(new GLWLabel("")),
@@ -1092,7 +1092,6 @@ DS3Viewer::DS3Viewer() :
             cm_bond_btns!=NULL&&
 # endif
             cm_bnds!=NULL&&cm_view!=NULL&&cm_view_btns!=NULL&&cm_opts!=NULL&&
-            _this->lb_status!=NULL&&
             _this->lb_datax!=NULL&&_this->lb_datay!=NULL&&_this->lb_dataz!=NULL&&
             _this->lb_datav!=NULL&&_this->cb_draw_slice!=NULL&&lb_slice_t!=NULL&&
             _this->tf_slice_t!=NULL&&_this->sl_slice_t != NULL&&lb_slice_p!=NULL&&
@@ -1543,9 +1542,9 @@ DS3Viewer::DS3Viewer() :
         glwCompSetFill(cm_vals,GLWC_HORIZONTAL);
         glwCompSetGridX(cm_vals,0);
         glwCompSetGridY(cm_vals,5);
-        glwCompSetInsets(&_this->lb_status->super,0,0,2,2);
-        glwCompSetGridWidth(&_this->lb_status->super,GLWC_REMAINDER);
-        glwCompSetFill(&_this->lb_status->super,GLWC_HORIZONTAL);
+        glwCompSetInsets(&_this->lb_status.super, 0, 0, 2, 2);
+        glwCompSetGridWidth(&_this->lb_status.super, GLWC_REMAINDER);
+        glwCompSetFill(&_this->lb_status.super, GLWC_HORIZONTAL);
         glwCompAdd(&_this->frame->super,&_this->ds3view->super,-1);
         glwCompAdd(&_this->frame->super,&lb_file->super,-1);
         glwCompAdd(&_this->frame->super, &_this->tf_file.super, -1);
@@ -1554,7 +1553,7 @@ DS3Viewer::DS3Viewer() :
         glwCompAdd(&_this->frame->super, &_this->tp_ctrl.super, -1);
         glwCompAdd(&_this->frame->super,&_this->legend.super, -1);
         glwCompAdd(&_this->frame->super,cm_vals,-1);
-        glwCompAdd(&_this->frame->super,&_this->lb_status->super,-1);
+        glwCompAdd(&_this->frame->super, &_this->lb_status.super, -1);
         glwCompSetLayout(cm_vals,&(new GLWGridBagLayout())->super);
         glwCompSetInsets(&_this->lb_datax->super,2,2,2,2);
         glwCompSetPreWidth(&_this->lb_datax->super,80);
@@ -2053,7 +2052,6 @@ DS3Viewer::~DS3Viewer()
     delete (_this->lb_dataz);
     delete (_this->lb_datay);
     delete (_this->lb_datax);
-    delete (_this->lb_status);
 //    glwCompFree(cm_opts);
 //    glwCompFree(cm_view_btns);
 //    glwCompFree(cm_view);
@@ -2467,7 +2465,7 @@ void ds3ViewerOpenFile(DS3Viewer *_this,const char *_file)
         delete _this->reader;
     }
     if (_file==NULL||_file[0]=='\0') {
-        glwLabelSetLabel(_this->lb_status,"Please type a file name in the "
+        glwLabelSetLabel(&_this->lb_status, "Please type a file name in the "
                          "\'Open File\' field.");
     } else {
         int    ret = 1;
@@ -2476,10 +2474,10 @@ void ds3ViewerOpenFile(DS3Viewer *_this,const char *_file)
         glwTextFieldSetText(&_this->tf_file, _file);
         _this->reader = new DS3VaspReader(_file, "r");
         if (_this->reader->file.f == NULL) {
-            glwLabelSetLabel(_this->lb_status,"Could not open \"");
-            glwLabelAddLabel(_this->lb_status,_file);
-            glwLabelAddLabel(_this->lb_status,"\": ");
-            glwLabelAddLabel(_this->lb_status,strerror(errno));
+            glwLabelSetLabel(&_this->lb_status, "Could not open \"");
+            glwLabelAddLabel(&_this->lb_status, _file);
+            glwLabelAddLabel(&_this->lb_status, "\": ");
+            glwLabelAddLabel(&_this->lb_status, strerror(errno));
         } else {
             _this->read_prog = 0;
 	    _this->read_name = _file;
@@ -2494,10 +2492,10 @@ void ds3ViewerOpenFile(DS3Viewer *_this,const char *_file)
         if (ret<=0) {
             if (!ret) {
                 if (!errno)errno=ENOMEM;
-                glwLabelSetLabel(_this->lb_status,"Error reading \"");
-                glwLabelAddLabel(_this->lb_status,_file);
-                glwLabelAddLabel(_this->lb_status,"\": ");
-                glwLabelAddLabel(_this->lb_status,strerror(errno));
+                glwLabelSetLabel(&_this->lb_status, "Error reading \"");
+                glwLabelAddLabel(&_this->lb_status, _file);
+                glwLabelAddLabel(&_this->lb_status, "\": ");
+                glwLabelAddLabel(&_this->lb_status, strerror(errno));
             } else ds3ViewerFinishRead(_this);
 	    _this->read_name.clear();
             delete _this->reader;

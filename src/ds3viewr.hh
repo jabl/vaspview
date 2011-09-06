@@ -40,7 +40,7 @@ public:
     GLWLabel          lb_data_set;
     GLWTabbedPane     tp_ctrl;
     DSColorLegend     legend;
-    GLWLabel         *lb_status;
+    GLWLabel          lb_status;
     GLWCheckBox      *cb_draw_slice;
     GLWLabel         *lb_datax;
     GLWLabel         *lb_datay;
