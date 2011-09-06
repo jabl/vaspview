@@ -336,7 +336,7 @@ static void ds3ViewerSliceDSliderChanged(DS3Viewer *_this,GLWComponent *_c)
 static void ds3ViewerDrawIsoChanged(DS3Viewer *_this,GLWComponent *_c)
 {
     int b;
-    b=glwCheckBoxGetState(_this->cb_draw_iso);
+    b = glwCheckBoxGetState(&_this->cb_draw_iso);
     ds3ViewSetDrawIso(_this->ds3view,b);
     glwCompEnable(&_this->tf_iso_v->super,b);
     glwCompEnable(&_this->sl_iso_v->super,b);
@@ -393,7 +393,7 @@ static void ds3ViewerDrawCoordSChanged(DS3Viewer *_this,GLWComponent *_c)
 static void ds3ViewerDrawPointsChanged(DS3Viewer *_this,GLWComponent *_c)
 {
     int b;
-    b=glwCheckBoxGetState(_this->cb_draw_points);
+    b = glwCheckBoxGetState(&_this->cb_draw_points);
     ds3ViewSetDrawPoints(_this->ds3view,b);
 # if defined(__DS3_ADD_BONDS__)
     glwCompEnable(&_this->tf_bond_f->super,b);
@@ -926,9 +926,9 @@ DS3Viewer::DS3Viewer() :
         tf_slice_t("", 5),
         tf_slice_p("", 5),
         tf_slice_d("", 5),
-        cb_draw_iso(new GLWCheckBox("Draw Iso-Surface",1,NULL)),
+        cb_draw_iso("Draw Iso-Surface",1,NULL),
         tf_iso_v(new GLWTextField("", 5)),
-        cb_draw_points(new GLWCheckBox("Draw Atoms",1,NULL)),
+        cb_draw_points("Draw Atoms",1,NULL),
         tf_point_r(new GLWTextField("", 5)),
         tf_point_s(new GLWTextField("", 5)),
         lb_point_t(new GLWLabel("Atom type:")),
@@ -1096,9 +1096,9 @@ DS3Viewer::DS3Viewer() :
             _this->sl_slice_t != NULL&&lb_slice_p!=NULL&&
             _this->sl_slice_p!=NULL&&lb_slice_d!=NULL&&
             _this->sl_slice_d!=NULL&&
-            _this->cb_draw_iso!=NULL&&lb_iso_v!=NULL&&_this->tf_iso_v!=NULL&&
+            lb_iso_v!=NULL&&_this->tf_iso_v!=NULL&&
             _this->sl_iso_v!=NULL&&lb_iso_d!=NULL&&/*_this->tf_iso_d!=NULL&&*/
-            _this->sl_iso_d!=NULL&&_this->cb_draw_points!=NULL&&lb_point_r!=NULL&&
+            _this->sl_iso_d!=NULL && lb_point_r!=NULL&&
             _this->tf_point_r!=NULL&&_this->sl_point_r!=NULL&&lb_point_s!=NULL&&
             _this->tf_point_s!=NULL&&_this->lb_point_t!=NULL&&
             _this->lb_point_l!=NULL&&_this->bn_point_c!=NULL&&
@@ -1186,15 +1186,15 @@ DS3Viewer::DS3Viewer() :
         glwCheckBoxSetChangedFunc(_this->cb_draw_coords,
                                   (GLWActionFunc)ds3ViewerDrawCoordSChanged);
         glwCheckBoxSetChangedCtx(_this->cb_draw_coords,_this);
-        glwCheckBoxSetChangedFunc(_this->cb_draw_points,
+        glwCheckBoxSetChangedFunc(&_this->cb_draw_points,
                                   (GLWActionFunc)ds3ViewerDrawPointsChanged);
-        glwCheckBoxSetChangedCtx(_this->cb_draw_points,_this);
+        glwCheckBoxSetChangedCtx(&_this->cb_draw_points, _this);
         glwCheckBoxSetChangedFunc(&_this->cb_draw_slice,
                                   (GLWActionFunc)ds3ViewerDrawSliceChanged);
         glwCheckBoxSetChangedCtx(&_this->cb_draw_slice, _this);
-        glwCheckBoxSetChangedFunc(_this->cb_draw_iso,
+        glwCheckBoxSetChangedFunc(&_this->cb_draw_iso,
                                   (GLWActionFunc)ds3ViewerDrawIsoChanged);
-        glwCheckBoxSetChangedCtx(_this->cb_draw_iso,_this);
+        glwCheckBoxSetChangedCtx(&_this->cb_draw_iso, _this);
         glwCheckBoxGroupSetChangedFunc(&_this->cg_scale,
                                        (GLWActionFunc)ds3ViewerScaleChanged);
         glwCheckBoxGroupSetChangedCtx(&_this->cg_scale,_this);
@@ -1608,8 +1608,8 @@ DS3Viewer::DS3Viewer() :
         glwCompSetInsets(&_this->sl_slice_d->super,0,0,10,2);
         glwCompSetGridWidth(&_this->sl_slice_d->super,GLWC_REMAINDER);
         glwCompSetFill(&_this->sl_slice_d->super,GLWC_HORIZONTAL);
-        glwCompSetInsets(&_this->cb_draw_iso->super,0,0,2,2);
-        glwCompSetGridWidth(&_this->cb_draw_iso->super,GLWC_REMAINDER);
+        glwCompSetInsets(&_this->cb_draw_iso.super, 0, 0, 2, 2);
+        glwCompSetGridWidth(&_this->cb_draw_iso.super, GLWC_REMAINDER);
         glwCompSetInsets(&lb_iso_v->super,0,0,10,2);
         glwCompSetWeightX(&lb_iso_v->super,1);
         glwCompSetInsets(&_this->tf_iso_v->super,0,0,2,2);
@@ -1636,7 +1636,7 @@ DS3Viewer::DS3Viewer() :
         glwCompAdd(cm_data,&lb_slice_d->super,-1);
         glwCompAdd(cm_data,&_this->tf_slice_d.super,-1);
         glwCompAdd(cm_data,&_this->sl_slice_d->super,-1);
-        glwCompAdd(cm_data,&_this->cb_draw_iso->super,-1);
+        glwCompAdd(cm_data,&_this->cb_draw_iso.super, -1);
         glwCompAdd(cm_data,&lb_iso_v->super,-1);
         glwCompAdd(cm_data,&_this->tf_iso_v->super,-1);
         glwCompAdd(cm_data,&_this->sl_iso_v->super,-1);
@@ -1644,8 +1644,8 @@ DS3Viewer::DS3Viewer() :
         /*glwCompAdd(cm_data,&_this->tf_iso_d->super,-1);*/
         glwCompAdd(cm_data,&_this->sl_iso_d->super,-1);
         glwCompSetLayout(cm_strc,&(new GLWGridBagLayout())->super);
-        glwCompSetInsets(&_this->cb_draw_points->super,0,0,2,2);
-        glwCompSetGridWidth(&_this->cb_draw_points->super,GLWC_REMAINDER);
+        glwCompSetInsets(&_this->cb_draw_points.super, 0, 0, 2, 2);
+        glwCompSetGridWidth(&_this->cb_draw_points.super, GLWC_REMAINDER);
         glwCompSetInsets(&lb_point_r->super,0,0,10,2);
         glwCompSetWeightX(&lb_point_r->super,1);
         glwCompSetInsets(&_this->tf_point_r->super,0,0,2,2);
@@ -1689,7 +1689,7 @@ DS3Viewer::DS3Viewer() :
         glwCompSetFill(cm_bond_btns,GLWC_HORIZONTAL);
         glwCompSetGridWidth(cm_bond_btns,GLWC_REMAINDER);
 # endif
-        glwCompAdd(cm_strc,&_this->cb_draw_points->super,-1);
+        glwCompAdd(cm_strc,&_this->cb_draw_points.super, -1);
         glwCompAdd(cm_strc,&lb_point_r->super,-1);
         glwCompAdd(cm_strc,&_this->tf_point_r->super,-1);
         glwCompAdd(cm_strc,&_this->sl_point_r->super,-1);
@@ -2029,14 +2029,12 @@ DS3Viewer::~DS3Viewer()
     delete _this->sl_point_r;
     delete (_this->tf_point_r);
 //    delete (lb_point_r);
-    delete (_this->cb_draw_points);
     delete _this->sl_iso_d;
     /*delete (_this->tf_iso_d);*/
 //    delete (lb_iso_d);
     delete _this->sl_iso_v;
     delete (_this->tf_iso_v);
 //    delete (lb_iso_v);
-    delete (_this->cb_draw_iso);
     delete _this->sl_slice_d;
 //    delete (lb_slice_d);
     delete _this->sl_slice_p;
