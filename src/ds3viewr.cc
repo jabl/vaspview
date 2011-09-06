@@ -276,11 +276,11 @@ static void ds3ViewerDrawSliceChanged(DS3Viewer *_this,GLWComponent *_c)
     int b;
     b = glwCheckBoxGetState(&_this->cb_draw_slice);
     ds3ViewSetDrawSlice(_this->ds3view,b);
-    glwCompEnable(&_this->tf_slice_t->super,b);
+    glwCompEnable(&_this->tf_slice_t.super,b);
     glwCompEnable(&_this->sl_slice_t->super,b);
-    glwCompEnable(&_this->tf_slice_p->super,b);
+    glwCompEnable(&_this->tf_slice_p.super,b);
     glwCompEnable(&_this->sl_slice_p->super,b);
-    glwCompEnable(&_this->tf_slice_d->super,b);
+    glwCompEnable(&_this->tf_slice_d.super,b);
     glwCompEnable(&_this->sl_slice_d->super,b);
 }
 
@@ -293,18 +293,18 @@ static void ds3ViewerSliceTextChanged(DS3Viewer *_this,GLWComponent *_c)
     double  d;
     int     i;
     i=0;
-    ds3ViewerTextSet(_this,&_this->tf_slice_t->super);
-    text=glwTextFieldGetText(_this->tf_slice_t);
+    ds3ViewerTextSet(_this,&_this->tf_slice_t.super);
+    text=glwTextFieldGetText(&_this->tf_slice_t);
     t=strtod(text,&e);
     if (e==text||e[0]!='\0')t=_this->ds3view->slice_t;
     else i=1;
-    ds3ViewerTextSet(_this,&_this->tf_slice_p->super);
-    text=glwTextFieldGetText(_this->tf_slice_p);
+    ds3ViewerTextSet(_this,&_this->tf_slice_p.super);
+    text=glwTextFieldGetText(&_this->tf_slice_p);
     p=strtod(text,&e);
     if (e==text||e[0]!='\0')p=_this->ds3view->slice_p;
     else i=1;
-    ds3ViewerTextSet(_this,&_this->tf_slice_d->super);
-    text=glwTextFieldGetText(_this->tf_slice_d);
+    ds3ViewerTextSet(_this,&_this->tf_slice_d.super);
+    text=glwTextFieldGetText(&_this->tf_slice_d);
     d=strtod(text,&e);
     if (e==text||e[0]!='\0')d=_this->ds3view->slice_d;
     else i=1;
@@ -923,9 +923,9 @@ DS3Viewer::DS3Viewer() :
         lb_datay(""),
         lb_dataz(""),
         lb_datav(""),
-        tf_slice_t(new GLWTextField("", 5)),
-        tf_slice_p(new GLWTextField("", 5)),
-        tf_slice_d(new GLWTextField("", 5)),
+        tf_slice_t("", 5),
+        tf_slice_p("", 5),
+        tf_slice_d("", 5),
         cb_draw_iso(new GLWCheckBox("Draw Iso-Surface",1,NULL)),
         tf_iso_v(new GLWTextField("", 5)),
         cb_draw_points(new GLWCheckBox("Draw Atoms",1,NULL)),
@@ -1093,9 +1093,9 @@ DS3Viewer::DS3Viewer() :
 # endif
             cm_bnds!=NULL&&cm_view!=NULL&&cm_view_btns!=NULL&&cm_opts!=NULL&&
             lb_slice_t!=NULL&&
-            _this->tf_slice_t!=NULL&&_this->sl_slice_t != NULL&&lb_slice_p!=NULL&&
-            _this->tf_slice_p!=NULL&&_this->sl_slice_p!=NULL&&lb_slice_d!=NULL&&
-            _this->tf_slice_d!=NULL&&_this->sl_slice_d!=NULL&&
+            _this->sl_slice_t != NULL&&lb_slice_p!=NULL&&
+            _this->sl_slice_p!=NULL&&lb_slice_d!=NULL&&
+            _this->sl_slice_d!=NULL&&
             _this->cb_draw_iso!=NULL&&lb_iso_v!=NULL&&_this->tf_iso_v!=NULL&&
             _this->sl_iso_v!=NULL&&lb_iso_d!=NULL&&/*_this->tf_iso_d!=NULL&&*/
             _this->sl_iso_d!=NULL&&_this->cb_draw_points!=NULL&&lb_point_r!=NULL&&
@@ -1213,24 +1213,24 @@ DS3Viewer::DS3Viewer() :
         glwTextFieldSetChangedFunc(&_this->tf_file,
                                    (GLWActionFunc)ds3ViewerFileTextChanged);
         glwTextFieldSetChangedCtx(&_this->tf_file, _this);
-        glwTextFieldSetActionFunc(_this->tf_slice_t,
+        glwTextFieldSetActionFunc(&_this->tf_slice_t,
                                   (GLWActionFunc)ds3ViewerSliceTextChanged);
-        glwTextFieldSetActionCtx(_this->tf_slice_t,_this);
-        glwTextFieldSetChangedFunc(_this->tf_slice_t,
+        glwTextFieldSetActionCtx(&_this->tf_slice_t,_this);
+        glwTextFieldSetChangedFunc(&_this->tf_slice_t,
                                    (GLWActionFunc)ds3ViewerTextChanged);
-        glwTextFieldSetChangedCtx(_this->tf_slice_t,_this);
-        glwTextFieldSetActionFunc(_this->tf_slice_p,
+        glwTextFieldSetChangedCtx(&_this->tf_slice_t,_this);
+        glwTextFieldSetActionFunc(&_this->tf_slice_p,
                                   (GLWActionFunc)ds3ViewerSliceTextChanged);
-        glwTextFieldSetActionCtx(_this->tf_slice_p,_this);
-        glwTextFieldSetChangedFunc(_this->tf_slice_p,
+        glwTextFieldSetActionCtx(&_this->tf_slice_p,_this);
+        glwTextFieldSetChangedFunc(&_this->tf_slice_p,
                                    (GLWActionFunc)ds3ViewerTextChanged);
-        glwTextFieldSetChangedCtx(_this->tf_slice_p,_this);
-        glwTextFieldSetActionFunc(_this->tf_slice_d,
+        glwTextFieldSetChangedCtx(&_this->tf_slice_p,_this);
+        glwTextFieldSetActionFunc(&_this->tf_slice_d,
                                   (GLWActionFunc)ds3ViewerSliceTextChanged);
-        glwTextFieldSetActionCtx(_this->tf_slice_d,_this);
-        glwTextFieldSetChangedFunc(_this->tf_slice_d,
+        glwTextFieldSetActionCtx(&_this->tf_slice_d,_this);
+        glwTextFieldSetChangedFunc(&_this->tf_slice_d,
                                    (GLWActionFunc)ds3ViewerTextChanged);
-        glwTextFieldSetChangedCtx(_this->tf_slice_d,_this);
+        glwTextFieldSetChangedCtx(&_this->tf_slice_d,_this);
         glwTextFieldSetActionFunc(_this->tf_iso_v,
                                   (GLWActionFunc)ds3ViewerIsoVTextChanged);
         glwTextFieldSetActionCtx(_this->tf_iso_v,_this);
@@ -1586,25 +1586,25 @@ DS3Viewer::DS3Viewer() :
         glwCompSetGridWidth(&_this->cb_draw_slice.super, GLWC_REMAINDER);
         glwCompSetInsets(&lb_slice_t->super,0,0,10,2);
         glwCompSetWeightX(&lb_slice_t->super,1);
-        glwCompSetInsets(&_this->tf_slice_t->super,0,0,2,2);
-        glwCompSetGridWidth(&_this->tf_slice_t->super,GLWC_REMAINDER);
-        glwCompSetAlignX(&_this->tf_slice_t->super,1);
+        glwCompSetInsets(&_this->tf_slice_t.super,0,0,2,2);
+        glwCompSetGridWidth(&_this->tf_slice_t.super,GLWC_REMAINDER);
+        glwCompSetAlignX(&_this->tf_slice_t.super,1);
         glwCompSetInsets(&_this->sl_slice_t->super,0,0,10,2);
         glwCompSetGridWidth(&_this->sl_slice_t->super,GLWC_REMAINDER);
         glwCompSetFill(&_this->sl_slice_t->super,GLWC_HORIZONTAL);
         glwCompSetInsets(&lb_slice_p->super,0,0,10,2);
         glwCompSetWeightX(&lb_slice_p->super,1);
-        glwCompSetInsets(&_this->tf_slice_p->super,0,0,2,2);
-        glwCompSetGridWidth(&_this->tf_slice_p->super,GLWC_REMAINDER);
-        glwCompSetAlignX(&_this->tf_slice_p->super,1);
+        glwCompSetInsets(&_this->tf_slice_p.super,0,0,2,2);
+        glwCompSetGridWidth(&_this->tf_slice_p.super,GLWC_REMAINDER);
+        glwCompSetAlignX(&_this->tf_slice_p.super,1);
         glwCompSetInsets(&_this->sl_slice_p->super,0,0,10,2);
         glwCompSetGridWidth(&_this->sl_slice_p->super,GLWC_REMAINDER);
         glwCompSetFill(&_this->sl_slice_p->super,GLWC_HORIZONTAL);
         glwCompSetInsets(&lb_slice_d->super,0,0,10,2);
         glwCompSetWeightX(&lb_slice_d->super,1);
-        glwCompSetInsets(&_this->tf_slice_d->super,0,0,2,2);
-        glwCompSetGridWidth(&_this->tf_slice_d->super,GLWC_REMAINDER);
-        glwCompSetAlignX(&_this->tf_slice_d->super,1);
+        glwCompSetInsets(&_this->tf_slice_d.super,0,0,2,2);
+        glwCompSetGridWidth(&_this->tf_slice_d.super,GLWC_REMAINDER);
+        glwCompSetAlignX(&_this->tf_slice_d.super,1);
         glwCompSetInsets(&_this->sl_slice_d->super,0,0,10,2);
         glwCompSetGridWidth(&_this->sl_slice_d->super,GLWC_REMAINDER);
         glwCompSetFill(&_this->sl_slice_d->super,GLWC_HORIZONTAL);
@@ -1628,13 +1628,13 @@ DS3Viewer::DS3Viewer() :
         glwCompSetFill(&_this->sl_iso_d->super,GLWC_HORIZONTAL);
         glwCompAdd(cm_data,&_this->cb_draw_slice.super, -1);
         glwCompAdd(cm_data,&lb_slice_t->super,-1);
-        glwCompAdd(cm_data,&_this->tf_slice_t->super,-1);
+        glwCompAdd(cm_data,&_this->tf_slice_t.super,-1);
         glwCompAdd(cm_data,&_this->sl_slice_t->super,-1);
         glwCompAdd(cm_data,&lb_slice_p->super,-1);
-        glwCompAdd(cm_data,&_this->tf_slice_p->super,-1);
+        glwCompAdd(cm_data,&_this->tf_slice_p.super,-1);
         glwCompAdd(cm_data,&_this->sl_slice_p->super,-1);
         glwCompAdd(cm_data,&lb_slice_d->super,-1);
-        glwCompAdd(cm_data,&_this->tf_slice_d->super,-1);
+        glwCompAdd(cm_data,&_this->tf_slice_d.super,-1);
         glwCompAdd(cm_data,&_this->sl_slice_d->super,-1);
         glwCompAdd(cm_data,&_this->cb_draw_iso->super,-1);
         glwCompAdd(cm_data,&lb_iso_v->super,-1);
@@ -2038,13 +2038,10 @@ DS3Viewer::~DS3Viewer()
 //    delete (lb_iso_v);
     delete (_this->cb_draw_iso);
     delete _this->sl_slice_d;
-    delete (_this->tf_slice_d);
 //    delete (lb_slice_d);
     delete _this->sl_slice_p;
-    delete (_this->tf_slice_p);
 //    delete (lb_slice_p);
 //    delete _this->sl_slice_t; // unique_ptr auto-delete?
-    delete (_this->tf_slice_t);
 //    delete (lb_slice_t);
 //    glwCompFree(cm_opts);
 //    glwCompFree(cm_view_btns);
@@ -2124,30 +2121,30 @@ void ds3ViewerSetSlice(DS3Viewer *_this,double _t,double _p,double _d)
     _p=_this->ds3view->slice_p;
     _d=_this->ds3view->slice_d;
     sprintf(text,"%0.3g",_t);
-    glwTextFieldSetChangedFunc(_this->tf_slice_t,
+    glwTextFieldSetChangedFunc(&_this->tf_slice_t,
                                (GLWActionFunc)ds3ViewerTextSet);
-    glwTextFieldSetText(_this->tf_slice_t,text);
-    glwTextFieldSetChangedFunc(_this->tf_slice_t,
+    glwTextFieldSetText(&_this->tf_slice_t,text);
+    glwTextFieldSetChangedFunc(&_this->tf_slice_t,
                                (GLWActionFunc)ds3ViewerTextChanged);
     _this->sl_slice_t->setChangedFunc(NULL);
     _this->sl_slice_t->setVal((int)(_t+0.5),0);
     _this->sl_slice_t->setChangedFunc(
         (GLWActionFunc)ds3ViewerSliceTSliderChanged);
     sprintf(text,"%0.3g",_p);
-    glwTextFieldSetChangedFunc(_this->tf_slice_p,
+    glwTextFieldSetChangedFunc(&_this->tf_slice_p,
                                (GLWActionFunc)ds3ViewerTextSet);
-    glwTextFieldSetText(_this->tf_slice_p,text);
-    glwTextFieldSetChangedFunc(_this->tf_slice_p,
+    glwTextFieldSetText(&_this->tf_slice_p,text);
+    glwTextFieldSetChangedFunc(&_this->tf_slice_p,
                                (GLWActionFunc)ds3ViewerTextChanged);
     glwSliderSetChangedFunc(_this->sl_slice_p,NULL);
     glwSliderSetVal(_this->sl_slice_p,(int)(_p+0.5),0);
     glwSliderSetChangedFunc(_this->sl_slice_p,
                             (GLWActionFunc)ds3ViewerSlicePSliderChanged);
     sprintf(text,"%0.3g",_d);
-    glwTextFieldSetChangedFunc(_this->tf_slice_d,
+    glwTextFieldSetChangedFunc(&_this->tf_slice_d,
                                (GLWActionFunc)ds3ViewerTextSet);
-    glwTextFieldSetText(_this->tf_slice_d,text);
-    glwTextFieldSetChangedFunc(_this->tf_slice_d,
+    glwTextFieldSetText(&_this->tf_slice_d,text);
+    glwTextFieldSetChangedFunc(&_this->tf_slice_d,
                                (GLWActionFunc)ds3ViewerTextChanged);
     glwSliderSetChangedFunc(_this->sl_slice_d,NULL);
     glwSliderSetVal(_this->sl_slice_d,(int)floor(_d*100+0.5),0);

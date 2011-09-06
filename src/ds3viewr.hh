@@ -46,11 +46,11 @@ public:
     GLWLabel          lb_datay;
     GLWLabel          lb_dataz;
     GLWLabel          lb_datav;
-    GLWTextField     *tf_slice_t;
+    GLWTextField      tf_slice_t;
     GLWSlider*        sl_slice_t;
-    GLWTextField     *tf_slice_p;
+    GLWTextField      tf_slice_p;
     GLWSlider        *sl_slice_p;
-    GLWTextField     *tf_slice_d;
+    GLWTextField      tf_slice_d;
     GLWSlider        *sl_slice_d;
     GLWCheckBox      *cb_draw_iso;
     GLWTextField     *tf_iso_v;
