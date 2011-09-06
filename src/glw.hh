@@ -390,7 +390,7 @@ void      glwFramePack(GLWFrame *_this);
 
 
 struct GLWLabel {
-    GLWLabel(const char*);
+    GLWLabel(const std::string&);
     GLWComponent super;
     std::string    label;
 private:

@@ -48,7 +48,7 @@ static const GLWCallbacks DS_COLOR_LEGEND_SCALE_CALLBACKS= {
 
 
 
-DSColorLegend::DSColorLegend() : lb_min("0"), lb_max("1"), lb_label(NULL)
+DSColorLegend::DSColorLegend() : lb_min("0"), lb_max("1"), lb_label("")
 {
     GLWGridBagLayout *layout = new GLWGridBagLayout();
     this->cm_scale.callbacks = &DS_COLOR_LEGEND_SCALE_CALLBACKS;
