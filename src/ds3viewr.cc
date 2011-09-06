@@ -915,7 +915,7 @@ DS3Viewer::DS3Viewer() :
         frame("VASP Data Viewer"),
         ds3view(new DS3View()),
         bn_open("Open"),
-        tf_file(NULL, 20),
+        tf_file("", 20),
         lb_data_set("Data Set: "),
         lb_status(""),
         cb_draw_slice("Draw Slice",1,NULL),
@@ -923,28 +923,28 @@ DS3Viewer::DS3Viewer() :
         lb_datay(""),
         lb_dataz(""),
         lb_datav(""),
-        tf_slice_t(new GLWTextField(NULL,5)),
-        tf_slice_p(new GLWTextField(NULL,5)),
-        tf_slice_d(new GLWTextField(NULL,5)),
+        tf_slice_t(new GLWTextField("", 5)),
+        tf_slice_p(new GLWTextField("", 5)),
+        tf_slice_d(new GLWTextField("", 5)),
         cb_draw_iso(new GLWCheckBox("Draw Iso-Surface",1,NULL)),
-        tf_iso_v(new GLWTextField(NULL,5)),
+        tf_iso_v(new GLWTextField("", 5)),
         cb_draw_points(new GLWCheckBox("Draw Atoms",1,NULL)),
-        tf_point_r(new GLWTextField(NULL,5)),
-        tf_point_s(new GLWTextField(NULL,5)),
+        tf_point_r(new GLWTextField("", 5)),
+        tf_point_s(new GLWTextField("", 5)),
         lb_point_t(new GLWLabel("Atom type:")),
         lb_point_l(new GLWLabel("Atom location:")),
         bn_point_c(new GLWButton("Look at Atom")),
         bn_point_v(new GLWButton("Hide Atom")),
         bn_point_sa(new GLWButton("Show All Atoms")),
 #if defined(__DS3_ADD_BONDS__)
-        tf_bond_f(new GLWTextField(NULL,5)),
-        tf_bond_t(new GLWTextField(NULL,5)),
-        tf_bond_s(new GLWTextField(NULL,5)),
+        tf_bond_f(new GLWTextField("", 5)),
+        tf_bond_t(new GLWTextField("", 5)),
+        tf_bond_s(new GLWTextField("", 5)),
         sl_bond_s(new GLWSlider(1,5,1,0)),
         bn_bond_a(new GLWButton("Add Bond")),
         bn_bond_d(new GLWButton("Delete Bond")),
 #endif
-        tf_minx(new GLWTextField(NULL,5)),
+        tf_minx(new GLWTextField("", 5)),
 	cb_projt_ortho("Orthographic", 0, &this->cg_projt)
 {
     GLWLabel     *lb_file;
@@ -1033,43 +1033,43 @@ DS3Viewer::DS3Viewer() :
     lb_minx = new GLWLabel("Minimum X:");
     _this->sl_minx= new GLWSlider(-100,200,0,0);
     lb_maxx = new GLWLabel("Maximum X:");
-    _this->tf_maxx = new GLWTextField(NULL,5);
+    _this->tf_maxx = new GLWTextField("", 5);
     _this->sl_maxx= new GLWSlider(-100,200,100,0);
     lb_miny= new GLWLabel("Minimum Y:");
-    _this->tf_miny = new GLWTextField(NULL,5);
+    _this->tf_miny = new GLWTextField("", 5);
     _this->sl_miny= new GLWSlider(-100,200,0,0);
     lb_maxy = new GLWLabel("Maximum Y:");
-    _this->tf_maxy = new GLWTextField(NULL,5);
+    _this->tf_maxy = new GLWTextField("", 5);
     _this->sl_maxy= new GLWSlider(-100,200,100,0);
     lb_minz = new GLWLabel("Minimum Z:");
-    _this->tf_minz = new GLWTextField(NULL,5);
+    _this->tf_minz = new GLWTextField("", 5);
     _this->sl_minz= new GLWSlider(-100,200,0,0);
     lb_maxz = new GLWLabel("Maximum Z:");
-    _this->tf_maxz = new GLWTextField(NULL,5);
+    _this->tf_maxz = new GLWTextField("", 5);
     _this->sl_maxz= new GLWSlider(-100,200,100,0);
     _this->cb_draw_coords = new GLWCheckBox("Draw Coordinate System",1,NULL);
     lb_zoom = new GLWLabel("Zoom:");
-    _this->tf_zoom = new GLWTextField(NULL,5);
+    _this->tf_zoom = new GLWTextField("", 5);
     _this->sl_zoom= new GLWSlider(0,200,100,0);
     lb_ornt = new GLWLabel("Orientation:");
     lb_ornt_y = new GLWLabel("Yaw:");
-    _this->tf_ornt_y = new GLWTextField(NULL,5);
+    _this->tf_ornt_y = new GLWTextField("", 5);
     _this->sl_ornt_y= new GLWSlider(0,360,0,0);
     lb_ornt_p = new GLWLabel("Pitch:");
-    _this->tf_ornt_p = new GLWTextField(NULL,5);
+    _this->tf_ornt_p = new GLWTextField("", 5);
     _this->sl_ornt_p= new GLWSlider(0,360,0,0);
     lb_ornt_r = new GLWLabel("Roll:");
-    _this->tf_ornt_r = new GLWTextField(NULL,5);
+    _this->tf_ornt_r = new GLWTextField("", 5);
     _this->sl_ornt_r=new GLWSlider(0,360,0,0);
     lb_cntr = new GLWLabel("Look at:");
     lb_cntr_x = new GLWLabel("X:");
-    _this->tf_cntr_x = new GLWTextField(NULL,5);
+    _this->tf_cntr_x = new GLWTextField("", 5);
     _this->sl_cntr_x=new GLWSlider(-100,200,50,0);
     lb_cntr_y = new GLWLabel("Y:");
-    _this->tf_cntr_y = new GLWTextField(NULL,5);
+    _this->tf_cntr_y = new GLWTextField("", 5);
     _this->sl_cntr_y=new GLWSlider(-100,200,50,0);
     lb_cntr_z = new GLWLabel("Z:");
-    _this->tf_cntr_z = new GLWTextField(NULL,5);
+    _this->tf_cntr_z = new GLWTextField("", 5);
     _this->sl_cntr_z=new GLWSlider(-100,200,50,0);
     bn_ornt = new GLWButton("Reset Orientation");
     bn_cntr = new GLWButton("Reset Position");

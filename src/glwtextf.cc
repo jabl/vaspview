@@ -506,7 +506,7 @@ const GLWCallbacks GLW_TEXT_FIELD_CALLBACKS= {
 };
 
 
-GLWTextField::GLWTextField(const char* _text, int _cols)
+GLWTextField::GLWTextField(const std::string& text, int _cols)
 {
     this->changed=NULL;
     this->changed_ctx=NULL;
@@ -515,8 +515,7 @@ GLWTextField::GLWTextField(const char* _text, int _cols)
     this->blink_timer=0;
     this->offs = this->carp = 0;
     this->mark = this->sels = this->sele = -1;
-    if (_text != NULL)
-        glwTextFieldSetText(this,_text);
+    glwTextFieldSetText(this, text);
     this->super.callbacks=&GLW_TEXT_FIELD_CALLBACKS;
     glwCompSetFont(&this->super,glwFontGet(GLW_FONT_FIXED,0));
     glwCompSetCursor(&this->super,GLUT_CURSOR_TEXT);

@@ -433,7 +433,7 @@ void           glwButtonSetPressedCtx(GLWButton *_this,void *_ctx);
 
 
 struct GLWTextField {
-    GLWTextField(const char*, int);
+    GLWTextField(const std::string&, int);
     GLWComponent   super;
     GLWActionFunc  action;          /*Enter pressed callback function*/
     void          *action_ctx;      /*Extra parameter for callback*/
