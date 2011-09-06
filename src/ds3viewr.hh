@@ -33,7 +33,7 @@ public:
     DS3Viewer();
     ~DS3Viewer();
 
-    GLWFrame*         frame;
+    GLWFrame          frame;
     DS3View*          ds3view;
     GLWButton         bn_open;
     GLWTextField      tf_file;

@@ -104,7 +104,7 @@ static void ds3ViewerTextChanged(DS3Viewer *_this,GLWComponent *_c)
 
 static void ds3ViewerTextSet(DS3Viewer *_this,GLWComponent *_c)
 {
-    glwCompSetForeColor(_c,_this->frame->super.forec);
+    glwCompSetForeColor(_c,_this->frame.super.forec);
 }
 
 static void ds3ViewerViewDataChanged(DS3Viewer *_this,DS3View *_view)
@@ -882,7 +882,7 @@ static void ds3ViewerAsyncRead(DS3Viewer *_this,GLWComponent *_c)
     int ret;
     ret=_this->reader->read();
     if (ret<=0) {
-        glwCompDelIdler(&_this->frame->super,_this->read_id);
+        glwCompDelIdler(&_this->frame.super, _this->read_id);
         _this->read_id=0;
         if (!ret) {
             if (!errno)errno=ENOMEM;
@@ -912,7 +912,7 @@ static void ds3ViewerOpen(DS3Viewer *_this,GLWComponent *_c)
 }
 
 DS3Viewer::DS3Viewer() :
-        frame(new GLWFrame("VASP Data Viewer")),
+        frame("VASP Data Viewer"),
         ds3view(new DS3View()),
         bn_open("Open"),
         tf_file(NULL, 20),
@@ -1086,7 +1086,7 @@ DS3Viewer::DS3Viewer() :
     lb_projt= new GLWLabel("Projection type:");
     _this->cb_projt_persp= new GLWCheckBox("Perspective",1,&_this->cg_projt);
 
-    if (_this->frame!=NULL&&_this->ds3view!=NULL&&cm_vals!=NULL&&lb_file!=NULL&&
+    if (_this->ds3view!=NULL&&cm_vals!=NULL&&lb_file!=NULL&&
             cm_data!=NULL&&cm_strc!=NULL&&cm_point_btns!=NULL&&
 # if defined(__DS3_ADD_BONDS__)
             cm_bond_btns!=NULL&&
@@ -1513,7 +1513,7 @@ DS3Viewer::DS3Viewer() :
         glwSliderSetMajorTickSpacing(_this->sl_cntr_z,100);
         glwSliderSetMinorTickSpacing(_this->sl_cntr_z,25);
         glwSliderSetSnap(_this->sl_cntr_z,1);
-        glwCompSetLayout(&_this->frame->super, &(new GLWGridBagLayout())->super);
+        glwCompSetLayout(&_this->frame.super, &(new GLWGridBagLayout())->super);
         glwCompSetMinWidth(&_this->ds3view->super,360);
         glwCompSetMinHeight(&_this->ds3view->super,360);
         glwCompSetInsets(&_this->ds3view->super,2,2,2,2);
@@ -1545,15 +1545,15 @@ DS3Viewer::DS3Viewer() :
         glwCompSetInsets(&_this->lb_status.super, 0, 0, 2, 2);
         glwCompSetGridWidth(&_this->lb_status.super, GLWC_REMAINDER);
         glwCompSetFill(&_this->lb_status.super, GLWC_HORIZONTAL);
-        glwCompAdd(&_this->frame->super,&_this->ds3view->super,-1);
-        glwCompAdd(&_this->frame->super,&lb_file->super,-1);
-        glwCompAdd(&_this->frame->super, &_this->tf_file.super, -1);
-        glwCompAdd(&_this->frame->super, &_this->bn_open.super, -1);
-        glwCompAdd(&_this->frame->super, &_this->lb_data_set.super, -1);
-        glwCompAdd(&_this->frame->super, &_this->tp_ctrl.super, -1);
-        glwCompAdd(&_this->frame->super,&_this->legend.super, -1);
-        glwCompAdd(&_this->frame->super,cm_vals,-1);
-        glwCompAdd(&_this->frame->super, &_this->lb_status.super, -1);
+        glwCompAdd(&_this->frame.super, &_this->ds3view->super, -1);
+        glwCompAdd(&_this->frame.super, &lb_file->super, -1);
+        glwCompAdd(&_this->frame.super, &_this->tf_file.super, -1);
+        glwCompAdd(&_this->frame.super, &_this->bn_open.super, -1);
+        glwCompAdd(&_this->frame.super, &_this->lb_data_set.super, -1);
+        glwCompAdd(&_this->frame.super, &_this->tp_ctrl.super, -1);
+        glwCompAdd(&_this->frame.super, &_this->legend.super, -1);
+        glwCompAdd(&_this->frame.super, cm_vals, -1);
+        glwCompAdd(&_this->frame.super, &_this->lb_status.super, -1);
         glwCompSetLayout(cm_vals,&(new GLWGridBagLayout())->super);
         glwCompSetInsets(&_this->lb_datax->super,2,2,2,2);
         glwCompSetPreWidth(&_this->lb_datax->super,80);
@@ -1943,7 +1943,7 @@ DS3Viewer::DS3Viewer() :
         ds3ViewerSetBox(_this,_this->ds3view->box[0][X],_this->ds3view->box[0][Y],
                         _this->ds3view->box[0][Z],_this->ds3view->box[1][X],
                         _this->ds3view->box[1][Y],_this->ds3view->box[1][Z]);
-        glwFramePack(_this->frame);
+        glwFramePack(&_this->frame);
     } else {
         throw "DS3Viewer initialization failed\n";
     }
@@ -2065,7 +2065,6 @@ DS3Viewer::~DS3Viewer()
 //    delete (lb_file);
 //    glwCompFree(cm_vals);
     delete _this->ds3view;
-    delete _this->frame;
 }
 
 void ds3ViewerUpdatePointRLabels(DS3Viewer *_this)
@@ -2458,7 +2457,7 @@ void ds3ViewerSetBond(DS3Viewer *_this,double _sz)
 void ds3ViewerOpenFile(DS3Viewer *_this,const char *_file)
 {
     if (_this->read_id) {
-        glwCompDelIdler(&_this->frame->super,_this->read_id);
+        glwCompDelIdler(&_this->frame.super, _this->read_id);
         _this->read_id=0;
         _this->reader->cancel();
 	_this->read_name.clear();
@@ -2481,8 +2480,8 @@ void ds3ViewerOpenFile(DS3Viewer *_this,const char *_file)
         } else {
             _this->read_prog = 0;
 	    _this->read_name = _file;
-            _this->read_id=glwCompAddIdler(&_this->frame->super,
-                                           (GLWActionFunc)ds3ViewerAsyncRead,_this);
+            _this->read_id = glwCompAddIdler(
+		&_this->frame.super, (GLWActionFunc)ds3ViewerAsyncRead,_this);
             if (!_this->read_id) {
                 _this->reader->cancel();
                 ret=0;
