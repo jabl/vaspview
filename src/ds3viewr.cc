@@ -798,12 +798,12 @@ static void ds3ViewerColorChanged(DS3Viewer *_this,GLWComponent *_c)
     switch (glwCheckBoxGroupGetSelectedIdx(&_this->cg_color)) {
     case 0: {
         ds3ViewSetColorScale(_this->ds3view,&DS_RAINBOW_SCALE);
-        dsColorLegendSetColorScale(_this->legend,&DS_RAINBOW_SCALE);
+        dsColorLegendSetColorScale(&_this->legend, &DS_RAINBOW_SCALE);
     }
     break;
     case 1: {
         ds3ViewSetColorScale(_this->ds3view,&DS_GRAY_SCALE);
-        dsColorLegendSetColorScale(_this->legend,&DS_GRAY_SCALE);
+        dsColorLegendSetColorScale(&_this->legend, &DS_GRAY_SCALE);
     }
     break;
     }
@@ -850,7 +850,7 @@ static void ds3ViewerFinishRead(DS3Viewer *_this)
         dsLinearScaleInit(&_this->scale_linear, _this->ds3->min,
                           _this->ds3->max);
         dsLogScaleInit(&_this->scale_log,_this->ds3->min,_this->ds3->max);
-        dsColorLegendSetDataSet(_this->legend, _this->ds3);
+        dsColorLegendSetDataSet(&_this->legend, _this->ds3);
         ds3ViewerUpdatePointRLabels(_this);
         ds3ViewerUpdateIsoVLabels(_this);
         /*ds3ViewerUpdateZoomLabels(_this);*/
@@ -917,7 +917,6 @@ DS3Viewer::DS3Viewer() :
         bn_open("Open"),
         tf_file(NULL, 20),
         lb_data_set("Data Set: "),
-        legend(new DSColorLegend()),
         lb_status(new GLWLabel(NULL)),
         cb_draw_slice(new GLWCheckBox("Draw Slice",1,NULL)),
         lb_datax(new GLWLabel(NULL)),
@@ -1093,7 +1092,7 @@ DS3Viewer::DS3Viewer() :
             cm_bond_btns!=NULL&&
 # endif
             cm_bnds!=NULL&&cm_view!=NULL&&cm_view_btns!=NULL&&cm_opts!=NULL&&
-            _this->legend!=NULL&&_this->lb_status!=NULL&&
+            _this->lb_status!=NULL&&
             _this->lb_datax!=NULL&&_this->lb_datay!=NULL&&_this->lb_dataz!=NULL&&
             _this->lb_datav!=NULL&&_this->cb_draw_slice!=NULL&&lb_slice_t!=NULL&&
             _this->tf_slice_t!=NULL&&_this->sl_slice_t != NULL&&lb_slice_p!=NULL&&
@@ -1536,10 +1535,10 @@ DS3Viewer::DS3Viewer() :
         glwCompSetGridWidth(&_this->tp_ctrl.super, GLWC_REMAINDER);
         glwCompSetGridHeight(&_this->tp_ctrl.super, 3);
         glwCompSetFill(&_this->tp_ctrl.super, GLWC_BOTH);
-        glwCompSetInsets(&_this->legend->super,2,2,2,2);
-        glwCompSetFill(&_this->legend->super,GLWC_HORIZONTAL);
-        glwCompSetGridX(&_this->legend->super,0);
-        glwCompSetGridY(&_this->legend->super,4);
+        glwCompSetInsets(&_this->legend.super, 2, 2, 2, 2);
+        glwCompSetFill(&_this->legend.super, GLWC_HORIZONTAL);
+        glwCompSetGridX(&_this->legend.super, 0);
+        glwCompSetGridY(&_this->legend.super, 4);
         glwCompSetInsets(cm_vals,2,2,2,2);
         glwCompSetFill(cm_vals,GLWC_HORIZONTAL);
         glwCompSetGridX(cm_vals,0);
@@ -1553,7 +1552,7 @@ DS3Viewer::DS3Viewer() :
         glwCompAdd(&_this->frame->super, &_this->bn_open.super, -1);
         glwCompAdd(&_this->frame->super, &_this->lb_data_set.super, -1);
         glwCompAdd(&_this->frame->super, &_this->tp_ctrl.super, -1);
-        glwCompAdd(&_this->frame->super,&_this->legend->super,-1);
+        glwCompAdd(&_this->frame->super,&_this->legend.super, -1);
         glwCompAdd(&_this->frame->super,cm_vals,-1);
         glwCompAdd(&_this->frame->super,&_this->lb_status->super,-1);
         glwCompSetLayout(cm_vals,&(new GLWGridBagLayout())->super);
@@ -2055,7 +2054,6 @@ DS3Viewer::~DS3Viewer()
     delete (_this->lb_datay);
     delete (_this->lb_datax);
     delete (_this->lb_status);
-    delete _this->legend;
 //    glwCompFree(cm_opts);
 //    glwCompFree(cm_view_btns);
 //    glwCompFree(cm_view);

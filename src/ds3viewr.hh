@@ -39,7 +39,7 @@ public:
     GLWTextField      tf_file;
     GLWLabel          lb_data_set;
     GLWTabbedPane     tp_ctrl;
-    DSColorLegend    *legend;
+    DSColorLegend     legend;
     GLWLabel         *lb_status;
     GLWCheckBox      *cb_draw_slice;
     GLWLabel         *lb_datax;
