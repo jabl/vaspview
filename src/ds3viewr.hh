@@ -37,7 +37,7 @@ public:
     DS3View*          ds3view;
     GLWButton         bn_open;
     GLWTextField      tf_file;
-    GLWLabel         *lb_data_set;
+    GLWLabel          lb_data_set;
     GLWTabbedPane    *tp_ctrl;
     DSColorLegend    *legend;
     GLWLabel         *lb_status;
