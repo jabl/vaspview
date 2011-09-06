@@ -396,19 +396,19 @@ static void ds3ViewerDrawPointsChanged(DS3Viewer *_this,GLWComponent *_c)
     b = glwCheckBoxGetState(&_this->cb_draw_points);
     ds3ViewSetDrawPoints(_this->ds3view,b);
 # if defined(__DS3_ADD_BONDS__)
-    glwCompEnable(&_this->tf_bond_f->super,b);
-    glwCompEnable(&_this->tf_bond_t->super,b);
-    glwCompEnable(&_this->tf_bond_s->super,b);
-    glwCompEnable(&_this->sl_bond_s->super,b);
-    glwCompEnable(&_this->bn_bond_a->super,b);
-    glwCompEnable(&_this->bn_bond_d->super,b);
+    glwCompEnable(&_this->tf_bond_f.super,b);
+    glwCompEnable(&_this->tf_bond_t.super,b);
+    glwCompEnable(&_this->tf_bond_s.super,b);
+    glwCompEnable(&_this->sl_bond_s.super,b);
+    glwCompEnable(&_this->bn_bond_a.super,b);
+    glwCompEnable(&_this->bn_bond_d.super,b);
 # endif
-    glwCompEnable(&_this->tf_point_r.super,b);
+    glwCompEnable(&_this->tf_point_r.super, b);
     glwCompEnable(&_this->sl_point_r->super,b);
-    glwCompEnable(&_this->tf_point_s.super,b);
-    glwCompEnable(&_this->bn_point_v.super,b);
-    glwCompEnable(&_this->bn_point_sa.super,b);
-    glwCompEnable(&_this->bn_point_c.super,b);
+    glwCompEnable(&_this->tf_point_s.super, b);
+    glwCompEnable(&_this->bn_point_v.super, b);
+    glwCompEnable(&_this->bn_point_sa.super, b);
+    glwCompEnable(&_this->bn_point_c.super, b);
 }
 
 static void ds3ViewerPointRTextChanged(DS3Viewer *_this,GLWComponent *_c)
@@ -477,11 +477,11 @@ static void ds3ViewerBondFTextChanged(DS3Viewer *_this,GLWComponent *_c)
     char *e;
     long  f;
     ds3ViewerTextSet(_this,_c);
-    text=glwTextFieldGetText(_this->tf_bond_f);
+    text=glwTextFieldGetText(&_this->tf_bond_f);
     f=strtol(text,&e,0)-1;
     if (e!=text&&e[0]=='\0') {
         long t;
-        text=glwTextFieldGetText(_this->tf_bond_t);
+        text = glwTextFieldGetText(&_this->tf_bond_t);
         t=strtol(text,&e,0)-1;
         if (e!=text&&e[0]=='\0')ds3ViewerSetSelectedBond(_this,f,t);
     }
@@ -498,7 +498,7 @@ static void ds3ViewerBondSTextChanged(DS3Viewer *_this,GLWComponent *_c)
     char   *e;
     double  r;
     ds3ViewerTextSet(_this,_c);
-    text=glwTextFieldGetText(_this->tf_bond_s);
+    text = glwTextFieldGetText(&_this->tf_bond_s);
     r=strtod(text,&e);
     if (e!=text&&e[0]=='\0') {
         ds3ViewerBondFTextChanged(_this,_c);
@@ -509,7 +509,7 @@ static void ds3ViewerBondSTextChanged(DS3Viewer *_this,GLWComponent *_c)
 static void ds3ViewerBondSSliderChanged(DS3Viewer *_this,GLWComponent *_c)
 {
     int v;
-    v=glwSliderGetVal(_this->sl_bond_s);
+    v = glwSliderGetVal(&_this->sl_bond_s);
     ds3ViewerBondFTextChanged(_this,_c);
     ds3ViewerSetBond(_this,v*0.1);
 }
@@ -520,12 +520,12 @@ static void ds3ViewerBondAdd(DS3Viewer *_this,GLWComponent *_c)
     char *e;
     long  f;
     int   v;
-    v=glwSliderGetVal(_this->sl_bond_s);
-    text=glwTextFieldGetText(_this->tf_bond_f);
+    v = glwSliderGetVal(&_this->sl_bond_s);
+    text = glwTextFieldGetText(&_this->tf_bond_f);
     f=strtol(text,&e,0)-1;
     if (e!=text&&e[0]=='\0') {
         long t;
-        text=glwTextFieldGetText(_this->tf_bond_t);
+        text = glwTextFieldGetText(&_this->tf_bond_t);
         t=strtol(text,&e,0)-1;
         if (e!=text&&e[0]=='\0') {
             ds3ViewSetBond(_this->ds3view,f,t,v*0.1);
@@ -937,12 +937,12 @@ DS3Viewer::DS3Viewer() :
         bn_point_v("Hide Atom"),
         bn_point_sa("Show All Atoms"),
 #if defined(__DS3_ADD_BONDS__)
-        tf_bond_f(new GLWTextField("", 5)),
-        tf_bond_t(new GLWTextField("", 5)),
-        tf_bond_s(new GLWTextField("", 5)),
-        sl_bond_s(new GLWSlider(1,5,1,0)),
-        bn_bond_a(new GLWButton("Add Bond")),
-        bn_bond_d(new GLWButton("Delete Bond")),
+        tf_bond_f("", 5),
+        tf_bond_t("", 5),
+        tf_bond_s("", 5),
+        sl_bond_s(1,5,1,0),
+        bn_bond_a("Add Bond"),
+        bn_bond_d("Delete Bond"),
 #endif
         tf_minx(new GLWTextField("", 5)),
 	cb_projt_ortho("Orthographic", 0, &this->cg_projt)
@@ -1101,9 +1101,8 @@ DS3Viewer::DS3Viewer() :
             _this->sl_iso_d!=NULL && lb_point_r!=NULL&&
             _this->sl_point_r!=NULL&&lb_point_s!=NULL&&
 # if defined(__DS3_ADD_BONDS__)
-            lb_bond_f!=NULL&&_this->tf_bond_f!=NULL&&lb_bond_t!=NULL&&
-            _this->tf_bond_t!=NULL&&lb_bond_s!=NULL&&_this->tf_bond_s!=NULL&&
-            _this->sl_bond_s!=NULL&&_this->bn_bond_a!=NULL&&_this->bn_bond_d!=NULL&&
+            lb_bond_f!=NULL&&lb_bond_t!=NULL&&
+            lb_bond_s!=NULL&&
 # endif
             lb_minx!=NULL&&_this->tf_minx!=NULL&&_this->sl_minx!=NULL&&lb_maxx!=NULL&&
             _this->tf_maxx!=NULL&&_this->sl_maxx!=NULL&&lb_miny!=NULL&&
@@ -1144,10 +1143,12 @@ DS3Viewer::DS3Viewer() :
         glwButtonSetPressedFunc(bn_align,(GLWActionFunc)ds3ViewerAlignOrientation);
         glwButtonSetPressedCtx(bn_align,_this);
 # if defined(__DS3_ADD_BONDS__)
-        glwButtonSetPressedFunc(_this->bn_bond_a,(GLWActionFunc)ds3ViewerBondAdd);
-        glwButtonSetPressedCtx(_this->bn_bond_a,_this);
-        glwButtonSetPressedFunc(_this->bn_bond_d,(GLWActionFunc)ds3ViewerBondDel);
-        glwButtonSetPressedCtx(_this->bn_bond_d,_this);
+        glwButtonSetPressedFunc(&_this->bn_bond_a,
+				(GLWActionFunc)ds3ViewerBondAdd);
+        glwButtonSetPressedCtx(&_this->bn_bond_a, _this);
+        glwButtonSetPressedFunc(&_this->bn_bond_d,
+				(GLWActionFunc)ds3ViewerBondDel);
+        glwButtonSetPressedCtx(&_this->bn_bond_d, _this);
 # endif
         ds3ViewSetDataChangedFunc(_this->ds3view,
                                   (GLWActionFunc)ds3ViewerViewDataChanged);
@@ -1253,24 +1254,24 @@ DS3Viewer::DS3Viewer() :
                                    (GLWActionFunc)ds3ViewerTextChanged);
         glwTextFieldSetChangedCtx(&_this->tf_point_s,_this);
 # if defined(__DS3_ADD_BONDS__)
-        glwTextFieldSetActionFunc(_this->tf_bond_f,
+        glwTextFieldSetActionFunc(&_this->tf_bond_f,
                                   (GLWActionFunc)ds3ViewerBondFTextChanged);
-        glwTextFieldSetActionCtx(_this->tf_bond_f,_this);
-        glwTextFieldSetChangedFunc(_this->tf_bond_f,
+        glwTextFieldSetActionCtx(&_this->tf_bond_f, _this);
+        glwTextFieldSetChangedFunc(&_this->tf_bond_f,
                                    (GLWActionFunc)ds3ViewerTextChanged);
-        glwTextFieldSetChangedCtx(_this->tf_bond_f,_this);
-        glwTextFieldSetActionFunc(_this->tf_bond_t,
+        glwTextFieldSetChangedCtx(&_this->tf_bond_f, _this);
+        glwTextFieldSetActionFunc(&_this->tf_bond_t,
                                   (GLWActionFunc)ds3ViewerBondTTextChanged);
-        glwTextFieldSetActionCtx(_this->tf_bond_t,_this);
-        glwTextFieldSetChangedFunc(_this->tf_bond_t,
+        glwTextFieldSetActionCtx(&_this->tf_bond_t, _this);
+        glwTextFieldSetChangedFunc(&_this->tf_bond_t,
                                    (GLWActionFunc)ds3ViewerTextChanged);
-        glwTextFieldSetChangedCtx(_this->tf_bond_t,_this);
-        glwTextFieldSetActionFunc(_this->tf_bond_s,
+        glwTextFieldSetChangedCtx(&_this->tf_bond_t, _this);
+        glwTextFieldSetActionFunc(&_this->tf_bond_s,
                                   (GLWActionFunc)ds3ViewerBondSTextChanged);
-        glwTextFieldSetActionCtx(_this->tf_bond_s,_this);
-        glwTextFieldSetChangedFunc(_this->tf_bond_s,
+        glwTextFieldSetActionCtx(&_this->tf_bond_s, _this);
+        glwTextFieldSetChangedFunc(&_this->tf_bond_s,
                                    (GLWActionFunc)ds3ViewerTextChanged);
-        glwTextFieldSetChangedCtx(_this->tf_bond_s,_this);
+        glwTextFieldSetChangedCtx(&_this->tf_bond_s, _this);
 # endif
         glwTextFieldSetActionFunc(_this->tf_minx,
                                   (GLWActionFunc)ds3ViewerBoxTextChanged);
@@ -1398,12 +1399,12 @@ DS3Viewer::DS3Viewer() :
         glwSliderAddLabel(_this->sl_iso_d,4,"Low");
         glwSliderSetSnap(_this->sl_iso_d,GLWC_SNAP_ALWAYS);
 # if defined(__DS3_ADD_BONDS__)
-        glwSliderSetChangedFunc(_this->sl_bond_s,
+        glwSliderSetChangedFunc(&_this->sl_bond_s,
                                 (GLWActionFunc)ds3ViewerBondSSliderChanged);
-        glwSliderSetChangedCtx(_this->sl_bond_s,_this);
-        glwSliderSetMajorTickSpacing(_this->sl_bond_s,1);
-        glwSliderMakeLabels(_this->sl_bond_s,1,1);
-        glwSliderSetSnap(_this->sl_bond_s,GLWC_SNAP_ALWAYS);
+        glwSliderSetChangedCtx(&_this->sl_bond_s, _this);
+        glwSliderSetMajorTickSpacing(&_this->sl_bond_s, 1);
+        glwSliderMakeLabels(&_this->sl_bond_s, 1, 1);
+        glwSliderSetSnap(&_this->sl_bond_s, GLWC_SNAP_ALWAYS);
 # endif
         glwSliderSetChangedFunc(_this->sl_minx,
                                 (GLWActionFunc)ds3ViewerMinXSliderChanged);
@@ -1666,22 +1667,22 @@ DS3Viewer::DS3Viewer() :
 # if defined(__DS3_ADD_BONDS__)
         glwCompSetInsets(&lb_bond_f->super,0,0,10,2);
         glwCompSetWeightX(&lb_bond_f->super,1);
-        glwCompSetInsets(&_this->tf_bond_f->super,0,0,2,2);
-        glwCompSetGridWidth(&_this->tf_bond_f->super,GLWC_REMAINDER);
-        glwCompSetAlignX(&_this->tf_bond_f->super,1);
+        glwCompSetInsets(&_this->tf_bond_f.super,0,0,2,2);
+        glwCompSetGridWidth(&_this->tf_bond_f.super,GLWC_REMAINDER);
+        glwCompSetAlignX(&_this->tf_bond_f.super,1);
         glwCompSetInsets(&lb_bond_t->super,0,0,10,2);
         glwCompSetWeightX(&lb_bond_t->super,1);
-        glwCompSetInsets(&_this->tf_bond_t->super,0,0,2,2);
-        glwCompSetGridWidth(&_this->tf_bond_t->super,GLWC_REMAINDER);
-        glwCompSetAlignX(&_this->tf_bond_t->super,1);
+        glwCompSetInsets(&_this->tf_bond_t.super,0,0,2,2);
+        glwCompSetGridWidth(&_this->tf_bond_t.super,GLWC_REMAINDER);
+        glwCompSetAlignX(&_this->tf_bond_t.super,1);
         glwCompSetInsets(&lb_bond_s->super,0,0,10,2);
         glwCompSetWeightX(&lb_bond_s->super,1);
-        glwCompSetInsets(&_this->tf_bond_s->super,0,0,2,2);
-        glwCompSetGridWidth(&_this->tf_bond_s->super,GLWC_REMAINDER);
-        glwCompSetAlignX(&_this->tf_bond_s->super,1);
-        glwCompSetInsets(&_this->sl_bond_s->super,0,0,10,2);
-        glwCompSetGridWidth(&_this->sl_bond_s->super,GLWC_REMAINDER);
-        glwCompSetFill(&_this->sl_bond_s->super,GLWC_HORIZONTAL);
+        glwCompSetInsets(&_this->tf_bond_s.super,0,0,2,2);
+        glwCompSetGridWidth(&_this->tf_bond_s.super,GLWC_REMAINDER);
+        glwCompSetAlignX(&_this->tf_bond_s.super,1);
+        glwCompSetInsets(&_this->sl_bond_s.super,0,0,10,2);
+        glwCompSetGridWidth(&_this->sl_bond_s.super,GLWC_REMAINDER);
+        glwCompSetFill(&_this->sl_bond_s.super,GLWC_HORIZONTAL);
         glwCompSetInsets(cm_bond_btns,2,2,2,2);
         glwCompSetFill(cm_bond_btns,GLWC_HORIZONTAL);
         glwCompSetGridWidth(cm_bond_btns,GLWC_REMAINDER);
@@ -1697,12 +1698,12 @@ DS3Viewer::DS3Viewer() :
         glwCompAdd(cm_strc,cm_point_btns,-1);
 # if defined(__DS3_ADD_BONDS__)
         glwCompAdd(cm_strc,&lb_bond_f->super,-1);
-        glwCompAdd(cm_strc,&_this->tf_bond_f->super,-1);
+        glwCompAdd(cm_strc,&_this->tf_bond_f.super, -1);
         glwCompAdd(cm_strc,&lb_bond_t->super,-1);
-        glwCompAdd(cm_strc,&_this->tf_bond_t->super,-1);
+        glwCompAdd(cm_strc,&_this->tf_bond_t.super, -1);
         glwCompAdd(cm_strc,&lb_bond_s->super,-1);
-        glwCompAdd(cm_strc,&_this->tf_bond_s->super,-1);
-        glwCompAdd(cm_strc,&_this->sl_bond_s->super,-1);
+        glwCompAdd(cm_strc,&_this->tf_bond_s.super, -1);
+        glwCompAdd(cm_strc,&_this->sl_bond_s.super, -1);
         glwCompAdd(cm_strc,cm_bond_btns,-1);
 # endif
         glwCompSetInsets(&_this->bn_point_c.super,0,0,2,2);
@@ -1716,14 +1717,14 @@ DS3Viewer::DS3Viewer() :
         glwCompAdd(cm_point_btns,&_this->bn_point_v.super,-1);
         glwCompAdd(cm_point_btns,&_this->bn_point_sa.super,-1);
 # if defined(__DS3_ADD_BONDS__)
-        glwCompSetInsets(&_this->bn_bond_a->super,0,0,2,2);
-        glwCompSetAlignX(&_this->bn_bond_a->super,1);
-        glwCompSetInsets(&_this->bn_bond_d->super,0,0,2,2);
-        glwCompSetAlignX(&_this->bn_bond_d->super,0);
-        glwCompSetGridWidth(&_this->bn_bond_d->super,GLWC_REMAINDER);
+        glwCompSetInsets(&_this->bn_bond_a.super, 0, 0, 2, 2);
+        glwCompSetAlignX(&_this->bn_bond_a.super, 1);
+        glwCompSetInsets(&_this->bn_bond_d.super, 0, 0, 2, 2);
+        glwCompSetAlignX(&_this->bn_bond_d.super, 0);
+        glwCompSetGridWidth(&_this->bn_bond_d.super, GLWC_REMAINDER);
         glwCompSetLayout(cm_bond_btns,&(new GLWGridBagLayout())->super);
-        glwCompAdd(cm_bond_btns,&_this->bn_bond_a->super,-1);
-        glwCompAdd(cm_bond_btns,&_this->bn_bond_d->super,-1);
+        glwCompAdd(cm_bond_btns, &_this->bn_bond_a.super, -1);
+        glwCompAdd(cm_bond_btns, &_this->bn_bond_d.super, -1);
 # endif
         glwCompSetLayout(cm_bnds,&(new GLWGridBagLayout())->super);
         glwCompSetInsets(&lb_minx->super,0,0,2,2);
@@ -2005,17 +2006,6 @@ DS3Viewer::~DS3Viewer()
     delete _this->sl_minx;
     delete (_this->tf_minx);
 //    delete (lb_minx);
-# if defined(__DS3_ADD_BONDS__)
-    delete (_this->bn_bond_d);
-    delete (_this->bn_bond_a);
-    delete _this->sl_bond_s;
-    delete (_this->tf_bond_s);
-//    delete (lb_bond_s);
-    delete (_this->tf_bond_t);
-//    delete (lb_bond_t);
-    delete (_this->tf_bond_f);
-//    delete (lb_bond_f);
-# endif
     delete _this->sl_point_r;
     delete _this->sl_iso_d;
     /*delete (_this->tf_iso_d);*/
@@ -2392,16 +2382,16 @@ void ds3ViewerSetSelectedBond(DS3Viewer *_this,long _f,long _t)
     if (ds3ViewGetSelectedBond(_this->ds3view,&_f,&_t)) {
         char text[32];
         sprintf(text,"%li",_f+1);
-        glwTextFieldSetChangedFunc(_this->tf_bond_f,
+        glwTextFieldSetChangedFunc(&_this->tf_bond_f,
                                    (GLWActionFunc)ds3ViewerTextSet);
-        glwTextFieldSetText(_this->tf_bond_f,text);
-        glwTextFieldSetChangedFunc(_this->tf_bond_f,
+        glwTextFieldSetText(&_this->tf_bond_f, text);
+        glwTextFieldSetChangedFunc(&_this->tf_bond_f,
                                    (GLWActionFunc)ds3ViewerTextChanged);
         sprintf(text,"%li",_t+1);
-        glwTextFieldSetChangedFunc(_this->tf_bond_t,
+        glwTextFieldSetChangedFunc(&_this->tf_bond_t,
                                    (GLWActionFunc)ds3ViewerTextSet);
-        glwTextFieldSetText(_this->tf_bond_t,text);
-        glwTextFieldSetChangedFunc(_this->tf_bond_t,
+        glwTextFieldSetText(&_this->tf_bond_t, text);
+        glwTextFieldSetChangedFunc(&_this->tf_bond_t,
                                    (GLWActionFunc)ds3ViewerTextChanged);
         ds3ViewerSetBond(_this,ds3ViewGetBond(_this->ds3view,_f,_t));
     }
@@ -2420,12 +2410,12 @@ void ds3ViewerSetBond(DS3Viewer *_this,double _sz)
         if (_sz>0) {
             char text[32];
             sprintf(text,"%0.4g",_sz*10);
-            glwTextFieldSetChangedFunc(_this->tf_bond_s,
+            glwTextFieldSetChangedFunc(&_this->tf_bond_s,
                                        (GLWActionFunc)ds3ViewerTextSet);
-            glwTextFieldSetText(_this->tf_bond_s,text);
-            glwTextFieldSetChangedFunc(_this->tf_bond_s,
+            glwTextFieldSetText(&_this->tf_bond_s, text);
+            glwTextFieldSetChangedFunc(&_this->tf_bond_s,
                                        (GLWActionFunc)ds3ViewerTextChanged);
-            glwSliderSetVal(_this->sl_bond_s,(int)(_sz*10+0.5),0);
+            glwSliderSetVal(&_this->sl_bond_s, (int)(_sz * 10 + 0.5), 0);
         }
     }
 }

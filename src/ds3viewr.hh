@@ -67,12 +67,12 @@ public:
     GLWButton         bn_point_v;
     GLWButton         bn_point_sa;
 # if defined(__DS3_ADD_BONDS__)
-    GLWTextField     *tf_bond_f;
-    GLWTextField     *tf_bond_t;
-    GLWTextField     *tf_bond_s;
-    GLWSlider        *sl_bond_s;
-    GLWButton        *bn_bond_a;
-    GLWButton        *bn_bond_d;
+    GLWTextField      tf_bond_f;
+    GLWTextField      tf_bond_t;
+    GLWTextField      tf_bond_s;
+    GLWSlider         sl_bond_s;
+    GLWButton         bn_bond_a;
+    GLWButton         bn_bond_d;
 # endif
     GLWTextField     *tf_minx;
     GLWSlider        *sl_minx;
