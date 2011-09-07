@@ -66,7 +66,6 @@ static void ds3ViewAxesPeerDisplay(DS3ViewComp *_this,
     glEnd();
     c=view->super.forec;
     if (glwCompIsFocused(&_this->super))c=glwColorBlend(c,DS3V_FOCUS_COLOR);
-    glDepthFunc(GL_ALWAYS);
     glwColor(c);
     glBegin(GL_LINES);
     for (i=0; i<3; i++) {                                        /*Draw each axis*/
@@ -93,7 +92,6 @@ static void ds3ViewAxesPeerDisplay(DS3ViewComp *_this,
         }
     }
     glEnd();
-    glDepthFunc(GL_LESS);
     glPopMatrix();
 }
 
