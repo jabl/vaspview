@@ -170,62 +170,6 @@ void ds3ViewIsoDrawLeaf(DS3IsoDrawCtx *_this,long _leaf,long _offs)
         glDrawElements(GL_TRIANGLES,leaf->nverts,GL_UNSIGNED_INT,leaf->verts);
 }
 
-/*This sets up the parameters for the below function*/
-/*{int           i;
- double        hlen;
- for(i=0;i<3;i++){
-  ds3view->light[i]=(ds3view->rot[1][i]-ds3view->rot[0][i])*0.707106781186547524401;
-  ds3view->eye[i]=ds3view->zoom*(ds3view->hvec[i]=ds3view->rot[2][i]);
-  ds3view->hvec[i]+=ds3view->light[i];
-  ds3view->eye[i]+=ds3view->cntr[i];}
- hlen=vectMag2_3d(ds3view->hvec);
- if(hlen>1E-16)vectMul3d(ds3view->hvec,ds3view->hvec,1/sqrt(hlen));}*/
-
-/*Draw a list of triangles, doing the lighting ourselves instead of letting GL do it.
-  This is equivalent to a two-sided light model, no local viewer, light 0 enabled,
-  all material parameters <1,1,1,0.75>, except the back specular, which is <0,0,0,1>,
-  and a shininess of 16. Because we can special case a great deal, this should be
-  faster than any non-hardware accelerated lighting
-static void ds3ViewIsoDrawLitLeaf(DS3View *_this,long _leaf){
- DS3IsoOctLeaf *leaf;
- DS3IsoVertex  *verts;
- GLint          i;
- verts=_DAGetAt(&_this->iso.verts,0,DS3IsoVertex);
- leaf=(DS3IsoOctLeaf *)_DAGetAt(&_this->iso.leafs,_leaf,GLint);
- for(i=0;i<leaf->nverts;i+=3){
-  Vect3d d0;
-  Vect3d d1;
-  Vect3d n;
-  GLint  j;
-  vectSub3d(d0,verts[leaf->verts[i]].vert,verts[leaf->verts[i+1]].vert);
-  vectSub3d(d1,verts[leaf->verts[i+2]].vert,verts[leaf->verts[i+1]].vert);
-  vectCross3d(n,d0,d1);
-  if(vectDot3d(n,_this->eye)>=vectDot3d(n,verts[leaf->verts[i]].vert)){
-   for(j=i+3;j-->i;){
-    double lum;
-    double ndl;
-    double ndh;
-    lum=0.2+0.15;
-    ndl=vectDot3d(_this->light,verts[leaf->verts[j]].norm);
-    if(ndl>0)lum+=0.65*ndl;
-    ndh=vectDot3d(_this->hvec,verts[leaf->verts[j]].norm);
-    if(ndh>0){
-     ndh*=ndh;
-     ndh*=ndh;
-     ndh*=ndh;
-     ndh*=ndh;
-     lum+=0.5*ndh;}
-    glColor4d(lum,lum,lum,0.75);
-    glArrayElement(leaf->verts[j]);} }
-  else{
-   for(j=i+3;j-->i;){
-    double lum;
-    double ndl;
-    lum=0.2+0.15;
-    ndl=vectDot3d(_this->light,verts[leaf->verts[j]].norm);
-    if(ndl<0)lum-=0.65*ndl;
-    glColor4d(lum,lum,lum,0.75);
-    glArrayElement(leaf->verts[j]);} } } }*/
 
 /*Draws all the children of an oct-tree node which fall at least partially
   within the current clip box. Exact clipping is handled by GL. Children are
