@@ -363,11 +363,13 @@ static void ds3ViewPeerDisplayChildren(DS3View *_this,
 # endif
             glwCompDisplay(&_this->cm_pts.super);
         }
-        if (_this->draw_slice) {                               /*Draw the data slice*/
-            glwCompDisplay(&_this->cm_slice.super);
-        }
         if (_this->draw_iso) {                                /*Draw the iso-surface*/
             glwCompDisplay(&_this->cm_iso.super);
+        }
+	// The slice must be rendered after the iso-surface, since
+	// it's opaque and should thus cull the iso-surface behind it.
+        if (_this->draw_slice) {  /*Draw the data slice*/
+            glwCompDisplay(&_this->cm_slice.super);
         }
         if (_this->draw_coords) {                                /*Draw bounding box*/
             glwCompDisplay(&_this->cm_box.super);

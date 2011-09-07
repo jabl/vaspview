@@ -354,7 +354,7 @@ static void ds3ViewIsoDrawTree(DS3View *_this,DS3IsoDrawCtx *_ctx,
 /*Draws the iso-surface*/
 static void ds3ViewIsoPeerDisplay(DS3ViewComp *_this,const GLWCallbacks *_cb)
 {
-    static const GLfloat COLOR[4]={1.F,1.F,1.F,.75F};
+    static const GLfloat COLOR[4]={1.F,1.F,1.F,.6F};
     DS3View       *view;
     DS3IsoDrawCtx  ctx;
     Vect3d         p;
@@ -403,7 +403,7 @@ static void ds3ViewIsoPeerDisplay(DS3ViewComp *_this,const GLWCallbacks *_cb)
     /*Set up OpenGL parameters*/
     DS3IsoVertex& vert = view->iso.verts[0];
     glPushAttrib(GL_COLOR_BUFFER_BIT|GL_CURRENT_BIT|
-                 GL_ENABLE_BIT|GL_LIGHTING_BIT);
+                 GL_ENABLE_BIT|GL_LIGHTING_BIT|GL_DEPTH_BUFFER_BIT);
     glPushClientAttrib(GL_CLIENT_VERTEX_ARRAY_BIT);
     for (i=0; i<6; i++)glEnable(GL_CLIP_PLANE0+i);
     glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,1);
@@ -415,6 +415,8 @@ static void ds3ViewIsoPeerDisplay(DS3ViewComp *_this,const GLWCallbacks *_cb)
     glEnable(GL_LIGHTING);
     glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
+    // Don't use Z buffer when rendering transparent objects.
+    glDisable(GL_DEPTH_TEST); 
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_NORMAL_ARRAY);
 
