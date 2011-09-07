@@ -286,8 +286,8 @@ static void ds3ViewPeerDisplayChildren(DS3View *_this,
         glScissor(dx,dy,_this->super.bounds.w,_this->super.bounds.h);
         glEnable(GL_SCISSOR_TEST);
         glViewport(dx,dy,_this->super.bounds.w,_this->super.bounds.h);
-        glClear(GL_DEPTH_BUFFER_BIT);
-        glEnable(GL_DEPTH_TEST);
+        glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
         glMatrixMode(GL_PROJECTION);            /*Set up the viewing transformation:*/
         glLoadIdentity();
         aspect=_this->super.bounds.w*DS3V_ASPECT/_this->super.bounds.h;
