@@ -6,8 +6,46 @@ This is an attempt to modernize the old `vaspview
 <http://vaspview.sf.net>`_ application for viewing VASP charge density
 files.
 
-Projects
-========
+Installation
+============
+
+Dependencies
+------------
+
+Vaspview 2 requires the following tools and libraries for building:
+
+- A C++ compiler.
+
+- cmake.
+
+- GLEW.
+
+- GLUT.
+
+- OpenGL libraries (GL and GLU).
+
+On Ubuntu 10.04 you can install everything required by installing the packages
+
+build-essential cmake libglew1.5-dev freeglut3-dev libgl1-mesa-dev
+libglu1-mesa-dev libxi-dev libxmu-dev
+
+On Redhat Enterprise Linux 5 + EPEL repo, you need (at least)
+
+gcc-c++ cmake glew-devel freeglut-devel libXmu-devel
+
+After that, make a directory for building, run cmake and make, e.g.
+
+mkdir build
+cd build
+cmake -D CMAKE_BUILD_TYPE=Release ..
+make
+
+Assuming everything is successful, the binary will be found in
+BUILD_DIRECTORY/src/vaspview .
+
+
+Development Projects
+====================
 
 DONE
 ----
@@ -99,3 +137,5 @@ TODO
   the vertices etc.
 
 - http://www.sci.utah.edu/~bavoil/opengl/vbo/batching/
+
+- Replace builtin GLUT-based widget toolkit with Qt?
