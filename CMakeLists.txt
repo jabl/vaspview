@@ -1,9 +1,9 @@
-# To build release version (1 order of magnitude faster!):
+# To build release version:
 # mkdir build-release
 # cd build-release
-# CXX=g++ cmake -D CMAKE_BUILD_TYPE=Release ..
+# cmake -D CMAKE_BUILD_TYPE=Release ..
 
-cmake_minimum_required (VERSION 2.6)
+cmake_minimum_required (VERSION 2.4)
 
 # For GLEW module
 SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR})
@@ -11,9 +11,9 @@ SET(CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR})
 project (vaspview C CXX)
 
 SUBDIRS (src)
-find_package(GLUT)
-find_package(OpenGL)
-find_package(GLEW)
+find_package(GLUT REQUIRED)
+find_package(OpenGL REQUIRED)
+find_package(GLEW REQUIRED)
 set(GLLIBS ${GLUT_LIBRARY} ${GLEW_LIBRARY} ${OPENGL_LIBRARY} ${X11_LIBRARIES})
 
 # More compiler output
