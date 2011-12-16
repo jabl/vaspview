@@ -563,7 +563,7 @@ static int ds3ViewGetAxesPoint(DS3View *_this,Vect3d _p,double *_t,
             e=64*sqrt(1/e)*_this->zoom;
             if (_this->offs>1E-16)e/=_this->offs;
             for (i=0; i<2; i++)for (j=0; j<3; j++) {
-                    for (k=0; k<3; k++)o[i][j][k]=_this->ds3->basis[k][j]*_this->box[i][j];
+                    for (k=0; k<3; k++)o[i][j][k]=_this->ds3->basis(k,j)*_this->box[i][j];
                 }
             for (i=0; i<8; i++) {
                 vectSet3d(b[i],0,0,0);
@@ -582,7 +582,7 @@ static int ds3ViewGetAxesPoint(DS3View *_this,Vect3d _p,double *_t,
                     }
             for (j=0; j<3; j++)if (_this->box[0][j]>0)vectSet3d(o[0][j],0,0,0);
             for (j=0; j<3; j++)if (_this->box[1][j]<1) {
-                    for (k=0; k<3; k++)o[1][j][k]=_this->ds3->basis[k][j];
+                    for (k=0; k<3; k++)o[1][j][k]=_this->ds3->basis(k, j);
                 }
             for (j=0; j<3; j++) {
                 if (ds3ViewGetRayLineISect(_this,p,&t,_p0,_p1,o[0][j],o[1][j],e)) {
@@ -658,7 +658,7 @@ static int ds3ViewGetPointsPoint(DS3View *_this,Vect3d _p,double *_t,
                         if (ds3ViewGetPointVisible(_this,(long)i)||
                                 ((size_t)_this->track_sp == i && glwCompIsFocused(&_this->cm_pts.super))) {
                             Vect3d p;
-                            Vect3d q;
+			    Vect3d q;
                             double t;
                             for (j=0; j<3; j++) {            /*Make sure point falls within our box*/
                                 double d;
@@ -668,10 +668,15 @@ static int ds3ViewGetPointsPoint(DS3View *_this,Vect3d _p,double *_t,
                             if (j!=3)continue;
                             /*It would probably be faster to back-transform the ray into data-set
                               coordinates, but the basis matrix is not guaranteed to be invertible*/
-                            vectSet3d(q,_this->ds3->points[i].pos[X]+x[X],
+			    vectSet3d(q,_this->ds3->points[i].pos[X]+x[X],
                                       _this->ds3->points[i].pos[Y]+x[Y],
                                       _this->ds3->points[i].pos[Z]+x[Z]);
-                            for (j=0; j<3; j++)p[j]=vectDot3d(_this->ds3->basis[j],q);
+			    for (j=0; j<3; j++) {
+				Vect3d tmp;
+				Eigen::Vector3f t2 = _this->ds3->basis.col(j);
+				vectSet3d(tmp, t2(X), t2(Y), t2(Z));
+				p[j]=vectDot3d(tmp,q);
+			    }
                             if (ds3ViewRaySphereISect(_this,p,&t,_p0,_p1,p,_this->point_r)) {
                                 if (!ret||t<*_t) {
                                     _this->track_mp=(long)i;
@@ -786,8 +791,12 @@ static int ds3ViewGetBondsPoint(DS3View *_this,Vect3d _p,double *_t,
                                         }
                                         if (l!=3)continue;
                                         for (l=0; l<3; l++) {       /*Transform points into world-coordinates*/
-                                            p0[l]=vectDot3d(_this->ds3->basis[l],q0);
-                                            p1[l]=vectDot3d(_this->ds3->basis[l],q1);
+					    Eigen::Vector3f tmp = _this->ds3->basis.col(l);
+					    Vect3d tmp2;
+					    vectSet3d(tmp2, tmp(X), tmp(Y), tmp(Z));
+
+                                            p0[l]=vectDot3d(tmp2, q0);
+                                            p1[l]=vectDot3d(tmp2, q1);
                                         }
                                         if (ds3ViewGetRayLineISect(_this,p,&t,_p0,_p1,p0,p1,
                                                                    bonds->bonds[i]*_this->point_r+e)) {
@@ -974,7 +983,8 @@ static int ds3ViewPeerMouse(DS3View *_this,const GLWCallbacks *_cb,
                         vectMul3d(p,p,0.5);
                         for (i=0; i<3; i++) {
                             c[i]=0;
-                            for (j=0; j<3; j++)c[i]+=_this->ds3->basis[j][i]*p[j];
+                            for (j=0; j<3; j++)
+				c[i] += _this->ds3->basis(j, i) * p[j];
                         }
                         ds3ViewSetCenter(_this,c[X],c[Y],c[Z]);
                         vectSub3d(p,box[1],box[0]);
@@ -1307,14 +1317,17 @@ int ds3ViewSetDataSet(DS3View *_this,DataSet3D *_ds3) {
     _this->ds3=_ds3;
     /*Invert basis matrix (needed for correct iso-surface drawing order)*/
     if (_ds3==NULL)for (i=0; i<3; i++)for (j=0; j<3; j++)_this->basinv[i][j]=i==j;
-    else dsMatrix3x3Inv(_ds3->basis,_this->basinv);
+    else {
+	Eigen::Map<Eigen::Matrix3d> bi(&_this->basinv[0][0]);
+	bi = _ds3->basis.inverse().cast<double>();
+    }
     if (_ds3!=NULL) {
         size_t k;
-        _this->offs=vectMag2_3d(_ds3->center);
+        _this->offs = _ds3->center.squaredNorm();
         for (i=0; i<3; i++) {
             Vect3d diff;
             double d;
-            for (j=0; j<3; j++)diff[j]=_ds3->basis[j][i]-_ds3->center[j];
+            for (j=0; j<3; j++)diff[j]=_ds3->basis(j, i) - _ds3->center(j);
             d=vectMag2_3d(diff);
             if (d>_this->offs)_this->offs=d;
         }
@@ -1322,7 +1335,7 @@ int ds3ViewSetDataSet(DS3View *_this,DataSet3D *_ds3) {
         ds3SliceInit(&_this->slice,_ds3->density);
         _this->iso.init(_ds3->density);
         for (i=0; i<3; i++) {
-            for (j=0; j<3; j++)_this->basis[(j<<2)+i]=_ds3->basis[i][j];
+            for (j=0; j<3; j++)_this->basis[(j<<2)+i]=_ds3->basis(i, j);
             _this->basis[(i<<2)+3]=0;
             _this->basis[(3<<2)+i]=0;
         }

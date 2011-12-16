@@ -29,9 +29,9 @@
 // Padding fields are to make the structure 32-byte aligned, which is
 // preferred by some GPU's.
 struct DS3IsoVertex {
-    Vect3f vert;
+    float vert[3];
     float pad1;
-    Vect3f norm; // 16 byte aligned, in case it matters?
+    float norm[3]; // 16 byte aligned, in case it matters?
     float pad2; 
 };
 

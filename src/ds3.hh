@@ -19,6 +19,7 @@
 #ifndef DS3_HH
 #define DS3_HH
 
+
 #include "glinc.hh"
 #include <stddef.h>
 #include <stdlib.h>
@@ -26,12 +27,19 @@
 #include <ctype.h>
 #include <errno.h>
 #include <limits.h>
+
 #include <math.h>
 #include <string.h>
 #include "glw.hh"
+
+// Eigen must be included before vect.hh, otherwise mysterious errors..
+#include <Eigen/Core>
+#include <Eigen/Geometry>
+
 #include "vect.hh"
 #include <string>
 #include <vector>
+
 
 # if !defined(M_PI)
 #  define M_PI (3.141592653589793238462643)
@@ -88,8 +96,8 @@ public:
     std::string name;               /*Name of the data set*/
     std::string label[4];           /*Label of three axes and data*/
     std::string units[4];           /*Units for three axes and data*/
-    Vect3d          basis[3];       /*Basis vectors for lattice*/
-    Vect3d          center;         /*Center of the lattice*/
+    Eigen::Matrix3f basis;          /*Basis vectors for lattice, as column vectors in matrix. */
+    Eigen::Vector3f center;         /*Center of the lattice*/
     size_t          npoints;        /*Number of points*/
     std::vector<DSPoint3D> points;  /*Discrete points*/
     size_t          density[3];     //Dimensions of packed array of data values

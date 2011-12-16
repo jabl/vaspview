@@ -43,14 +43,14 @@ DS3VaspReader::DS3VaspReader(const char* file_name, const char* mode)
     /*Read the basis for the box*/
     for (i=0; i<3; i++) {
         for (j=0; j<3; j++)
-            if (fscanf(file.f,"%lf", ds3->basis[j] + i) < 1)
+            if (fscanf(file.f,"%f", &ds3->basis(j, i)) < 1)
                 goto err;
     }
-    for (i=0; i<3; i++)vectMul3d(ds3->basis[i],ds3->basis[i],scale);
+    ds3->basis *= scale;
     if (fscanf(file.f," ")<0)goto err;
-    vectSet3d(ds3->center,0,0,0);
-    for (i=0; i<3; i++)vectAdd3d(ds3->center,ds3->center,ds3->basis[i]);
-    vectMul3d(ds3->center,ds3->center,0.5);
+    ds3->center.setZero();
+    for (i=0; i<3; i++) ds3->center += ds3->basis.col(i);
+    ds3->center *= 0.5f;
     /*Read the atom types*/
     if (!file.fgets(str)) goto err;
     trimlr(str);
@@ -89,15 +89,15 @@ DS3VaspReader::DS3VaspReader(const char* file_name, const char* mode)
     case 'c': {                                                         /*"Cart"*/
         /*Cart coordinates are regular cartesian, but should be scaled by the
           universal scaling factor. We convert them to Direct coordinates.*/
-        Vect3d basinv[3];
-        dsMatrix3x3Inv(ds3->basis,basinv);
+	Eigen::Matrix3f basinv = ds3->basis.inverse();
         for (k = 0,i = 0; k < atypes.size(); k++) {
             double col;
             col=k*d;
             for (int ll = atypes[k]; ll-- > 0; i++) {
-                Vect3d pos;
-                for (j=0; j<3; j++)if (fscanf(file.f,"%lf",&pos[j])<1)goto err;
-                for (j=0; j<3; j++)ds3->points[i].pos[j]=scale*vectDot3d(pos,basinv[j]);
+		Eigen::Vector3f pos;
+                for (j=0; j<3; j++)if (fscanf(file.f,"%f",&pos[j])<1)goto err;
+                for (j=0; j<3; j++) 
+		    ds3->points[i].pos[j] = scale * pos.dot(basinv.col(j));
                 ds3->points[i].typ=(int)k;
                 ds3->points[i].col=col;
             }

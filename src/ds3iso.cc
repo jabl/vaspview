@@ -114,24 +114,17 @@ void DS3IsoSurface::xForm(DataSet3D *_ds3)
 {
     for (std::vector<DS3IsoVertex>::iterator it = this->verts.begin();
             it != this->verts.end(); ++it) {
-        Vect3d p, tmp;
-        double m;
-        int    j;
         DS3IsoVertex& vert = *it;
-        for (int ii = 0; ii < 3; ++ii)
-            p[ii] = vert.vert[ii];
-        for (j = 0; j < 3; j++) vert.vert[j] = vectDot3d(_ds3->basis[j], p);
-
-        for (int ii = 0; ii < 3; ++ii)
-            tmp[ii] = vert.norm[ii];
-        for (j = 0; j < 3; j++) p[j] = vectDot3d(_ds3->basis[j], tmp);
-        m=vectMag2_3d(p);
-        if (m < 1E-100) vectSet3f(vert.norm, 0, 0, 1);
-        else {
-            double rsqrtm = 1/sqrt(m);
-            for (int ii = 0; ii < 3; ++ii)
-                vert.norm[ii] = p[ii] * rsqrtm;
-        }
+	Eigen::Map<Eigen::Vector3f> vertex(vert.vert);
+	Eigen::Matrix3f bt = _ds3->basis.transpose();
+	vertex = bt * vertex;
+	Eigen::Map<Eigen::Vector3f> norm(vert.norm);
+	Eigen::Vector3f tmp = bt * norm;
+	float m = tmp.squaredNorm();
+        if (m < 1E-10) 
+	    norm << 0, 0, 1;
+        else
+	    norm = tmp / sqrt(m);
     }
 }
 
@@ -259,7 +252,7 @@ static void ds3ViewIsoDrawTree(DS3View *_this,DS3IsoDrawCtx *_ctx,
 
     vectSet3d(p,0,0,0);
     for (i=0; i<3; i++) {
-        for (j=0; j<3; j++)p[j]+=_this->ds3->basis[j][i]*_box[0][i];
+        for (j=0; j<3; j++)p[j]+=_this->ds3->basis(j,i)*_box[0][i];
         _ctx->cntr[i]=(_ctx->iso->dim>>1)+_box[0][i]*_this->ds3->density[i];
     }
     if (use_vbo) {

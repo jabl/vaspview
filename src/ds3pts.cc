@@ -90,7 +90,10 @@ static void ds3ViewPointsPeerDisplay(DS3ViewComp *_this,
                             vectSet3d(o,view->ds3->points[i].pos[X]+x[X],
                                       view->ds3->points[i].pos[Y]+x[Y],
                                       view->ds3->points[i].pos[Z]+x[Z]);
-                            for (j=0; j<3; j++)p[j]=vectDot3d(view->ds3->basis[j],o);
+                            for (j=0; j<3; j++) {
+				Eigen::Vector3d tmp = view->ds3->basis.col(j).cast<double>();
+				p[j]=vectDot3d(tmp.data(), o);
+			    }
                             glTranslated(p[X],p[Y],p[Z]);
                             gluSphere(q,r,detail,detail);
                             glPopMatrix();
@@ -213,7 +216,8 @@ static int ds3ViewPointsPeerSpecial(DS3ViewComp *_this,
                     Vect3d p;
                     int    i;
                     for (i=0; i<3; i++) {
-                        p[i]=vectDot3d(view->ds3->points[l].pos,view->ds3->basis[i]);
+			Eigen::Vector3d tmp = view->ds3->basis.col(i).cast<double>(); 
+                        p[i]=vectDot3d(view->ds3->points[l].pos, tmp.data());
                     }
                     ds3ViewSetCenter(view,p[X],p[Y],p[Z]);
                     ds3ViewSetZoom(view,view->zoom*0.5);

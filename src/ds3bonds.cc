@@ -139,8 +139,9 @@ static void ds3ViewBondsPeerDisplay(DS3ViewComp *_this,
                                         }
                                         if (l!=3)continue;
                                         for (l=0; l<3; l++) {        /*Transform points into world-coordinates*/
-                                            p0[l]=vectDot3d(view->ds3->basis[l],q0);
-                                            p1[l]=vectDot3d(view->ds3->basis[l],q1);
+					    Eigen::Vector3d tmp = view->ds3->basis.col(l).cast<double>();
+					    p0[l] = vectDot3d(tmp.data(), q0);
+					    p1[l] = vectDot3d(tmp.data(), q0);
                                         }
                                         vectSub3d(q0,p1,p0);
                                         d=vectMag2_3d(q0);
