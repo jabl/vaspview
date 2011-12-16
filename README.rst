@@ -1,8 +1,8 @@
-============
-Vaspview 2.x
-============
+==========
+Vaspview 2
+==========
 
-This is an attempt to modernize the old `vaspview
+This is an experiment to modernize the old `vaspview
 <http://vaspview.sf.net>`_ application for viewing VASP charge density
 files.
 
@@ -66,7 +66,7 @@ DONE
   hardware (e.g. NVIDIA Fermi and later) doubles are an order of
   magnitude slower.
 
-- Added pad fields so that the vertex structure is be a multiple of 32
+- Added pad fields so that the vertex structure is a multiple of 32
   bytes in size (previously 24 with GL_FLOAT, 48 with GL_DOUBLE); this
   is supposedly better on Ati according to
   http://www.opengl.org/wiki/Vertex_Buffer_Object
@@ -76,10 +76,11 @@ DONE
   replacing CHashTable with std::map (std::unordered_map in C++2011
   would be even better, but it doesn't matter performance-wise). Also,
   switching object allocation and destruction to new/delete and
-  contained objects allows simplified resource management (RAII).
+  classes with constructors and destructors simplifies the code a bit.
 
-- Use Vertex Buffer Objects (VBO) for uploading isosurface data to the
-  GPU. Time spent in ds3ViewIsoDrawNode dropped from 38% to 11%, nice!
+- Optionally use Vertex Buffer Objects (VBO) for uploading isosurface
+  data to the GPU. Time spent in ds3ViewIsoDrawNode dropped from 38%
+  to 11%, nice!
 
 - Use CMAKE for building.
 
@@ -97,10 +98,11 @@ DONE
 
 - Removed old 2D slice texture generation-on-CPU codepath, as all
   current hardware supports EXT_texture3D (part of OpenGL 1.2 core),
-  and the fallback is unusably slow and buggy. Tested on GeForce 2MX
+  and the fallback was unusably slow and buggy. Tested on GeForce 2MX
   and Radeon 9200, both ~10 year old HW in 2011, and both support 3D
   textures.
 
+- Fix a bunch of bugs wrt using uninitialized memory.
 
 TODO
 ====
@@ -133,9 +135,13 @@ TODO
 
 - Supposedly element rendering is faster if the indices are
   GL_UNSIGNED_SHORT rather than GL_UNSIGNED_INT. Since it's easy to
-  have more than 2**64 vertices, this would imply batching and sorting
+  have more than 2**16 vertices, this would imply batching and sorting
   the vertices etc.
 
 - http://www.sci.utah.edu/~bavoil/opengl/vbo/batching/
 
 - Replace builtin GLUT-based widget toolkit with Qt?
+
+- Better use of RAII, per 'good' C++ style. This is, unfortunately,
+  tedious as currently object ownership and lifetimes are not very
+  clear.
