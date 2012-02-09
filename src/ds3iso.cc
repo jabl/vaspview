@@ -134,9 +134,9 @@ typedef struct DS3IsoDrawCtx {
     DS3IsoSurface *iso;           /*The iso-surface to draw*/
     long           cntr[3];       /*The data-set coordinates of the center of the current oct-tree node*/
     GLsizeiptr ibo_off; // Current offset into the index buffer
-    Eigen::Vector3f         box[2];                 /*The clip box in data-set coordinates*/
-    Eigen::Vector3f         eye;
-    Eigen::Vector3f trans;  // Current translation vector
+    Vect3d         box[2];                 /*The clip box in data-set coordinates*/
+    Vect3d         eye;
+    Vect3d trans;  // Current translation vector
 } DS3IsoDrawCtx; /*The eye position in data-set coordinates*/
 
 
@@ -223,6 +223,7 @@ static void ds3ViewIsoDrawNode(DS3IsoDrawCtx *_this,long _node,long _offs)
 static void ds3ViewIsoDrawTree(DS3View *_this,DS3IsoDrawCtx *_ctx,
                                int _box[2][3])
 {
+    Vect3d p;
     int    i;
     int    j;
     /*If we're not in a 1x1x1 box, split it up and recurse*/
@@ -249,13 +250,14 @@ static void ds3ViewIsoDrawTree(DS3View *_this,DS3IsoDrawCtx *_ctx,
         }
     /*We are in a 1x1x1 box: draw a copy of the iso-surface*/
 
-    Eigen::Vector3f p(0, 0, 0);
+    vectSet3d(p,0,0,0);
     for (i=0; i<3; i++) {
         for (j=0; j<3; j++)p[j]+=_this->ds3->basis(j,i)*_box[0][i];
         _ctx->cntr[i]=(_ctx->iso->dim>>1)+_box[0][i]*_this->ds3->density[i];
     }
     if (use_vbo) {
-	Eigen::Vector3f tmp = p - _ctx->trans;
+        Vect3d tmp;
+        vectSub3d(tmp, p, _ctx->trans);
         if (tmp[X] != 0 || tmp[Y] != 0 || tmp[Z] != 0) {
             // When we change the translation vector, we must first
             // paint all the vertices that have been accumulated in
@@ -267,9 +269,9 @@ static void ds3ViewIsoDrawTree(DS3View *_this,DS3IsoDrawCtx *_ctx,
             _ctx->ibo_off = 0;
             // Then we set the translation to the difference between
             // the new and current vectors.
-            glTranslatef(tmp[X], tmp[Y], tmp[Z]);
+            glTranslated(tmp[X], tmp[Y], tmp[Z]);
             // Finally set the current vector to the offset from zero.
-            _ctx->trans = p;
+            vectSet3dv(_ctx->trans, p);
         }
         // .. and continue filling in the element buffer.
         ds3ViewIsoDrawNode(_ctx,0,_ctx->iso->dim>>1);
@@ -277,7 +279,7 @@ static void ds3ViewIsoDrawTree(DS3View *_this,DS3IsoDrawCtx *_ctx,
         // Without VBO's, it's a bit simpler, first we save the old matrix.
         glPushMatrix();
         // Then set the new one with the translation vector.
-        glTranslatef(p[X],p[Y],p[Z]);
+        glTranslated(p[X],p[Y],p[Z]);
         // Paint.
         ds3ViewIsoDrawNode(_ctx,0,_ctx->iso->dim>>1);
         // Restore the old matrix.
@@ -292,7 +294,7 @@ static void ds3ViewIsoPeerDisplay(DS3ViewComp *_this,const GLWCallbacks *_cb)
     static const GLfloat COLOR[4]={1.F,1.F,1.F,.6F};
     DS3View       *view;
     DS3IsoDrawCtx  ctx;
-    Eigen::Vector3f         p;
+    Vect3d         p;
     int            i;
     int            j;
     int            box[2][3];
@@ -316,18 +318,17 @@ static void ds3ViewIsoPeerDisplay(DS3ViewComp *_this,const GLWCallbacks *_cb)
     switch (view->proj) {
     case DS3V_PROJECT_ORTHOGRAPHIC: {
         /*Approximate being really, really, far away*/
-	//vectMul3d(p,view->rot[2],(1+view->zoom)*65536);
-        p = view->rot[2] * (1 + view->zoom) * 65536;
+        vectMul3d(p,view->rot[2],(1+view->zoom)*65536);
     }
     break;
     /*case DS3V_PROJECT_PERSPECTIVE :*/
     default                       : {
-        p = view->rot[2] * view->zoom;
+        vectMul3d(p,view->rot[2],view->zoom);
     }
     }
-    p += view->cntr;
+    vectAdd3d(p,p,view->cntr);
     for (i=0; i<3; i++) {
-        ctx.eye[i] = p.dot(view->basinv[i]);
+        ctx.eye[i]=vectDot3d(p,view->basinv[i]);
         ctx.eye[i]*=view->ds3->density[i];
     }
     /*Figure out what region to tile with surfaces*/
@@ -361,7 +362,7 @@ static void ds3ViewIsoPeerDisplay(DS3ViewComp *_this,const GLWCallbacks *_cb)
     static bool vboinit;
     if (use_vbo) {
         ctx.ibo_off = 0;
-        ctx.trans << 0, 0, 0;
+        vectSet3d(ctx.trans,0,0,0);
         glPushMatrix();
         if (!vboinit) {
             glGenBuffersARB(1, &vboid);

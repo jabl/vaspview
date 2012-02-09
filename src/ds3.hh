@@ -74,9 +74,9 @@ typedef double   (*DSUnscaleFunc)(const DSDataScale *_this,double _v);
 
 
 struct DSPoint3D {
-    Eigen::Vector3f   pos;
-    double   col;
+    Vect3d   pos;
     int      typ;
+    double   col;
 };
 
 

@@ -109,17 +109,17 @@ static void ds3ViewBondsPeerDisplay(DS3ViewComp *_this,
                             if (ds3ViewGetPointVisible(view,j)) {
                                 for (k=j+1; k<bonds->natoms; k++,i++) {
                                     if (ds3ViewGetPointVisible(view,k)&&bonds->bonds[i]>0) {
-					Eigen::Vector3f p0;
-                                        Eigen::Vector3f p1;
-                                        Eigen::Vector3f q0;
-                                        Eigen::Vector3f q1;
-                                        float d;
-                                        q0 << view->ds3->points[j].pos[X]+x[X],
-					    view->ds3->points[j].pos[Y]+x[Y],
-					    view->ds3->points[j].pos[Z]+x[Z];
-                                        q1 << view->ds3->points[k].pos[X]+x[X],
-					    view->ds3->points[k].pos[Y]+x[Y],
-					    view->ds3->points[k].pos[Z]+x[Z];
+                                        Vect3d p0;
+                                        Vect3d p1;
+                                        Vect3d q0;
+                                        Vect3d q1;
+                                        double d;
+                                        vectSet3d(q0,view->ds3->points[j].pos[X]+x[X],
+                                                  view->ds3->points[j].pos[Y]+x[Y],
+                                                  view->ds3->points[j].pos[Z]+x[Z]);
+                                        vectSet3d(q1,view->ds3->points[k].pos[X]+x[X],
+                                                  view->ds3->points[k].pos[Y]+x[Y],
+                                                  view->ds3->points[k].pos[Z]+x[Z]);
                                         for (l=0; l<3; l++) {
                                             d=q0[l]-q1[l];
                                             if (d<-0.5)q0[l]+=1;
@@ -139,12 +139,12 @@ static void ds3ViewBondsPeerDisplay(DS3ViewComp *_this,
                                         }
                                         if (l!=3)continue;
                                         for (l=0; l<3; l++) {        /*Transform points into world-coordinates*/
-					    Eigen::Vector3f tmp = view->ds3->basis.col(l);
-					    p0[l] = tmp.dot(q0);
-					    p1[l] = tmp.dot(q1);
+					    Eigen::Vector3d tmp = view->ds3->basis.col(l).cast<double>();
+					    p0[l] = vectDot3d(tmp.data(), q0);
+					    p1[l] = vectDot3d(tmp.data(), q0);
                                         }
-                                        q0 = p1 - p0;
-					d = q0.squaredNorm();
+                                        vectSub3d(q0,p1,p0);
+                                        d=vectMag2_3d(q0);
                                         if (d>1E-100) {
                                             GLWcolor c;
                                             double   r;
@@ -168,12 +168,12 @@ static void ds3ViewBondsPeerDisplay(DS3ViewComp *_this,
                                                 r+=0.05*view->point_r;
                                             }
                                             d=sqrt(d);
-					    q0 *= 1/d;
+                                            vectMul3d(q0,q0,1/d);
                                             glwColor(c);
                                             glPushMatrix();
-                                            glTranslatef(p0[X],p0[Y],p0[Z]);
-                                            glRotatef(atan2(q0[X],q0[Z])*(180/M_PI),0,1,0);
-                                            glRotatef(-atan2(q0[Y],sqrt(q0[Z]*q0[Z]+q0[X]*q0[X]))*(180/M_PI),
+                                            glTranslated(p0[X],p0[Y],p0[Z]);
+                                            glRotated(atan2(q0[X],q0[Z])*(180/M_PI),0,1,0);
+                                            glRotated(-atan2(q0[Y],sqrt(q0[Z]*q0[Z]+q0[X]*q0[X]))*(180/M_PI),
                                                       1,0,0);
                                             gluCylinder(q,r,r,d,detail,1);
                                             glPopMatrix();

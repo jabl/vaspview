@@ -70,21 +70,22 @@ static void ds3ViewAxesPeerDisplay(DS3ViewComp *_this,
     glBegin(GL_LINES);
     for (i=0; i<3; i++) {                                        /*Draw each axis*/
         static const int next[3]={1,2,0};
-	Eigen::Vector3f d(0, 0, 0);
+        Vect3d   d;
+        vectSet3d(d,0,0,0);
         d[i]=b[0][i];
         if (view->track_ax==i&&glwCompIsCapturing(&_this->super)) {
             glwColor(glwColorBlend(view->super.forec,DS3V_CAPTURE_COLOR));
         }
-        glVertex3fv(d.data());
+        glVertex3dv(d);
         d[i]=b[1][i];
-        glVertex3fv(d.data());
+        glVertex3dv(d);
         for (j=next[i]; j!=i; j=next[j]) {                        /*Add arrow heads*/
             d[i]-=0.05;
             d[j]+=0.05;
-            glVertex3fv(d.data());
+            glVertex3dv(d);
             d[i]+=0.05;
             d[j]-=0.05;
-            glVertex3fv(d.data());
+            glVertex3dv(d);
         }
         if (view->track_ax==i&&glwCompIsCapturing(&_this->super)) {
             glwColor(c);
@@ -94,7 +95,7 @@ static void ds3ViewAxesPeerDisplay(DS3ViewComp *_this,
     glPopMatrix();
 }
 
-static void ds3ViewGetTrackCoords(DS3View *_this,int _x,int _y, Eigen::Vector3f _track)
+static void ds3ViewGetTrackCoords(DS3View *_this,int _x,int _y,Vect3d _track)
 {
     if (_this->super.bounds.w>0&&_this->super.bounds.h>0) {
         double aspect;
@@ -117,8 +118,8 @@ static void ds3ViewGetTrackCoords(DS3View *_this,int _x,int _y, Eigen::Vector3f 
             d=1-dx*dx-dy*dy;
             if (d<0) {
                 d=sqrt(1-d);
-		_track << dx/d, dy/d, 0;
-            } else _track << dx, dy, _this->track_rt * sqrt(d);
+                vectSet3d(_track,dx/d,dy/d,0);
+            } else vectSet3d(_track,dx,dy,_this->track_rt*sqrt(d));
         }
         break;
         /*case DS3V_PROJECT_PERSPECTIVE :*/
@@ -134,18 +135,18 @@ static void ds3ViewGetTrackCoords(DS3View *_this,int _x,int _y, Eigen::Vector3f 
             if (d<0) {
                 double f;
                 f=1-z*z;
-                if (f>=0||!e) _track << 0, 0, 1;
+                if (f>=0||!e)vectSet3d(_track,0,0,1);
                 else {
                     c=sqrt(-e*f)/(z*e);
-                    _track << dx*c, dy*c, 1/z;
+                    vectSet3d(_track,dx*c,dy*c,1/z);
                 }
             } else {
                 d=(-b+_this->track_rt*sqrt(d))/(2*a);
-                _track << dx*(z-d), dy*(z-d), d;
+                vectSet3d(_track,dx*(z-d),dy*(z-d),d);
             }
         }
         }
-    } else _track << 0, 0, 1;
+    } else vectSet3d(_track,0,0,1);
 }
 
 /*Composes an additional rotation onto the given view orientation, and sets
@@ -363,13 +364,12 @@ static int ds3ViewAxesPeerSpecial(DS3ViewComp *_this,const GLWCallbacks *_cb,
         }
         if (ret<0) {
             if (axis) {
-		Eigen::Vector3f c;
+                Vect3d c;
                 double d;
                 d=view->zoom<0.05*view->offs?0.05*view->offs:view->zoom;
-                if (axis<0)
-		    c = view->rot[-1-axis] * (-DS3V_UNIT_DIST)*d;
-                else c = view->rot[axis-1] * DS3V_UNIT_DIST*d;
-                c += view->cntr;
+                if (axis<0)vectMul3d(c,view->rot[-1-axis],-DS3V_UNIT_DIST*d);
+                else vectMul3d(c,view->rot[axis-1],DS3V_UNIT_DIST*d);
+                vectAdd3d(c,c,view->cntr);
                 ds3ViewSetCenter(view,c[X],c[Y],c[Z]);
             }
         } else ret=glwCompSuperSpecial(&_this->super,_cb,_k,_x,_y);
@@ -385,25 +385,22 @@ static int ds3ViewAxesPeerMouse(DS3ViewComp *_this,const GLWCallbacks *_cb,
     ret=glwCompSuperMouse(&_this->super,_cb,_b,_s,_x,_y);
     if (ret>=0&&_b==GLUT_LEFT_BUTTON&&_s) {
         DS3View *view;
-	Eigen::Vector3f p;
-	Eigen::Vector3f q;
+        Vect3d   p;
+        Vect3d   q;
         int      i;
         view=_this->ds3view;
-        p = view->track_pt - view->cntr;
-        for (i=0; i<3; i++)
-	    view->track_an[i] = view->rot.col(i).dot(p);
-        view->track_rd = view_track_an.norm();
-        if (view->track_rd<1E-16)
-	    view->track_an << 0,0,1;
-        else view->track_an *= 1/view->track_rd;
+        vectSub3d(p,view->track_pt,view->cntr);
+        for (i=0; i<3; i++)view->track_an[i]=vectDot3d(view->rot[i],p);
+        view->track_rd=vectMag3d(view->track_an);
+        if (view->track_rd<1E-16)vectSet3d(view->track_an,0,0,1);
+        else vectMul3d(view->track_an,view->track_an,1/view->track_rd);
         view->track_rt=-1;
         ds3ViewGetTrackCoords(view,_x,_y,p);
-	p -= view->track_an;
+        vectSub3d(p,p,view->track_an);
         view->track_rt=1;
         ds3ViewGetTrackCoords(view,_x,_y,q);
-        q -= view->track_an;
-        if (p.squaredNorm() < q.squaredNorm())
-	    view->track_rt = -1;
+        vectSub3d(q,q,view->track_an);
+        if (vectMag2_3d(p)<vectMag2_3d(q))view->track_rt=-1;
         view->track_r=view->roll;
         view->track_p=view->pitch;
         view->track_y=view->yaw;
@@ -420,14 +417,13 @@ static int ds3ViewAxesPeerMotion(DS3ViewComp *_this,const GLWCallbacks *_cb,
     ret=glwCompSuperMotion(&_this->super,_cb,_x,_y);
     if (ret>=0&&(_this->super.mouse_b&1<<GLUT_LEFT_BUTTON)) {
         DS3View *view;
-        Eigen::Vector3f p;
-        Eigen::Vector3f axis;
-        float   qs;
+        Vect3d   p;
+        Vect3d   axis;
+        double   qs;
         view=_this->ds3view;
         ds3ViewGetTrackCoords(view,_x,_y,p);
-        //vectCross3d(axis,view->track_an,p);
-	axis = view->track_an.cross(p);
-        qs = axis.norm();
+        vectCross3d(axis,view->track_an,p);
+        qs=vectMag3d(axis);
         if (qs<1E-8) {
             ds3ViewSetOrientation(view,view->track_y,
                                   view->track_p,view->track_r);
@@ -435,16 +431,15 @@ static int ds3ViewAxesPeerMotion(DS3ViewComp *_this,const GLWCallbacks *_cb,
             double qc;
             double q[3][3];
             int    i,j;
-            axis *= 1/qs;
+            vectMul3d(axis,axis,1/qs);
             if (qs>1)qs=1;
             qc=sqrt(1-qs*qs);
-            if (view->track_an.dot(p) < 0) 
-		qc = -qc;
+            if (vectDot3d(view->track_an,p)<0)qc=-qc;
             for (i=0; i<3; i++) {
                 for (j=0; j<3; j++)q[i][j]=axis[i]*axis[j]*(1-qc);
                 q[i][i]+=qc;
             }
-            axis *= qs;
+            vectMul3d(axis,axis,qs);
             q[1][2]-=axis[0];
             q[2][1]+=axis[0];
             q[2][0]-=axis[1];
