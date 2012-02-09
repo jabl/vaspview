@@ -2189,8 +2189,8 @@ void ds3ViewerSetCenter(DS3Viewer *_this,double _x,double _y,double _z)
     Vect3d cntr;
     int    i;
     for (i=0; i<3; i++) {
-        cntr[i] = _this->ds3->basis(i, X) * _x + _this->ds3->basis(i, Y) * _y
-	    + _this->ds3->basis(i, Z) * _z;
+        cntr[i] = _this->ds3->basis[i][X] * _x + _this->ds3->basis[i][Y] * _y
+                  + _this->ds3->basis[i][Z] * _z;
     }
     ds3ViewSetCenterChangedFunc(_this->ds3view,NULL);
     ds3ViewSetCenter(_this->ds3view,cntr[X],cntr[Y],cntr[Z]);

@@ -26,8 +26,10 @@ bool use_vbo;
 /*Initializes the data set to default values*/
 DataSet3D::DataSet3D()
 {
-    this->basis.setIdentity();
-    this->center.setConstant(0.5f);
+    vectSet3d(this->basis[0],1,0,0);
+    vectSet3d(this->basis[1],0,1,0);
+    vectSet3d(this->basis[2],0,0,1);
+    vectSet3d(this->center,0.5,0.5,0.5);
     this->npoints=0;
     this->density[0]=this->density[1]=this->density[2]=0;
     this->min=0;

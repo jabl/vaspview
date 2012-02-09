@@ -297,10 +297,9 @@ static void ds3ViewGetSliceTrackCoords(DS3View *_this,Vect3d _track,
     double a,b,c,d,r;
     r=_this->track_rd;
     r=r>1E-16?1/r:1;
-    Eigen::Vector3d center = _this->ds3->center.cast<double>();
-    vectSub3d(p0,_p0, center.data());
+    vectSub3d(p0,_p0,_this->ds3->center);
     vectMul3d(p0,p0,r);
-    vectSub3d(p1,_p1, center.data());
+    vectSub3d(p1,_p1,_this->ds3->center);
     vectMul3d(p1,p1,r);
     vectSub3d(dp,p1,p0);
     a=vectMag2_3d(dp);
@@ -493,8 +492,7 @@ static int ds3ViewSlicePeerMouse(DS3ViewComp *_this,const GLWCallbacks *_cb,
         Vect3d   p;
         Vect3d   q;
         view=_this->ds3view;
-	Eigen::Vector3d cent = view->ds3->center.cast<double>();
-        vectSub3d(view->track_an,view->track_pt, cent.data());
+        vectSub3d(view->track_an,view->track_pt,view->ds3->center);
         view->track_rd=vectMag3d(view->track_an);
         if (view->track_rd<1E-16)vectSet3d(view->track_an,0,0,1);
         else vectMul3d(view->track_an,view->track_an,1/view->track_rd);
