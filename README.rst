@@ -35,10 +35,10 @@ gcc-c++ cmake glew-devel freeglut-devel libXmu-devel
 
 After that, make a directory for building, run cmake and make, e.g.
 
-mkdir build
-cd build
-cmake -D CMAKE_BUILD_TYPE=Release ..
-make
+- mkdir build
+- cd build
+- cmake -D CMAKE_BUILD_TYPE=Release ..
+- make
 
 Assuming everything is successful, the binary will be found in
 BUILD_DIRECTORY/src/vaspview .
