@@ -54,7 +54,7 @@ private:
 
 struct DS3ViewParams {
     double box[2][3];
-    Vect3d cntr;
+    Eigen::Vector3f cntr;
     double zoom;
 };
 
@@ -102,10 +102,10 @@ struct DS3View {
     DS3IsoSurface  iso;
     /*Cached information*/
     double         offs;              /*Radius of smallest enclosing sphere*/
-    double         rot[3][3]; /*Rotation matrix for orientation around cntr*/
-    double         basis[16];                   /*GL-formatted basis matrix*/
-    double         basinv[3][3];                    /*Inverted basis matrix*/
-    double         strans[3][4];              /*Slice transformation matrix*/
+    Eigen::Matrix3f rot;   /*Rotation matrix for orientation around cntr*/
+    Eigen::Affine3f basis;                   /*GL-formatted basis matrix*/
+    Eigen::Matrix3f basinv;                  /*Inverted basis matrix*/
+    Eigen::Matrix<float, 3, 4> strans;       /*Slice transformation matrix*/
     std::vector<DS3ViewParams>  view_stack;  /*Saved clip boxes*/
     /*Viewing parameters*/
     double         point_r;                                  /*Point radius*/
@@ -117,7 +117,7 @@ struct DS3View {
     /*Position/orientation parameters*/
     int            proj;                                  /*Projection type*/
     double         zoom;                   /*Distance from point to look at*/
-    Vect3d         cntr;                                 /*Point to look at*/
+    Eigen::Vector3f cntr;                                /*Point to look at*/
     double         roll;                        /*Orientation around center*/
     double         pitch;
     double         yaw;
@@ -128,11 +128,11 @@ struct DS3View {
     int            track_cy;
     int            track_mx;  /*Pixel coordinates of current mouse position*/
     int            track_my;
-    Vect3d         track_p0;                      /*Ray from mouse position*/
-    Vect3d         track_p1;                          /*(world coordinates)*/
-    Vect3d         track_pt; /*Point mouse is currently (world-coordinates)*/
+    Eigen::Vector3f track_p0;                     /*Ray from mouse position*/
+    Eigen::Vector3f track_p1;                         /*(world coordinates)*/
+    Eigen::Vector3f track_pt; /*Point mouse is currently (world-coordinates)*/
     double         track_t; /*Distance along projection ray to intersection*/
-    Vect3d         track_an;/*Point mouse clicked (unit vector from center)*/
+    Eigen::Vector3f track_an; /*Point mouse clicked (unit vector from center)*/
     double         track_rd;     /*Distance from center where mouse clicked*/
     int            track_rt;    /*Which half of the sphere is being tracked*/
     double         track_r;                  /*Orientation at time of click*/
@@ -171,7 +171,7 @@ struct DS3View {
 void     ds3ViewExpandRot(double _y,double _p,double _r,double _rot[3][3]);
 
 void     ds3ViewGetUnprojRay(DS3View *_this,int _x,int _y,
-                             Vect3d _p0,Vect3d _p1);
+                             Eigen::Vector3f _p0, Eigen::Vector3f _p1);
 void     ds3ViewSetDataChangedFunc(DS3View *_this,GLWActionFunc _func);
 void     ds3ViewSetDataChangedCtx(DS3View *_this,void *_ctx);
 void     ds3ViewSetSliceChangedFunc(DS3View *_this,GLWActionFunc _func);

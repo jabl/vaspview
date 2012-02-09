@@ -51,8 +51,8 @@ static void ds3ViewPointsPeerDisplay(DS3ViewComp *_this,
                         if ((ds3ViewGetPointVisible(view,(long)i)) ||
                                 ((size_t)view->track_sp == i && glwCompIsFocused(&_this->super))) {
                             GLWcolor c;
-                            Vect3d   p;
-                            Vect3d   o;
+                            Eigen::Vector3f   p;
+                            Eigen::Vector3f   o;
                             double   r;
                             int      detail;
                             for (j=0; j<3; j++) {              /*Make sure point falls within our box*/
@@ -87,14 +87,14 @@ static void ds3ViewPointsPeerDisplay(DS3ViewComp *_this,
                             /*We must multiply the basis out oursevles, because we only want to
                               scale the center of the sphere along the basis vectors, not each
                               point on the sphere (which would make ovals)*/
-                            vectSet3d(o,view->ds3->points[i].pos[X]+x[X],
-                                      view->ds3->points[i].pos[Y]+x[Y],
-                                      view->ds3->points[i].pos[Z]+x[Z]);
+                            o << view->ds3->points[i].pos[X]+x[X],
+				view->ds3->points[i].pos[Y]+x[Y],
+				view->ds3->points[i].pos[Z]+x[Z];
                             for (j=0; j<3; j++) {
-				Eigen::Vector3d tmp = view->ds3->basis.col(j).cast<double>();
-				p[j]=vectDot3d(tmp.data(), o);
+				Eigen::Vector3f tmp = view->ds3->basis.col(j);
+				p[j] = tmp.dot(o);
 			    }
-                            glTranslated(p[X],p[Y],p[Z]);
+                            glTranslatef(p[X],p[Y],p[Z]);
                             gluSphere(q,r,detail,detail);
                             glPopMatrix();
                             if (view->track_mp==(long)i&&glwCompIsCapturing(&_this->super)) {
@@ -213,11 +213,11 @@ static int ds3ViewPointsPeerSpecial(DS3ViewComp *_this,
                 long l;
                 l=ds3ViewGetSelectedPoint(view);
                 if (l>=0) {
-                    Vect3d p;
+                    Eigen::Vector3f p;
                     int    i;
                     for (i=0; i<3; i++) {
-			Eigen::Vector3d tmp = view->ds3->basis.col(i).cast<double>(); 
-                        p[i]=vectDot3d(view->ds3->points[l].pos, tmp.data());
+			Eigen::Vector3f tmp = view->ds3->basis.col(i); 
+                        p[i] = view->ds3->points[l].pos.dot(tmp);
                     }
                     ds3ViewSetCenter(view,p[X],p[Y],p[Z]);
                     ds3ViewSetZoom(view,view->zoom*0.5);

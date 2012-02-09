@@ -168,7 +168,7 @@ static int ds3SliceTexture3D(DS3Slice *_this,DS3View *_view)
 typedef struct DS3SliceVertex DS3SliceVertex;
 
 struct DS3SliceVertex {
-    Vect3d p;
+    Eigen::Vector3f p;
     double tx;
     double ty;
 };
@@ -195,9 +195,9 @@ static int ds3ViewSliceClipPlane(DS3SliceVertex _slice[16],int _nverts,
         d1=vectDot3d(_slice[j].p,_plane)+_plane[W];
         if (d0>=0)*(slice+ret++)=*(_slice+i);
         if (((d0 > 0) && (d1 < 0))||(d0 < 0 && (d1 > 0))) {
-            Vect3d dp;
+            Eigen::Vector3f dp;
             double t;
-            vectSub3d(dp,_slice[j].p,_slice[i].p);
+            dp = _slice[j].p - _slice[i].p;
             t=(-_plane[W]-vectDot3d(_slice[i].p,_plane))/vectDot3d(dp,_plane);
             vectMul3d(slice[ret].p,dp,t);
             vectAdd3d(slice[ret].p,slice[ret].p,_slice[i].p);
@@ -222,8 +222,7 @@ static int ds3ViewSliceClip(DS3View *_this,DS3SliceVertex _slice[16])
     int    i;
     int    j;
     for (i=0; i<4; i++) {
-        Vect3d p;
-        vectSet3d(p,-3+6*(i>>1),-3+6*((i&1)^(i>>1)),0);
+        Eigen::Vector3f p(-3+6*(i>>1), -3+6*((i&1)^(i>>1)), 0);
         for (j=0; j<3; j++) {
             _slice[i].p[j]=vectDot3d(_this->strans[j],p)+_this->strans[j][W];
         }
@@ -288,24 +287,26 @@ static void ds3ViewSlicePeerDisplay(DS3ViewComp *_this,
   track: The unit vector returned
   p0:    The origin of the unprojected ray
   p1:    The endpoint of the unprojected ray*/
-static void ds3ViewGetSliceTrackCoords(DS3View *_this,Vect3d _track,
-                                       const Vect3d _p0,const Vect3d _p1)
+static void ds3ViewGetSliceTrackCoords(DS3View *_this, 
+				       Eigen::Vector3f& _track,
+                                       const Eigen::Vector3f _p0,
+				       const Eigen::Vector3f _p1)
 {
-    Vect3d p0;
-    Vect3d p1;
-    Vect3d dp;
+    Eigen::Vector3f p0;
+    Eigen::Vector3f p1;
+    Eigen::Vector3f dp;
     double a,b,c,d,r;
     r=_this->track_rd;
     r=r>1E-16?1/r:1;
-    Eigen::Vector3d center = _this->ds3->center.cast<double>();
-    vectSub3d(p0,_p0, center.data());
-    vectMul3d(p0,p0,r);
-    vectSub3d(p1,_p1, center.data());
-    vectMul3d(p1,p1,r);
-    vectSub3d(dp,p1,p0);
-    a=vectMag2_3d(dp);
-    b=vectDot3d(dp,p0);
-    c=vectMag2_3d(p0)-1;
+    Eigen::Vector3f center = _this->ds3->center;
+    p0 = _p0 - center;
+    p0 *= r;
+    p1 = _p1 - center;
+    p1 *= r;
+    dp = p1 - p0;
+    a = dp.squaredNorm();
+    b = dp.dot(p0);
+    c = p0.squaredNorm() - 1;
     d=b*b-a*c;
     if (d<0) {
         switch (_this->proj) {
@@ -317,12 +318,12 @@ static void ds3ViewGetSliceTrackCoords(DS3View *_this,Vect3d _track,
             c*=c;
             d=b*b-4*a*c;
             if (d<0||fabs(c)<1E-100) {
-                vectSet3d(_track,0,0,1);
+                _track << 0,0,1;
                 return;
             }
             d=(-b+sqrt(d))/c;
-            vectMul3d(p0,p0,d);
-            b=vectDot3d(dp,p0);
+	    p0 *= d;
+	    b = dp.dot(p0);
             d=0;
         }
         break;
@@ -342,23 +343,23 @@ static void ds3ViewGetSliceTrackCoords(DS3View *_this,Vect3d _track,
             }
             d=b*b-a*c;
             if (d<0||fabs(a)<1E-100) {
-                vectSet3d(_track,0,0,1);
+                _track << 0, 0, 1;
                 return;
             }
             d=(-b-sqrt(d))/a;
-            vectMul3d(p1,p1,d);
-            vectSub3d(dp,p1,p0);
-            a=vectMag2_3d(dp);
-            b=vectDot3d(dp,p0);
+	    p1 *= d;
+	    dp = p1 - p0;
+	    a = dp.squaredNorm();
+	    b = dp.dot(p0);
             d=0;
         }
         }
     }
-    if (fabs(a)<1E-100)vectSet3d(_track,0,0,1);
+    if (fabs(a)<1E-100) 
+	_track << 0, 0, 1;
     else {
         d=(-b+_this->track_rt*sqrt(d))/a;
-        vectMul3d(_track,dp,d);
-        vectAdd3d(_track,_track,p0);
+        _track = dp * d + p0;
     }
 }
 
@@ -490,21 +491,23 @@ static int ds3ViewSlicePeerMouse(DS3ViewComp *_this,const GLWCallbacks *_cb,
     ret=glwCompSuperMouse(&_this->super,_cb,_b,_s,_x,_y);
     if (ret>=0&&_b==GLUT_LEFT_BUTTON&&_s) {
         DS3View *view;
-        Vect3d   p;
-        Vect3d   q;
+        Eigen::Vector3f   p;
+        Eigen::Vector3f   q;
         view=_this->ds3view;
-	Eigen::Vector3d cent = view->ds3->center.cast<double>();
-        vectSub3d(view->track_an,view->track_pt, cent.data());
-        view->track_rd=vectMag3d(view->track_an);
-        if (view->track_rd<1E-16)vectSet3d(view->track_an,0,0,1);
-        else vectMul3d(view->track_an,view->track_an,1/view->track_rd);
+	Eigen::Vector3f cent = view->ds3->center;
+        view->track_an = view->track_pt - cent;
+        view->track_rd = view->track_an.norm();
+        if (view->track_rd<1E-16)
+	    view->track_an << 0, 0, 1;
+        else view->track_an *= 1/view->track_rd;
         view->track_rt=-1;
         ds3ViewGetSliceTrackCoords(view,p,view->track_p0,view->track_p1);
-        vectSub3d(p,p,view->track_an);
+	p -= view->track_an;
         view->track_rt=1;
         ds3ViewGetSliceTrackCoords(view,q,view->track_p0,view->track_p1);
-        vectSub3d(q,q,view->track_an);
-        if (vectMag2_3d(p)<vectMag2_3d(q))view->track_rt=-1;
+        q -= view->track_an;
+        if (p.squaredNorm() < q.squaredNorm())
+	    view->track_rt = -1;
         view->track_p=view->slice_t;
         view->track_y=view->slice_p;
         return 1;
@@ -520,29 +523,30 @@ static int ds3ViewSlicePeerMotion(DS3ViewComp *_this,const GLWCallbacks *_cb,
     ret=glwCompSuperMotion(&_this->super,_cb,_x,_y);
     if (ret>=0&&(_this->super.mouse_b&1<<GLUT_LEFT_BUTTON)) {
         DS3View *view;
-        Vect3d   p;
-        Vect3d   axis;
-        double   qs;
+        Eigen::Vector3f   p;
+        Eigen::Vector3f   axis;
+        float qs;
         view=_this->ds3view;
         ds3ViewGetUnprojRay(view,_x,_y,view->track_p0,view->track_p1);
         ds3ViewGetSliceTrackCoords(view,p,view->track_p0,view->track_p1);
-        vectCross3d(axis,view->track_an,p);
-        qs=vectMag3d(axis);
+        axis = view->track_an.cross(p);
+        qs = axis.norm();
         if (qs<1E-8) {
             ds3ViewSetSlice(view,view->track_p,view->track_y,view->slice_d);
         } else {
             double qc;
             double q[3][3];
             int    i,j;
-            vectMul3d(axis,axis,1/qs);
+            axis *= 1/qs;
             if (qs>1)qs=1;
             qc=sqrt(1-qs*qs);
-            if (vectDot3d(view->track_an,p)<0)qc=-qc;
+            if (view->track_an.dot(p) < 0) 
+		qc = -qc;
             for (i=0; i<3; i++) {
                 for (j=0; j<3; j++)q[i][j]=axis[i]*axis[j]*(1-qc);
                 q[i][i]+=qc;
             }
-            vectMul3d(axis,axis,qs);
+            axis *= qs;
             q[1][2]-=axis[0];
             q[2][1]+=axis[0];
             q[2][0]-=axis[1];
