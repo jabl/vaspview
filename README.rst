@@ -84,8 +84,8 @@ DONE
 
 - Use CMAKE for building.
 
-- Enable support for compressed 3D textures. Tried to do this, but
-  image quality was bad so it had to be removed.
+- Enabled support for compressed 3D textures, but image quality was
+  bad so it had to be removed.
 
 - Removed old EXT_paletted_textures code path, as no current hardware
   supports paletted textures:
