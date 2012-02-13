@@ -20,5 +20,5 @@ set(GLLIBS ${GLUT_LIBRARY} ${GLEW_LIBRARY} ${OPENGL_LIBRARY} ${X11_LIBRARIES})
 set( CMAKE_VERBOSE_MAKEFILE ON )
 
 if (CMAKE_COMPILER_IS_GNUCXX) 
-   add_definitions (-g -Wall -Wno-long-long -pedantic)
+   add_definitions (-g -Wall -Wno-long-long -pedantic -fno-math-errno)
 endif ()

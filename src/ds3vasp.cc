@@ -129,7 +129,6 @@ DS3VaspReader::DS3VaspReader(const char* file_name, const char* mode)
 err:
     delete ds3;
     ds3 = NULL;
-    if (!errno)errno=EINVAL;
     throw "Error initializing vasp reader\n";
 }
 

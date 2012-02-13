@@ -231,7 +231,6 @@ static void ds3ViewerLoadBonds(DS3Viewer *_this)
             while (!feof(file.f)) {
                 char *p;
                 if (!file.fgets(line)) {
-                    if (!ferror(file.f))errno=ENOMEM;
                     break;
                 }
                 trimlr(line);
@@ -885,7 +884,6 @@ static void ds3ViewerAsyncRead(DS3Viewer *_this,GLWComponent *_c)
         glwCompDelIdler(&_this->frame.super, _this->read_id);
         _this->read_id=0;
         if (!ret) {
-            if (!errno)errno=ENOMEM;
             glwLabelSetLabel(&_this->lb_status, "Error reading \"");
             glwLabelAddLabel(&_this->lb_status, _this->read_name.c_str());
             glwLabelAddLabel(&_this->lb_status, "\": ");
@@ -2425,12 +2423,10 @@ void ds3ViewerOpenFile(DS3Viewer *_this,const char *_file)
             if (!_this->read_id) {
                 _this->reader->cancel();
                 ret=0;
-                errno=ENOMEM;
             }
         }
         if (ret<=0) {
             if (!ret) {
-                if (!errno)errno=ENOMEM;
                 glwLabelSetLabel(&_this->lb_status, "Error reading \"");
                 glwLabelAddLabel(&_this->lb_status, _file);
                 glwLabelAddLabel(&_this->lb_status, "\": ");
