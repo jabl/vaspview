@@ -1,6 +1,4 @@
----
-title: Vaspview 2
----
+# Vaspview 2
 
 This is an experiment to modernize the old
 [vaspview](http://vaspview.sf.net) application for viewing VASP charge
@@ -19,6 +17,11 @@ Vaspview 2 requires the following tools and libraries for building:
 -   GLEW.
 -   GLUT.
 -   OpenGL libraries (GL and GLU).
+
+On Ubuntu 20.04 you require
+
+build-essential cmake libglew-dev freeglut3-dev libxi-dev libgl1-mesa-dev
+libglu1-mesa-dev
 
 On Ubuntu 10.04 you can install everything required by installing the
 packages
